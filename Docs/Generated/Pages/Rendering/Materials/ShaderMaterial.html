@@ -10,7 +10,7 @@
 				
 			<div class="class-wrapper" id="class ShaderMaterial">
 				<div class="class-header">
-					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L18" target="_blank" class="class-name source-link">ShaderMaterial</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Materials/Material.html#class Material">Material</a></span>
+					<span class="keyword">class</span> <a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L19" target="_blank" class="class-name source-link">ShaderMaterial</a> <span class="keyword">extends</span> <span class="class-name"><a href="../../Rendering/Materials/Material.html#class Material">Material</a></span>
 				</div>
 				<div class="class desc">
 					Represents a custom shader-based material with a user-specified vertex and fragment shader programs.
@@ -18,17 +18,56 @@
 				
 				
 				
+					<div class="header">Properties</div>
+					<div class="class-properties">
+		<div class="prop-wrapper" id="ShaderMaterial.uniforms">
+			<div class="prop-header member">
+				<span class="prop-name">uniforms</span>
+				<span class="type">Object</span>
+			</div>
+			<div class="prop desc">A mapping from uniform names to uniform values, with the type correspondence specified in the <a href="../../Rendering/GLSL API/Basics.html#GLSL API">GLSL API</a>. This can be used to customize the behavior of the material</div>
+			<span class="prop-attrs"></span>
+		</div>
+	</div>
+				
 				
 				
 					<div class="header">Methods</div>
 					<div class="class-methods">
 		<div class="function-wrapper" id="ShaderMaterial.prototype.constructor()">
 			<div class="function-header member">
-				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L24" target="_blank" class="function-name source-link">constructor</a>()
+				<a href="https://www.github.com/Elkwizard/Hengine/blob/master/Package/Engine/Render\Material.js?#L25" target="_blank" class="function-name source-link">constructor</a>(<span class="param">fragmentShader?</span>, <span class="param">vertexShader?</span>)
 			</div>
 			<div class="function desc">
 				Creates a new custom material.
 			</div>
+			
+				<div class="function-signature">
+					
+			<div class="header">Parameters</div>
+			
+						<div class="param-wrapper" id="ShaderMaterial.prototype.constructor():fragmentShader?">
+							<div class="param-name">
+								<span class="param">fragmentShader</span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
+							</div>
+							<div class="param desc">
+								The source code for the fragment shader. The default produces an opaque white color under all circumstances
+							</div>
+						</div>
+					
+						<div class="param-wrapper" id="ShaderMaterial.prototype.constructor():vertexShader?">
+							<div class="param-name">
+								<span class="param">vertexShader</span>
+								<span class="type"><a href="../../Built-Ins/String.html#class String">String</a></span>
+							</div>
+							<div class="param desc">
+								The source code for the vertex shader. The default projects the vertex position and passes no additional information to the fragment shader
+							</div>
+						</div>
+					
+		
+				</div>
 			
 		</div>
 	</div>

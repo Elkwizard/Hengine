@@ -136,10 +136,9 @@ class Camera3D extends Matrix4 {
 		
 		const forward = transform.localDirectionToGlobal(Vector3.forward);
 		const right = transform.localDirectionToGlobal(Vector3.right);
-		this.direction = forward;
 		this.position = transform.position;
-		this.rotation = 0;
-		const roll = this.right.angleTo(right);
+		this.direction = forward;
+		const roll = this.getRight(forward).angleTo(right);
 		this.rotation = -roll.mag * Math.sign(roll.dot(forward));
 
 		this.shouldUpdate = true;
@@ -166,12 +165,15 @@ class Camera3D extends Matrix4 {
 		this.screen = screens.some(screen => screen === null) ? null : Frustum.fuse(screens);
 		return this.screen;
 	}
+	getRight(forward) {
+		const cross = forward.cross(Vector3.up);
+		return cross.sqrMag ? cross.normalize() : Vector3.right;
+	}
 	updateDirection() {
 		if (!this.shouldUpdate) return;
 
 		const { direction } = this;
-		const cross = direction.cross(Vector3.up);
-		const right = cross.sqrMag ? cross.normalize() : Vector3.right;
+		const right = this.getRight(direction);
 		this.right = right.rotate(direction.times(-this.rotation));
 		this.updateMatrix();
 	}

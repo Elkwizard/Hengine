@@ -8,69 +8,14 @@ type CanvasArtist = Artist3D;
 type MatrixN = Matrix3;
 type TransformMatrixN = Matrix4;
 type VectorN = Vector3;
-type CameraN = Camera3D;
 type ArtistN = Artist3D;
+type CameraN = Camera3D;
 type TransformN = Transform3D;
 type BoxN = Prism;
 type WorldObjectBallN = Sphere;
 type WorldObjectPolytopeN = Polyhedron;
 type InertiaN = Matrix3;
 type AngleN = Vector3;
-
-/**
- * Represents the way a canvas scales with changes to the window size.
- */
-declare enum ScalingMode {
-	/**
-	 * The canvas changes size to fill the entire window
-	 */
-	STRETCH,
-	/**
-	 * The canvas will be the largest size that can fit in the window while still retaining the same aspect ratio
-	 */
-	PRESERVE_ASPECT_RATIO,
-	/**
-	 * Same as `ScalingMode.PRESERVE_ASPECT_RATIO`, except the scale factor on the size will always be in the form (n) or (1/n), where n is an integer
-	 */
-	INTEGER_MULTIPLE
-}
-
-/**
- * Represents the canvas on which the Hengine is rendered.
- * The pixel ratio of the canvas is equal to `window.devicePixelRatio`.
- * The `.width` and `.height` properties of this class are also available on the global object.
- * A vector with components equal to half the dimensions of the canvas is also available on the global object in the `.middle` property.
- * This class is available via the `.canvas` property of both the global object and Hengine.
- * ```js
- * canvas.scalingMode = ScalingMode.STRETCH;
- * 
- * intervals.continuous(() => { // render a circle to the middle of the screen
- * 	renderer.draw(new Color("blue")).circle(middle, 10);
- * });
- * ```
- */
-declare class CanvasImage extends ImageType {
-	/**
-	 * A 2D or 3D renderer which can draw to the screen. WorldObjects will be drawn to this surface's World-Space
-	 */
-	renderer: CanvasArtist;
-	/**
-	 * A 2D renderer which targets a Screen-Space overlay on top of the canvas. Content on this will not be considered when this object is used as an ImageType
-	 */
-	ui: CanvasArtist2D;
-	/**
-	 * The cursor icon. This can be either an image or a CSS cursor name
-	 */
-	cursor: ImageType | string;
-	/**
-	 * The way in which the canvas scales when the window is resized. Starts as `ScalingMode.PRESERVE_ASPECT_RATIO`
-	 */
-	scalingMode: ScalingMode;
-	/**
-	 * The function that will be called to clear the screen each frame. Starts as `() => renderer.fill(new Color(255, 255, 255))`
-	 */
-	clearScreen: () => void;
-}
 
 /**
  * Represents a non-leaf node in the element tree, and can contain SceneObjects or additional ElementContainers.
@@ -201,6 +146,61 @@ declare class ElementContainer extends SceneElement {
 	 * @param script - The class of the ElementScript to check for
 	 */
 	getElementsWithScript(script: Class<ElementScript>): SceneObject[];
+}
+
+/**
+ * Represents the way a canvas scales with changes to the window size.
+ */
+declare enum ScalingMode {
+	/**
+	 * The canvas changes size to fill the entire window
+	 */
+	STRETCH,
+	/**
+	 * The canvas will be the largest size that can fit in the window while still retaining the same aspect ratio
+	 */
+	PRESERVE_ASPECT_RATIO,
+	/**
+	 * Same as `ScalingMode.PRESERVE_ASPECT_RATIO`, except the scale factor on the size will always be in the form (n) or (1/n), where n is an integer
+	 */
+	INTEGER_MULTIPLE
+}
+
+/**
+ * Represents the canvas on which the Hengine is rendered.
+ * The pixel ratio of the canvas is equal to `window.devicePixelRatio`.
+ * The `.width` and `.height` properties of this class are also available on the global object.
+ * A vector with components equal to half the dimensions of the canvas is also available on the global object in the `.middle` property.
+ * This class is available via the `.canvas` property of both the global object and Hengine.
+ * ```js
+ * canvas.scalingMode = ScalingMode.STRETCH;
+ * 
+ * intervals.continuous(() => { // render a circle to the middle of the screen
+ * 	renderer.draw(new Color("blue")).circle(middle, 10);
+ * });
+ * ```
+ */
+declare class CanvasImage extends ImageType {
+	/**
+	 * A 2D or 3D renderer which can draw to the screen. WorldObjects will be drawn to this surface's World-Space
+	 */
+	renderer: CanvasArtist;
+	/**
+	 * A 2D renderer which targets a Screen-Space overlay on top of the canvas. Content on this will not be considered when this object is used as an ImageType
+	 */
+	ui: CanvasArtist2D;
+	/**
+	 * The cursor icon. This can be either an image or a CSS cursor name
+	 */
+	cursor: ImageType | string;
+	/**
+	 * The way in which the canvas scales when the window is resized. Starts as `ScalingMode.PRESERVE_ASPECT_RATIO`
+	 */
+	scalingMode: ScalingMode;
+	/**
+	 * The function that will be called to clear the screen each frame. Starts as `() => renderer.fill(new Color(255, 255, 255))`
+	 */
+	clearScreen: () => void;
 }
 
 /**
@@ -955,236 +955,38 @@ declare class Scene {
 }
 
 /**
- * Represents the way in which dimensions are prioritized in `Geometry.gridToRects()`.
+ * Represents a quartic spline with four control points.
  */
-declare enum RectPriority {
+declare class Spline<Vector = any> {
 	/**
-	 * The rectangles should be approximately square, with a difference in dimensions of at most one tile
+	 * The first control point
 	 */
-	SQUARE,
+	a: Vector;
 	/**
-	 * The rectangles should become as wide as possible, and then grow vertically
+	 * The second control point
 	 */
-	HORIZONTAL,
+	b: Vector;
 	/**
-	 * The rectangles should become as tall as possible, and then grow horizontally
+	 * The third control point
 	 */
-	VERTICAL
-}
-
-/**
- * Provides a collection of 2D geometric algorithms that operate on shapes and vectors.
- * All methods of this class are static and do not mutate their arguments.
- */
-declare class Geometry {
+	c: Vector;
 	/**
-	 * Applies a single smoothing step to a connected sequence of line segments.
-	 * @param path - The path to be smoothed
+	 * The fourth control point
 	 */
-	static smoothConnector(path: Vector2[]): Vector2[];
+	d: Vector;
 	/**
-	 * Applies a single smoothing step to a polygon.
-	 * @param shape - The shape to be smoothed
+	 * Creates a new Spline based on a set of control points.
+	 * @param a - The first control point
+	 * @param b - The second control point
+	 * @param c - The third control point
+	 * @param d - The fourth control point
 	 */
-	static smoothPolygon(shape: Polygon): Polygon;
+	constructor(a: Vector, b: Vector, c: Vector, d: Vector);
 	/**
-	 * Simplifies a polygon by removing a specified proportion of the vertices.
-	 * @param polygon - The polygon to simplify
-	 * @param percent - The percentage of vertices to remove
+	 * Evaluates the point on the spline at a specified parameter value t.
+	 * @param t - The parameter value
 	 */
-	static simplify(polygon: Polygon, percent: number): Polygon;
-	/**
-	 * Inflates a polygon along its normals by a specified distance.
-	 * @param polygon - The polygon to inflate
-	 * @param distance - The distance to extrude by
-	 */
-	static inflate(polygon: Polygon, distance: number): Polygon;
-	/**
-	 * Simplifies a polygon by combining adjacent edges that are nearly colinear.
-	 * @param polygon - The polygon to simplify
-	 * @param dtheta - The maximum angular difference in direction between two consecutive edges where they will be combined
-	 */
-	static joinEdges(polygon: Polygon, dtheta: number): Polygon;
-	/**
-	 * Creates a triangular decomposition of the provided convex polygon.
-	 * The triangles are returned as arrays of three vectors.
-	 * @param shape - The convex polygon to decompose
-	 */
-	static triangulate(shape: Polygon): Vector2[][];
-	/**
-	 * Returns a new list of the unique vectors among a given list, with vectors within a certain tolerance being considered equal.
-	 * @param vectors - A list of a single type of vector
-	 */
-	static unique(vectors: Vector[]): Vector[];
-	/**
-	 * Returns the smallest convex Polygon which contains a given set of points.
-	 * The behavior is undefined if the points are all colinear.
-	 * @param points - The points to create a convex hull for. There must be at least 3
-	 */
-	static convexHull(points: Vector2[]): Polygon;
-	/**
-	 * Checks whether a list of points are in clockwise order.
-	 * @param vertices - The points to check
-	 */
-	static isListClockwise(vertices: Vector2[]): boolean;
-	/**
-	 * Combines a set of grid-aligned squares into the minimum number of rectangles occupying the same space.
-	 * These are then scaled by a certain factor about the origin of the grid.
-	 * @param srcGrid - A grid of booleans representing the squares. The first index of the boolean is the x coordinate, the second index is the y, and the value of the boolean determines whether or not a square exists in that space
-	 * @param cellSize - The factor to scale the result by
-	 * @param priority - How the dimensions of the rectangles should be prioritized in the greedy algorithm. Default is `RectPriority.SQUARE`
-	 */
-	static gridToRects(srcGrid: boolean[][], cellSize: number, priority?: RectPriority): Rect[];
-	/**
-	 * Combines a set of grid-aligned squares into the minimum number of polygons occupying the same space.
-	 * These are then scaled by a certain factor about the origin of the grid. Holes within groups of squares will be removed.
-	 * @param srcGrid - A grid of booleans representing the squares. The first index of the boolean is the x coordinate, the second index is the y, and the value of the boolean determines whether or not a square exists in that space
-	 * @param cellSize - The factor to scale the result by
-	 */
-	static gridToExactPolygons(srcGrid: boolean[][], cellSize: number): Polygon[];
-	/**
-	 * Same as `.gridToExactPolygons()`, except that the returned Polygons have their concave vertices removed. Note that this filtering step only happens once, so the result may have still have concave vertices.
-	 * @param srcGrid - A boolean grid representing the squares
-	 * @param cellSize - The factor to scale the result by
-	 */
-	static gridToPolygons(srcGrid: boolean[][], cellSize: number): Polygon[];
-	/**
-	 * Finds the closest point from a list of points to a given point.
-	 * @param target - The point distances are checked from
-	 * @param points - The points to compare
-	 */
-	static closest(target: Vector, points: Vector[]): Vector;
-	/**
-	 * Finds the farthest point from a list of points to a given point.
-	 * @param target - The point distances are checked from
-	 * @param points - The points to compare
-	 */
-	static farthest(target: Vector, points: Vector[]): Vector;
-	/**
-	 * Normalizes an angle to be on the interval [0, 2π).
-	 * @param theta - The angle to normalize
-	 */
-	static normalizeAngle(theta: number): number;
-	/**
-	 * Finds the shortest angular displacement between two angles.
-	 * @param a - The first angle
-	 * @param b - The second angle
-	 */
-	static signedAngularDist(a: number, b: number): number;
-	/**
-	 * Returns the closest intersection of a ray with a collection of shapes.
-	 * The return value is either null (if the ray-cast misses) or an object with two properties:
-	 * a `.hitPoint` property containing the location of the ray intersection, and a `.hitShape` property containing the shape that the ray intersected.
-	 * The dimensionality of the ray specification and the shapes must match, but this function will work for both Vector2/Shape2D and Vector3/Shape3D configurations.
-	 * @param rayOrigin - The starting point of the ray
-	 * @param rayDirection - The direction of the ray
-	 * @param shapes - The Shapes to ray-cast against
-	 */
-	static rayCast(rayOrigin: Vector, rayDirection: Vector, shapes: Shape[]): { hitShape: Shape, hitPoint: Vector } | null;
-	/**
-	 * Decomposes any polygon into a collection of convex polygons that occupy the same space.
-	 * @param polygon - The polygon to subdivide
-	 */
-	static subdividePolygon(polygon: Polygon): Polygon[];
-	/**
-	 * Returns the point of intersection between a line segment and a ray, or null if they don't intersect
-	 * @param rayOrigin - The origin of the ray
-	 * @param rayDirection - The direction of the ray
-	 * @param line - The line
-	 */
-	static intersectRayLine(rayOrigin: Vector2, rayDirection: Vector2, line: Line): Vector2 | null;
-	/**
-	 * Returns the point of intersection between two line segments, or null if they don't intersect
-	 * @param a - The first line
-	 * @param b - The second line
-	 */
-	static intersectLineLine(a: Line, b: Line): Vector2 | null;
-	/**
-	 * Returns the region of intersection between two convex polygons, or null if they don't intersect.
-	 * @param a - The first polygon
-	 * @param b - The second polygon
-	 */
-	static intersectPolygonPolygon(a: Polygon, b: Polygon): Polygon | null;
-}
-
-/**
- * Represents a GLSL operation that can be run in parallel on the GPU.
- * The entry point for the GLSL operation is the `compute` function, which returns any struct type and takes no arguments.
- * ```glsl
- * SomeStruct compute() { ... }
- * ```
- * The returned value is considered the output of the operation, and some global variables are provided as the input:
- * ```glsl
- * uniform int problems; // the total number of operations in the current batch
- * int problemIndex; // the index of the current operation in the batch
- * ```
- * Commonly, one or more dynamic array uniforms can be used to store complex input data, as shown in the following example.
- * ```js
- * // computation to move circles toward the middle of the screen
- * const computation = new GPUComputation(`
- * 	struct Circle {
- * 		vec2 position;
- * 		float radius;
- * 	};
- * 
- * 	uniform Circle[] circles;
- * 	uniform vec2 middle;
- * 
- * 	Circle compute() {
- * 		Circle circle = circles[problemIndex];
- * 		circle.position = mix(circle.position, middle, 0.01);
- * 		return circle;
- * 	}
- * `);
- * 
- * const circles = Array.dim(1000).map(() => {
- * 	return { position: Random.inShape(scene.camera.screen), radius: 10 };
- * });
- * 
- * // write, compute, and readback circle data
- * computation.setUniforms({ circles, middle });
- * computation.compute(circles.length);
- * computation.output.read(circles);
- * ```
- */
-declare class GPUComputation implements GPUInterface {
-	/**
-	 * An array storing the output of the most recent batch of operations
-	 */
-	output: GPUArray;
-	/**
-	 * Runs a batch of operations.
-	 * @param problems - The number of operations to run
-	 */
-	compute(problems: number): void;
-	/**
-	 * The source code of the program
-	 */
-	glsl: string;
-	/**
-	 * Sets the value of a uniform in the program.
-	 * @param name - The name of the uniform
-	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
-	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
-	 */
-	setUniform(name: string, value: any, force?: boolean): void;
-	/**
-	 * Sets the value of many uniforms at once.
-	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
-	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
-	 */
-	setUniforms(uniforms: object, force?: boolean): void;
-	/**
-	 * Retrieves the current value of a given uniform.
-	 * For the return type of this function, see the GLSL API.
-	 * @param name - The name of the uniform
-	 */
-	getUniform(name: string): any;
-	/**
-	 * Checks whether a given uniform exists.
-	 * @param name - The name of the uniform to check
-	 */
-	hasUniform(name: string): boolean;
+	evaluate(t: number): Vector;
 }
 
 /**
@@ -1352,6 +1154,329 @@ declare class Animatable {
 	 * Returns the current value of the animatable and doesn't advance the transition
 	 */
 	get current(): MathObject;
+}
+
+/**
+ * Represents a physical constraint between one or more SceneObjects.
+ * This is an abstract superclass and should not be constructed.
+ */
+declare class Constraint {
+	/**
+	 * Returns the World-Space location of the constrained points.
+	 */
+	get ends(): VectorN[];
+	/**
+	 * Removes the constraint from the simulation.
+	 */
+	remove(): void;
+}
+
+/**
+ * Represents a physical constraint between a SceneObject and a fixed point.
+ */
+declare class Constraint1 extends Constraint {
+	/**
+	 * The local-space offset of the constrained point on the object
+	 */
+	offset: VectorN;
+	/**
+	 * The fixed point in the constraint
+	 */
+	point: VectorN;
+	/**
+	 * The desired distance between the two constrained points. This is only defined for length constraints
+	 */
+	length: number;
+	/**
+	 * Returns the object in the constraint.
+	 */
+	get body(): SceneObject;
+}
+
+/**
+ * Represents a physical constraint between two SceneObjects.
+ */
+declare class Constraint2 extends Constraint {
+	/**
+	 * The local-space offset of the constrained point on the first object
+	 */
+	offsetA: VectorN;
+	/**
+	 * The local-space offset of the constrained point on the second object
+	 */
+	offsetB: VectorN;
+	/**
+	 * Whether or not the first object should be considered static by the constraint
+	 */
+	staticA: boolean;
+	/**
+	 * Whether or not the second object should be considered static by the constraint
+	 */
+	staticB: boolean;
+	/**
+	 * The desired distance between the two constrained points. This is only defined for length constraints
+	 */
+	length: number;
+	/**
+	 * Returns the first object in the constraint.
+	 */
+	get bodyA(): SceneObject;
+	/**
+	 * Returns the second object in the constraint.
+	 */
+	get bodyB(): SceneObject;
+}
+
+/**
+ * Represents a collision with another SceneObject.
+ */
+declare class CollisionData {
+	/**
+	 * The object that is being collided with
+	 */
+	element: SceneObject;
+	/**
+	 * A unit vector along the collision normal pointing toward the other object
+	 */
+	direction: VectorN;
+	/**
+	 * A list of World-Space contact points between the two objects
+	 */
+	contacts: VectorN[];
+	/**
+	 * Indicates whether the object being collided with requested that the collision be a trigger collision. A trigger collision is not resolved
+	 */
+	isTrigger: boolean;
+}
+
+/**
+ * Represents a collection of collisions that a SceneObject is undergoing.
+ */
+declare class CollisionMonitor {
+	/**
+	 * Returns all collisions. If there are no collisions, this returns null.
+	 */
+	get general(): CollisionData[] | null;
+	/**
+	 * Returns all collisions on the left side of the object. If there are no collisions, this returns null.
+	 */
+	get left(): CollisionData[] | null;
+	/**
+	 * Returns all collisions on the right side of the object. If there are no collisions, this returns null.
+	 */
+	get right(): CollisionData[] | null;
+	/**
+	 * Returns all collisions with the top edge of the object. If there are no collisions, this returns null.
+	 */
+	get top(): CollisionData[] | null;
+	/**
+	 * Returns all collisions with the bottom edge of the object. If there are no collisions, this returns null.
+	 */
+	get bottom(): CollisionData[] | null;
+	/**
+	 * Returns all collisions on the front (+Z) side of the object.
+	 * If there are no collisions, this returns null.
+	 * This accessor only works in 3D Mode.
+	 */
+	get front(): CollisionData[] | null;
+	/**
+	 * Returns all collisions on the back (-Z) side of the object.
+	 * If there are no collisions, this returns null.
+	 * This accessor only works in 3D Mode.
+	 */
+	get back(): CollisionData[] | null;
+	/**
+	 * Checks whether there is a collision with a specific object.
+	 * @param object - The object to check
+	 */
+	has(object: SceneObject): boolean;
+	/**
+	 * Returns all collisions where the collision is in a specific direction.
+	 * If there are no such collisions, this returns null.
+	 * @param direction - A unit vector representing the direction to check. This will be interpreted as pointing toward the other object, rather than away
+	 */
+	direction(direction: VectorN): CollisionData[] | null;
+	/**
+	 * Returns all collisions meeting a specific requirement.
+	 * If there are no such collisions, this returns null.
+	 * @param mask - The function that will be passed each collision to determine its eligibility
+	 */
+	test(mask: (arg0: CollisionData) => boolean): CollisionData[] | null;
+}
+
+/**
+ * Represents a simulation in which WorldObjects can interact in a "physically accurate" manner. This class should not be constructed, and should instead be accessed via the `.physics` property of Scene.
+ */
+declare class PhysicsEngine {
+	/**
+	 * The proportion of velocity lost to air resistance every frame. Lower values will cause speed to decrease more gradually. Starts as 0.005
+	 */
+	airResistance: number;
+	/**
+	 * Whether or not collision events will be detected. If this is true, then the `.collide*()` handlers on ElementScripts of colliding objects will be called when collisions begin. Starts as true
+	 */
+	collisionEvents: boolean;
+	/**
+	 * The number of solver iterations to run each frame. Starts as 10
+	 */
+	iterations: number;
+	/**
+	 * The number of contact solver iterations to run per solver iterations. Starts as 4
+	 */
+	contactIterations: number;
+	/**
+	 * The number of constraint solver iterations to run per solver iteration. Starts as 4
+	 */
+	constraintIterations: number;
+	/**
+	 * Sets the gravitational acceleration for the physics engine.
+	 * @param gravity - The new gravitational acceleration
+	 */
+	set gravity(gravity: VectorN);
+	/**
+	 * Returns the current gravitational acceleration for the physics engine.
+	 * This is initially `VectorN.y(0.4)`.
+	 */
+	get gravity(): VectorN;
+	/**
+	 * Returns all the active constraints in the scene.
+	 */
+	get constraints(): Constraint[];
+	/**
+	 * Returns all of the WorldObjects in the simulation.
+	 */
+	get bodies(): WorldObject[];
+	/**
+	 * Creates a physical constraint that forces the distance between two points on two objects to remain constant.
+	 * @param a - The first object to constrain. Must have the PHYSICS script
+	 * @param b - The second object to constrain. Must have the PHYSICS script
+	 * @param aOffset - The local a-space point where the constraint will attach to the first object. Default is no offset
+	 * @param bOffset - The local b-space point where the constraint will attach to the second object. Default is no offset
+	 * @param length - The distance to enforce between the two points. Default is the current distance between the constrained points
+	 */
+	constrainLength(a: WorldObject, b: WorldObject, aOffset?: VectorN, bOffset?: VectorN, length?: number): Constraint2;
+	/**
+	 * Creates a physical constraint that forces the distance between a point on an object and a fixed point to remain constant.
+	 * @param object - The object to constrain. Must have the PHYSICS script
+	 * @param offset - The local object-space point where the constraint will attach to the object. Default is no offset
+	 * @param point - The location to constrain the length to. Default is the current location of the constrained point
+	 * @param length - The distance to enforce between the two points. Default is the current distance between the constrained points
+	 */
+	constrainLengthToPoint(object: WorldObject, offset?: VectorN, point?: VectorN, length?: number): Constraint1;
+	/**
+	 * Creates a physical constraint that forces two points on two objects to be in the same location.
+	 * @param a - The first object to constrain. Must have the PHYSICS script
+	 * @param b - The second object to constrain. Must have the PHYSICS script
+	 * @param aOffset - The local a-space point where the constraint will attach to the first object. Default is no offset
+	 * @param bOffset - The local b-space point where the constraint will attach to the second object. Default is no offset
+	 */
+	constrainPosition(a: WorldObject, b: WorldObject, aOffset?: VectorN, bOffset?: VectorN): Constraint2;
+	/**
+	 * Creates a physical constraint that forces the a point on an object and a fixed point to remain in the same location.
+	 * @param object - The object to constrain. Must have the PHYSICS script
+	 * @param offset - The local object-space point where the constraint will attach to the object. Default is no offset
+	 * @param point - The location to constrain the length to. Default is the current location of the constrained point
+	 */
+	constrainPositionToPoint(object: WorldObject, offset?: VectorN, point?: VectorN): Constraint1;
+}
+
+/**
+ * Contains a collection of useful static methods for manipulating 3D shapes and figures.
+ * This class cannot be constructed.
+ */
+declare class Geometry3D {
+	/**
+	 * Returns the smallest convex Polyhedron which contains a given set of points.
+	 * The behavior is undefined if the points are all coplanar.
+	 * @param points - The points to create a convex hull for. There must be at least 4
+	 */
+	static convexHull(points: Vector3[]): Polyhedron;
+	/**
+	 * Subdivides a frustum along the z axis.
+	 * @param frustum - The frustum to subdivide
+	 * @param portions - How to slice the frustum. If this is a number, the frustum will be sliced into that many pieces of equal size. If this is an array, each element provides a weight proportional to the size of each piece of the frustum. The weights may be scaled by any constant
+	 */
+	static subdivideFrustum(frustum: Frustum, portions: number[] | number): Frustum[];
+}
+
+/**
+ * Represents a GLSL operation that can be run in parallel on the GPU.
+ * The entry point for the GLSL operation is the `compute` function, which returns any struct type and takes no arguments.
+ * ```glsl
+ * SomeStruct compute() { ... }
+ * ```
+ * The returned value is considered the output of the operation, and some global variables are provided as the input:
+ * ```glsl
+ * uniform int problems; // the total number of operations in the current batch
+ * int problemIndex; // the index of the current operation in the batch
+ * ```
+ * Commonly, one or more dynamic array uniforms can be used to store complex input data, as shown in the following example.
+ * ```js
+ * // computation to move circles toward the middle of the screen
+ * const computation = new GPUComputation(`
+ * 	struct Circle {
+ * 		vec2 position;
+ * 		float radius;
+ * 	};
+ * 
+ * 	uniform Circle[] circles;
+ * 	uniform vec2 middle;
+ * 
+ * 	Circle compute() {
+ * 		Circle circle = circles[problemIndex];
+ * 		circle.position = mix(circle.position, middle, 0.01);
+ * 		return circle;
+ * 	}
+ * `);
+ * 
+ * const circles = Array.dim(1000).map(() => {
+ * 	return { position: Random.inShape(scene.camera.screen), radius: 10 };
+ * });
+ * 
+ * // write, compute, and readback circle data
+ * computation.setUniforms({ circles, middle });
+ * computation.compute(circles.length);
+ * computation.output.read(circles);
+ * ```
+ */
+declare class GPUComputation implements GPUInterface {
+	/**
+	 * An array storing the output of the most recent batch of operations
+	 */
+	output: GPUArray;
+	/**
+	 * Runs a batch of operations.
+	 * @param problems - The number of operations to run
+	 */
+	compute(problems: number): void;
+	/**
+	 * The source code of the program
+	 */
+	glsl: string;
+	/**
+	 * Sets the value of a uniform in the program.
+	 * @param name - The name of the uniform
+	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
+	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
+	 */
+	setUniform(name: string, value: any, force?: boolean): void;
+	/**
+	 * Sets the value of many uniforms at once.
+	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
+	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
+	 */
+	setUniforms(uniforms: object, force?: boolean): void;
+	/**
+	 * Retrieves the current value of a given uniform.
+	 * For the return type of this function, see the GLSL API.
+	 * @param name - The name of the uniform
+	 */
+	getUniform(name: string): any;
+	/**
+	 * Checks whether a given uniform exists.
+	 * @param name - The name of the uniform to check
+	 */
+	hasUniform(name: string): boolean;
 }
 
 /**
@@ -1652,624 +1777,812 @@ declare class Matrix4 extends Matrix {
 }
 
 /**
- * Represents a physical constraint between one or more SceneObjects.
+ * Represents a 3D shape.
+ */
+declare class Shape3D extends Shape<Matrix4, Vector3> {
+	/**
+	 * The amount of space contained within the shape
+	 */
+	volume: number;
+	/**
+	 * Returns the smallest axis-aligned rectangular prism that contains the entire shape.
+	 */
+	getBoundingBox(): Prism;
+}
+
+/**
+ * Represents a line segment in 3D space.
+ */
+declare class Line3D extends Shape3D {
+	/**
+	 * The beginning of the line segment
+	 */
+	a: Vector3;
+	/**
+	 * The end of the line segment
+	 */
+	b: Vector3;
+	/**
+	 * The length of the line segment
+	 */
+	length: number;
+	/**
+	 * The vector from `.a` to `.b`
+	 */
+	vector: Vector3;
+	/**
+	 * Computes the linear interpolation along the line segment (from `.a` to `.b`) for a specific `t` value.
+	 * @param t - The parameter value for the interpolation on [0, 1]
+	 */
+	evaluate(t: number): Vector3;
+	/**
+	 * Returns the points on the caller and a given line segment that with minimal distance.
+	 * The distance between these points gives the distance between the line segments.
+	 * The first element of the return value is the point on the caller, and the second is the point on the argument.
+	 * @param other - The line segment to compare with
+	 */
+	getClosestPoints(other: this): Vector3[];
+}
+
+/**
+ * Represents a triangle in 3D space.
+ */
+declare class Triangle extends Shape3D {
+	/**
+	 * The first vertex of the triangle
+	 */
+	a: Vector3;
+	/**
+	 * The second vertex of the triangle
+	 */
+	b: Vector3;
+	/**
+	 * The third vertex of the triangle
+	 */
+	c: Vector3;
+	/**
+	 * The unit surface normal of the triangle
+	 */
+	normal: Vector3;
+	/**
+	 * The area of the triangle
+	 */
+	area: number;
+	/**
+	 * Creates a new triangle.
+	 * @param points - The points of the triangle
+	 */
+	constructor(...points: Vector3[]);
+	/**
+	 * Returns the plane in which the triangle resides.
+	 */
+	get plane(): Plane;
+}
+
+/**
+ * Represents an append-only structure for building procedural polyhedra.
+ * Vertices and triangles can be added through various means, and can at any point be converted into a Polyhedron.
+ */
+declare class PolyhedronBuilder {
+	/**
+	 * The vertices of the polyhedron. These can be added to directly, if desired
+	 */
+	vertices: Vector3[];
+	/**
+	 * The indices of the vertices of the triangular faces of the polyhedron. These can be added to directly, if desired
+	 */
+	indices: number[];
+	/**
+	 * Whether the polyhedron should be constructed lazily, i.e. whether it is guaranteed to not contain duplicate vertices or degenerate triangles. Starts as false
+	 */
+	lazy: boolean;
+	/**
+	 * Creates a new building structure, with no vertices or indices.
+	 */
+	constructor();
+	/**
+	 * Creates a new Polyhedron out of the current state of the builder.
+	 * The Polyhedron is disconnected, in the sense that future changes to the builder will not be reflected in the created Polyhedron.
+	 */
+	get polyhedron(): Polyhedron;
+	/**
+	 * Adds an additional triangle for every existing triangle, with the opposite winding direction.
+	 */
+	double(): void;
+	/**
+	 * Adds a new vertex, and returns its index.
+	 * @param vertex - The vertex to add
+	 */
+	addVertex(vertex: Vector3): number;
+	/**
+	 * Adds a new sequence of vertices, and returns the index of the first vertex in the sequence
+	 * @param vertices - The vertices to add
+	 */
+	addVertices(vertices: Vector3[]): number;
+	/**
+	 * Adds the entire contents of a Polyhedron to the builder, and returns the index of the first vertex added.
+	 * @param polyhedron - The Polyhedron to add
+	 * @param flip - Whether to flip all the faces in the added Polyhedron. This does not modify the first argument in-place. Default is false
+	 */
+	addPolyhedron(polyhedron: Polyhedron, flip?: boolean): number;
+	/**
+	 * Adds a list of vertices representing the edge of a convex polygon, and adds triangles in a "triangle fan" formation to connect them.
+	 * Returns the index of the first vertex added.
+	 * @param vertices - The vertices of the convex polygon
+	 * @param flip - Whether to swap the winding direction of the faces to be opposite the order of the vertices. Default is false
+	 */
+	addConvexVertices(vertices: Vector3[], flip?: boolean): number;
+}
+
+/**
+ * Represents a closed 3D polyhedron as a collection of contiguous triangles.
+ */
+declare class Polyhedron extends Shape3D {
+	/**
+	 * The vertices of the polyhedron
+	 */
+	vertices: Vector3[];
+	/**
+	 * An array representing the triangles of the polyhedron. Every three indices in the array specify the locations in the `.vertices` array which make up a triangle
+	 */
+	indices: number[];
+	/**
+	 * The number of faces of the polyhedron. This property is equivalent to `indices.length / 3`
+	 */
+	faceCount: number;
+	/**
+	 * Creates a new polyhedron.
+	 * @param vertices - The vertices of the polyhedron
+	 * @param indices - The vertex indices for the triangular faces of the polyhedron
+	 */
+	constructor(vertices: Vector3[], indices: number[]);
+	/**
+	 * Returns a set of unique lines that represent the edges of the faces of the polyhedron.
+	 */
+	getEdges(): Line3D[];
+	/**
+	 * Returns the vertex indices of the nth face of the polyhedron.
+	 * @param index - The index of the face
+	 */
+	getFaceIndices(index: number): number[];
+	/**
+	 * Returns the nth face in the polyhedron.
+	 * @param index - The index of the face
+	 */
+	getFace(index: number): Triangle;
+	/**
+	 * Returns a set of triangles making up the surface of the polyhedron.
+	 */
+	getFaces(): Triangle[];
+	/**
+	 * Returns a set of planes whose negative half-spaces' intersection form the polyhedron.
+	 * This method has undefined behavior for a concave polyhedron.
+	 */
+	getPlanes(): Plane[];
+	/**
+	 * Returns an undirected adjacency map between the face indices of the polyhedron.
+	 * In the map, faces are represented by their index in the return value of `.getFaces()`, and all faces are included as keys.
+	 */
+	getFaceAdjacency(): Map<number, number[]>
+	/**
+	 * Subdivides each triangle in the polyhedron into a power of 4 number of additional triangles.
+	 * The subdivided mesh is a copy and is returned.
+	 * @param count - The power of 4 to multiply the triangle count by. Default is 1
+	 */
+	subdivide(count?: number): this;
+	/**
+	 * Creates a new polyhedron by transforming every vertex using a given function.
+	 * @param vertexTransform - The function to apply to each vertex
+	 */
+	map(vertexTransform: (arg0: Vector3) => Vector3): this;
+	/**
+	 * Creates a new polyhedron from a list of triangles which form a closed surface.
+	 * @param triangles - The triangles to use as the surface
+	 */
+	static fromTriangles(triangles: Triangle[]): Polyhedron;
+	/**
+	 * Creates a polyhedron that resembles a sphere to a given level of precision.
+	 * @param sphere - The sphere to approximate
+	 * @param steps - The amount of vertices to use around the great circles of the sphere. Default is 8
+	 */
+	static fromSphere(sphere: Sphere, steps?: number): Polyhedron;
+	/**
+	 * Creates a polyhedron that resembles a capsule.
+	 * @param capsule - The capsule to approximate
+	 * @param steps - The amount of vertices to use around the circular cross-sections of the capsule. Default is 8
+	 */
+	static fromCapsule(capsule: Capsule, steps?: number): void;
+	/**
+	 * Creates a polyhedron that resembles a right circular cone to a given level of precision
+	 * @param axis - A line segment from the center of the cone's base to the peak
+	 * @param radius - The radius of the circular base
+	 * @param steps - The amount of vertices around the circular base. Default is 8
+	 */
+	static fromCone(axis: Line3D, radius: number, steps?: number): void;
+	/**
+	 * Creates a polyhedron that resembles a right circular cylinder to a given level of precision.
+	 * @param longAxis - A line segment between the centers of the two circular faces
+	 * @param radius - The radius of the cylinder
+	 * @param steps - The amount of vertices to use around the circular faces. Default is 8
+	 */
+	static fromCylinder(longAxis: Line3D, radius: number, steps?: number): Polyhedron;
+}
+
+/**
+ * Represents an axis-aligned rectangular prism.
+ */
+declare class Prism extends Polyhedron {
+	/**
+	 * The C coordinate of the left-upper-front corner
+	 */
+	x: number;
+	/**
+	 * The C coordinate of the left-upper-front corner
+	 */
+	y: number;
+	/**
+	 * The C coordinate of the left-upper-front corner
+	 */
+	z: number;
+	/**
+	 * The x axis size of the prism
+	 */
+	width: number;
+	/**
+	 * The y axis size of the prism
+	 */
+	height: number;
+	/**
+	 * The z axis size of the prism
+	 */
+	depth: number;
+	/**
+	 * The interval of the C axis occupied by the prism
+	 */
+	xRange: Range;
+	/**
+	 * The interval of the C axis occupied by the prism
+	 */
+	yRange: Range;
+	/**
+	 * The interval of the C axis occupied by the prism
+	 */
+	zRange: Range;
+	/**
+	 * The left-upper-front corner
+	 */
+	min: Vector3;
+	/**
+	 * The right-lower-back corner
+	 */
+	max: Vector3;
+	/**
+	 * Creates a new rectangular prism.
+	 * @param min - The left-upper-front corner of the prism
+	 * @param max - The right-lower-back corner of the prism
+	 */
+	constructor(min: Vector3, max: Vector3);
+	/**
+	 * Returns a prism representing the points in both the caller and another given prism.
+	 * @param prism - The prism to intersect with
+	 */
+	clip(prism: this): this;
+	/**
+	 * Creates a rectangular prism from a set of intervals.
+	 * @param xRange - The interval on the x axis occupied by the prism
+	 * @param yRange - The interval on the y axis occupied by the prism
+	 * @param zRange - The interval on the z axis occupied by the prism
+	 */
+	static fromRanges(xRange: Range, yRange: Range, zRange: Range): Prism;
+	/**
+	 * Creates a rectangular prism from a given minimum and maximum point.
+	 * @param min - The left-upper-front corner of the prism
+	 * @param max - The right-lower-back corner of the prism
+	 */
+	static fromMinMax(min: Vector3, max: Vector3): Prism;
+	/**
+	 * Creates a rectangular prism centered at the origin with given dimensions.
+	 * @param dimensions - A vector containing (width, height, depth) of the prism
+	 */
+	static fromDimensions(dimensions: Vector3): Prism;
+	/**
+	 * Creates a rectangular prism centered at the origin with given dimensions.
+	 * @param width - The width of the prism
+	 * @param height - The height of the prism
+	 * @param depth - The depth of the prism
+	 */
+	static fromDimensions(width: number, height: number, depth: number): Prism;
+	/**
+	 * Computes the smallest rectangular prism that contains a set of points and returns it.
+	 * @param points - The points to contain
+	 */
+	static bound(points: Vector3[]): Prism;
+	/**
+	 * Computes the smallest bounding rectangular prism the contains a set of other rectangular prisms.
+	 * @param boxes - The boxes to contain
+	 */
+	static composeBoundingBoxes(boxes: Prism[]): Prism;
+}
+
+/**
+ * Represents an infinite plane in 3D space.
+ */
+declare class Plane extends Shape3D {
+	/**
+	 * The unit normal vector to the plane
+	 */
+	normal: Vector3;
+	/**
+	 * The distance from the plane to the origin
+	 */
+	distance: number;
+	/**
+	 * Creates a new plane.
+	 */
+	constructor();
+	/**
+	 * Returns the signed distance from the caller to a given point.
+	 * @param point - The point to find the signed distance to
+	 */
+	signedDist(point: Vector3): number;
+	/**
+	 * Reflects a point in-place about the caller and returns it.
+	 * @param point - The point to reflect
+	 */
+	reflect(point: Vector3): Vector3;
+	/**
+	 * Returns a copy of a point reflected about the caller.
+	 * @param point - The point to reflect
+	 */
+	reflected(point: Vector3): Vector3;
+}
+
+/**
+ * Represents the frustum of a projection matrix.
+ * This is the space projected (via a perspective divide) by a given matrix into the region [-1, 1].
+ */
+declare class Frustum extends Polyhedron {
+	/**
+	 * The planes bounding the frustum
+	 */
+	planes: Plane[];
+	/**
+	 * Creates a frustum for a given projection matrix.
+	 * @param projection - The projection for which to create a frustum
+	 */
+	constructor(projection: Matrix4);
+}
+
+/**
+ * Represents a 3D sphere, the collection of points within a given distance of a center.
+ */
+declare class Sphere extends Shape3D {
+	/**
+	 * The center of the sphere
+	 */
+	position: Vector3;
+	/**
+	 * The maximum distance from the center of the sphere to its bounds
+	 */
+	radius: number;
+	/**
+	 * Creates a new sphere.
+	 * @param position - The center of the sphere
+	 * @param radius - The radius of the sphere
+	 */
+	constructor(position: Vector3, radius: number);
+	/**
+	 * Returns a sphere which contains all of the given spheres.
+	 * It is not guaranteed to be a newly allocated sphere, nor is it guaranteed to be the smallest possible bounding sphere.
+	 * @param spheres - The bounding spheres to compose together. This must include at least one sphere
+	 */
+	static composeBoundingBalls(spheres: Sphere[]): Sphere;
+}
+
+/**
+ * Represents an arbitrarily aligned capsule (the set of points which are a fixed radius away from a line segment).
+ */
+declare class Capsule extends Shape3D {
+	/**
+	 * The core line segment which all points are equidistant to
+	 */
+	axis: Line3D;
+	/**
+	 * The radius of the capsule
+	 */
+	radius: number;
+	/**
+	 * Creates a new capsule.
+	 * @param axis - The central line segment
+	 * @param radius - The radius of the capsule
+	 */
+	constructor(axis: Line3D, radius: number);
+}
+
+/**
+ * Represents an inclusive interval.
+ */
+declare class Range implements Copyable {
+	/**
+	 * The lower bound of the interval
+	 */
+	min: number;
+	/**
+	 * The upper bound of the interval
+	 */
+	max: number;
+	/**
+	 * Creates a new interval, optionally with a specific min and max.
+	 * If the arguments are not in ascending order, they will be reversed.
+	 * If no arguments are provided, the interval will be empty.
+	 */
+	constructor();
+	/**
+	 * Creates a new interval, optionally with a specific min and max.
+	 * If the arguments are not in ascending order, they will be reversed.
+	 * If no arguments are provided, the interval will be empty.
+	 * @param min - The lower bound
+	 * @param max - The upper bound
+	 */
+	constructor(min: number, max: number);
+	/**
+	 * Returns the mean value of the range.
+	 */
+	get middle(): number;
+	/**
+	 * Returns the size of the interval represented by the range.
+	 */
+	get length(): number;
+	/**
+	 * Returns the set intersection between the caller and another range.
+	 * @param range - The range to clip against
+	 */
+	clip(range: this): this;
+	/**
+	 * Returns the distance from a specified value to the closest bound of the range.
+	 * If the value is inside the range, the distance will be positive, otherwise, it will be negative.
+	 * @param value - The value to check the depth of
+	 */
+	getDepth(value: number): number;
+	/**
+	 * Checks whether a value is within the current bounds of the range.
+	 * @param value - The value to check
+	 */
+	includes(value: number): this;
+	/**
+	 * Expands the range to include a specified value.
+	 * @param value - The value to include
+	 */
+	include(value: number): void;
+	/**
+	 * Checks if there is any overlap between the caller and another range.
+	 * @param range - The range to check against
+	 */
+	intersect(range: this): boolean;
+	/**
+	 * Increases the size of the range by evenly moving both bounds away from the center.
+	 * @param padding - The amount to change each bound by. For example, a padding value of 10 will increase the length of the range by 20
+	 */
+	expand(padding: number): void;
+	/**
+	 * Returns the smallest range that contains every one of a collection of values.
+	 * @param values - The set of values to bound
+	 */
+	static fromValues(values: number[]): Range;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
+}
+
+/**
+ * Represents a solid shape.
+ * Within the documentation of this class, `Vector` refers to either `Vector2` or `Vector3` depending on whether the 2D or 3D subclass is used.
+ * Similarly, `Matrix` refers to either `Matrix3` or `Matrix4`.
  * This is an abstract superclass and should not be constructed.
  */
-declare class Constraint {
+declare class Shape<Matrix = any, Vector = any> {
 	/**
-	 * Returns the World-Space location of the constrained points.
+	 * The geometric center of the shape
 	 */
-	get ends(): VectorN[];
+	middle: Vector;
 	/**
-	 * Removes the constraint from the simulation.
+	 * Returns a copy of the shape after a certain transformation is applied to all its points.
+	 * @param transform - The transformation to apply to the shape
 	 */
-	remove(): void;
+	getModel(transform: Matrix): this;
+	/**
+	 * Returns a copy of the shape scaled about a specified point.
+	 * @param factor - The scale factor on each axis. If this is a number, it applies to all axes equally
+	 * @param position - The scaling center. Default is the middle of the shape
+	 */
+	scale(factor: Vector | number, position?: Vector): this;
+	/**
+	 * Returns a copy of the shape centered at a specified location.
+	 * @param newCenter - The location of the new center
+	 */
+	center(newCenter: Vector): this;
+	/**
+	 * Returns a copy of the shape translated by a specified amount.
+	 * @param displacement - The amount to displace the shape by
+	 */
+	move(displacement: Vector): this;
+	/**
+	 * Checks if two shapes are congruent.
+	 * @param other - The Shape to compare against
+	 */
+	equals(other: this): boolean;
+	/**
+	 * Checks if two shapes intersect.
+	 * @param shape - The Shape to check intersections with
+	 */
+	intersect(shape: this): boolean;
+	/**
+	 * Returns the closest point within the shape to a specified other point, including the boundary.
+	 * @param point - The target point
+	 */
+	closestPointTo(point: Vector): Vector;
+	/**
+	 * Returns the distance from a specified point to the shape.
+	 * If the point is inside the shape, this will return 0.
+	 * @param point - The target point
+	 */
+	distanceTo(point: Vector): number;
+	/**
+	 * Checks if a point is inside the shape, including points on the boundary.
+	 * @param point - The point to check
+	 */
+	containsPoint(point: Vector): boolean;
+	/**
+	 * Traces a ray until it intersects the caller.
+	 * If the ray misses the shape, returns Infinity.
+	 * If it hits, it returns the distance that the ray traveled prior to intersection.
+	 * @param origin - The starting point of the ray
+	 * @param direction - The unit vector in the direction of the ray
+	 */
+	rayCast(origin: Vector, direction: Vector): number;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
 }
 
 /**
- * Represents a physical constraint between a SceneObject and a fixed point.
+ * Represents a 2D shape.
  */
-declare class Constraint1 extends Constraint {
+declare class Shape2D extends Shape<Matrix3, Vector2> {
 	/**
-	 * The local-space offset of the constrained point on the object
+	 * The area of the shape at the time of construction
 	 */
-	offset: VectorN;
+	area: number;
 	/**
-	 * The fixed point in the constraint
+	 * Returns the smallest axis-aligned rectangle that contains the entire shape.
 	 */
-	point: VectorN;
+	getBoundingBox(): Rect;
+}
+
+/**
+ * Represents a line segment.
+ */
+declare class Line extends Shape2D {
 	/**
-	 * The desired distance between the two constrained points. This is only defined for length constraints
+	 * The start point of the line segment
+	 */
+	a: Vector2;
+	/**
+	 * The end point of the line segment
+	 */
+	b: Vector2;
+	/**
+	 * A vector from the start point of the line segment to the end point
+	 */
+	vector: Vector2;
+	/**
+	 * A normal vector to the line segment. Left-handed (in Screen-Space)
+	 */
+	normal: Vector2;
+	/**
+	 * THe length of the line segment
 	 */
 	length: number;
 	/**
-	 * Returns the object in the constraint.
+	 * The slope of the line segment. If the line segment is vertical, this is infinite
 	 */
-	get body(): SceneObject;
+	slope: number;
+	/**
+	 * The y-intercept of the line segment if it were extended into a line
+	 */
+	intercept: number;
+	/**
+	 * Creates a new Line.
+	 * @param x - The x coordinate of the start point of the line segment
+	 * @param y - The y coordinate of the start point of the line segment
+	 * @param x2 - The x coordinate of the end point of the line segment
+	 * @param y2 - The y coordinate of the end point of the line segment
+	 */
+	constructor(x: number, y: number, x2: number, y2: number);
+	/**
+	 * Creates a new Line.
+	 * @param start - The start point of the line segment
+	 * @param end - The end point of the line segment
+	 */
+	constructor(start: Vector2, end: Vector2);
+	/**
+	 * Computes the linear interpolation along the line segment (from `.a` to `.b`) for a specific `t` value.
+	 * @param t - The parameter value for the interpolation on [0, 1]
+	 */
+	evaluate(t: number): Vector2;
+	/**
+	 * Creates a new line segment with a specified slope and intercept.
+	 * The start point is at the y-intercept, and the end point is at x = 1.
+	 * @param m - The slope of the line segment
+	 * @param b - The y-intercept of the line segment
+	 */
+	static fromSlopeIntercept(m: number, b: number): Line;
 }
 
 /**
- * Represents a physical constraint between two SceneObjects.
+ * Represents a contiguous 2D polygon with no holes.
  */
-declare class Constraint2 extends Constraint {
+declare class Polygon extends Shape2D {
 	/**
-	 * The local-space offset of the constrained point on the first object
+	 * The vertices of the border of the polygon, they are in a clockwise order.
 	 */
-	offsetA: VectorN;
+	vertices: Vector2[];
 	/**
-	 * The local-space offset of the constrained point on the second object
+	 * Creates a new Polygon.
+	 * @param vertices - The vertices for the new polygon. They can be ordered either clockwise or counter-clockwise
 	 */
-	offsetB: VectorN;
+	constructor(vertices: Vector2[]);
 	/**
-	 * Whether or not the first object should be considered static by the constraint
+	 * Returns the edges of the polygon.
 	 */
-	staticA: boolean;
+	getEdges(): Line[];
 	/**
-	 * Whether or not the second object should be considered static by the constraint
+	 * Returns the edges of the polygon.
 	 */
-	staticB: boolean;
+	getFaces(): Line[];
 	/**
-	 * The desired distance between the two constrained points. This is only defined for length constraints
+	 * Returns a copy of the polygon rotated clockwise (in Screen-Space) by a specified angle.
+	 * @param angle - The angle to rotate by (in radians)
 	 */
-	length: number;
+	rotate(angle: number): this;
 	/**
-	 * Returns the first object in the constraint.
+	 * Checks whether a given point is inside the polygon (including the boundary).
+	 * The behavior of this method is undefined if the polygon is concave.
+	 * @param point - The point to check
 	 */
-	get bodyA(): SceneObject;
+	containsPoint(point: Vector2): boolean;
 	/**
-	 * Returns the second object in the constraint.
+	 * Returns a new regular polygon centered at the origin with a specified amount of sides and radius.
+	 * @param sides - The number of sides of the polygon
+	 * @param radius - The distance from the center to each vertex
 	 */
-	get bodyB(): SceneObject;
+	static regular(sides: number, radius: number): Polygon;
 }
 
 /**
- * Represents a collision with another SceneObject.
+ * Represents an axis-aligned rectangle.
  */
-declare class CollisionData {
+declare class Rect extends Polygon {
 	/**
-	 * The object that is being collided with
+	 * The x coordinate of the upper-left corner of the rectangle
 	 */
-	element: SceneObject;
+	x: number;
 	/**
-	 * A unit vector along the collision normal pointing toward the other object
+	 * The y coordinate of the upper-left corner of the rectangle
 	 */
-	direction: VectorN;
+	y: number;
 	/**
-	 * A list of World-Space contact points between the two objects
+	 * The width of the rectangle
 	 */
-	contacts: VectorN[];
+	width: number;
 	/**
-	 * Indicates whether the object being collided with requested that the collision be a trigger collision. A trigger collision is not resolved
+	 * The height of the rectangle
 	 */
-	isTrigger: boolean;
+	height: number;
+	/**
+	 * The upper-left corner of the rectangle
+	 */
+	min: Vector2;
+	/**
+	 * The lower-right corner of the rectangle
+	 */
+	max: Vector2;
+	/**
+	 * The horizontal interval that contains the rectangle
+	 */
+	xRange: Range;
+	/**
+	 * The vertical interval that contains the rectangle
+	 */
+	yRange: Range;
+	/**
+	 * Creates a new Rect. The width and height can be negative and will extend the rectangle to the left and top respectively.
+	 * @param x - The x coordinate of the upper-left corner of the rectangle
+	 * @param y - The y coordinate of the upper-left corner of the rectangle
+	 * @param width - The width of the rectangle
+	 * @param height - The height of the rectangle
+	 */
+	constructor(x: number, y: number, width: number, height: number);
+	/**
+	 * Returns the largest rectangle with a given aspect ratio that fits within the caller, centered at the center of the caller.
+	 * @param width - The width of the hypothetical rectangle from which to determine the aspect ratio
+	 * @param height - The height of the hypothetical rectangle from which to determine the aspect ratio
+	 */
+	largestWithin(width: number, height: number): this;
+	/**
+	 * Returns the region of intersection between the caller and another rectangle.
+	 * @param rect - The rectangle to intersect with
+	 */
+	clip(rect: this): this;
+	/**
+	 * Given a rectangle in the same coordinate space as the caller, returns a representation of it a re-scaled and translated space where (0, 0) is the upper left corner of the caller, and (1, 1) is the lower right.
+	 * This method is the inverse of `.fromUV()`.
+	 * @param rect - A rectangle in the same coordinate space as the caller
+	 */
+	toUV(rect: this): this;
+	/**
+	 * Given a rectangle in the normalized coordinate space of the caller (where (0, 0) is the upper left corner and (1, 1) is the lower right), produces a representation of it in the same coordinate space as the caller.
+	 * This method is the inverse of `.toUV()`.
+	 * @param uv - A rectangle in the normalized coordinate space of the caller
+	 */
+	fromUV(uv: this): this;
+	/**
+	 * Returns a new rectangle with the specified minimum and maximum coordinates.
+	 * @param min - The upper-left corner of the rectangle
+	 * @param max - The lower-right corner of the rectangle
+	 */
+	static fromMinMax(min: Vector2, max: Vector2): Rect;
+	/**
+	 * Returns a new rectangle with the specified vertical and horizontal spans.
+	 * @param xRange - The horizontal span of the rectangle
+	 * @param yRange - The vertical span of the rectangle
+	 */
+	static fromRanges(xRange: Range, yRange: Range): Rect;
+	/**
+	 * Returns a new rectangle with specified dimensions centered at the origin.
+	 * @param dimensions - A vector containing (width, height)
+	 */
+	static fromDimensions(dimensions: Vector2): Rect;
+	/**
+	 * Returns a new rectangle with specified dimensions centered at the origin.
+	 * @param width - The width of the rectangle
+	 * @param height - The height of the rectangle
+	 */
+	static fromDimensions(width: number, height: number): Rect;
+	/**
+	 * Returns the smallest bounding rectangle around a collection of points.
+	 * @param points - The points to create a bounding box for
+	 */
+	static bound(points: Vector2[]): Rect;
+	/**
+	 * Returns the smallest bounding rectangle around a collection of rectangles.
+	 * @param boxes - The rectangles to create a bounding box for
+	 */
+	static composeBoundingBoxes(boxes: Rect[]): Rect;
 }
 
 /**
- * Represents a collection of collisions that a SceneObject is undergoing.
+ * Represents a circle.
  */
-declare class CollisionMonitor {
+declare class Circle extends Shape2D {
 	/**
-	 * Returns all collisions. If there are no collisions, this returns null.
+	 * The center of the circle
 	 */
-	get general(): CollisionData[] | null;
+	position: Vector2;
 	/**
-	 * Returns all collisions on the left side of the object. If there are no collisions, this returns null.
+	 * The radius of the circle
 	 */
-	get left(): CollisionData[] | null;
+	radius: number;
 	/**
-	 * Returns all collisions on the right side of the object. If there are no collisions, this returns null.
+	 * Creates a new Circle.
+	 * @param position - The center of the circle
+	 * @param radius - The radius of the circle
 	 */
-	get right(): CollisionData[] | null;
-	/**
-	 * Returns all collisions with the top edge of the object. If there are no collisions, this returns null.
-	 */
-	get top(): CollisionData[] | null;
-	/**
-	 * Returns all collisions with the bottom edge of the object. If there are no collisions, this returns null.
-	 */
-	get bottom(): CollisionData[] | null;
-	/**
-	 * Returns all collisions on the front (+Z) side of the object.
-	 * If there are no collisions, this returns null.
-	 * This accessor only works in 3D Mode.
-	 */
-	get front(): CollisionData[] | null;
-	/**
-	 * Returns all collisions on the back (-Z) side of the object.
-	 * If there are no collisions, this returns null.
-	 * This accessor only works in 3D Mode.
-	 */
-	get back(): CollisionData[] | null;
-	/**
-	 * Checks whether there is a collision with a specific object.
-	 * @param object - The object to check
-	 */
-	has(object: SceneObject): boolean;
-	/**
-	 * Returns all collisions where the collision is in a specific direction.
-	 * If there are no such collisions, this returns null.
-	 * @param direction - A unit vector representing the direction to check. This will be interpreted as pointing toward the other object, rather than away
-	 */
-	direction(direction: VectorN): CollisionData[] | null;
-	/**
-	 * Returns all collisions meeting a specific requirement.
-	 * If there are no such collisions, this returns null.
-	 * @param mask - The function that will be passed each collision to determine its eligibility
-	 */
-	test(mask: (arg0: CollisionData) => boolean): CollisionData[] | null;
-}
-
-/**
- * Represents a simulation in which WorldObjects can interact in a "physically accurate" manner. This class should not be constructed, and should instead be accessed via the `.physics` property of Scene.
- */
-declare class PhysicsEngine {
-	/**
-	 * The proportion of velocity lost to air resistance every frame. Lower values will cause speed to decrease more gradually. Starts as 0.005
-	 */
-	airResistance: number;
-	/**
-	 * Whether or not collision events will be detected. If this is true, then the `.collide*()` handlers on ElementScripts of colliding objects will be called when collisions begin. Starts as true
-	 */
-	collisionEvents: boolean;
-	/**
-	 * The number of solver iterations to run each frame. Starts as 10
-	 */
-	iterations: number;
-	/**
-	 * The number of contact solver iterations to run per solver iterations. Starts as 4
-	 */
-	contactIterations: number;
-	/**
-	 * The number of constraint solver iterations to run per solver iteration. Starts as 4
-	 */
-	constraintIterations: number;
-	/**
-	 * Sets the gravitational acceleration for the physics engine.
-	 * @param gravity - The new gravitational acceleration
-	 */
-	set gravity(gravity: VectorN);
-	/**
-	 * Returns the current gravitational acceleration for the physics engine.
-	 * This is initially `VectorN.y(0.4)`.
-	 */
-	get gravity(): VectorN;
-	/**
-	 * Returns all the active constraints in the scene.
-	 */
-	get constraints(): Constraint[];
-	/**
-	 * Returns all of the WorldObjects in the simulation.
-	 */
-	get bodies(): WorldObject[];
-	/**
-	 * Creates a physical constraint that forces the distance between two points on two objects to remain constant.
-	 * @param a - The first object to constrain. Must have the PHYSICS script
-	 * @param b - The second object to constrain. Must have the PHYSICS script
-	 * @param aOffset - The local a-space point where the constraint will attach to the first object. Default is no offset
-	 * @param bOffset - The local b-space point where the constraint will attach to the second object. Default is no offset
-	 * @param length - The distance to enforce between the two points. Default is the current distance between the constrained points
-	 */
-	constrainLength(a: WorldObject, b: WorldObject, aOffset?: VectorN, bOffset?: VectorN, length?: number): Constraint2;
-	/**
-	 * Creates a physical constraint that forces the distance between a point on an object and a fixed point to remain constant.
-	 * @param object - The object to constrain. Must have the PHYSICS script
-	 * @param offset - The local object-space point where the constraint will attach to the object. Default is no offset
-	 * @param point - The location to constrain the length to. Default is the current location of the constrained point
-	 * @param length - The distance to enforce between the two points. Default is the current distance between the constrained points
-	 */
-	constrainLengthToPoint(object: WorldObject, offset?: VectorN, point?: VectorN, length?: number): Constraint1;
-	/**
-	 * Creates a physical constraint that forces two points on two objects to be in the same location.
-	 * @param a - The first object to constrain. Must have the PHYSICS script
-	 * @param b - The second object to constrain. Must have the PHYSICS script
-	 * @param aOffset - The local a-space point where the constraint will attach to the first object. Default is no offset
-	 * @param bOffset - The local b-space point where the constraint will attach to the second object. Default is no offset
-	 */
-	constrainPosition(a: WorldObject, b: WorldObject, aOffset?: VectorN, bOffset?: VectorN): Constraint2;
-	/**
-	 * Creates a physical constraint that forces the a point on an object and a fixed point to remain in the same location.
-	 * @param object - The object to constrain. Must have the PHYSICS script
-	 * @param offset - The local object-space point where the constraint will attach to the object. Default is no offset
-	 * @param point - The location to constrain the length to. Default is the current location of the constrained point
-	 */
-	constrainPositionToPoint(object: WorldObject, offset?: VectorN, point?: VectorN): Constraint1;
-}
-
-/**
- * Represents a seeded random number generator.
- * All instance methods of this class are available statically, so `Random.int(3, 5)` is valid and uses statically stored state of the class itself.
- * The random number generation functions of this class are organized into two categories: stable and unstable.
- * Stable functions will produce the same value when called with the same arguments.
- * Unstable functions don't take any seeding parameters and change their return value on each call.
- * ```js
- * let total = 0;
- * let count = 0;
- * 
- * intervals.continuous(() => {
- * 	total += Random.int(1, 10); // generate a random value each frame
- * 	count++;
- * 	const mean = total / count; // compute the mean of the random values
- * 	renderer.draw(new Color("black")).text(Font.Arial20, mean, 10, 10);
- * });
- * ```
- */
-declare class Random {
-	/**
-	 * The current seed for the unstable random functions. e.g. `.random()`, `.angle()`, `.range()`, etc.
-	 */
-	seed: number;
-	/**
-	 * The seed for the stable random functions. e.g. `.perlin3D()`, `.voronoi()`, etc.
-	 */
-	sampleSeed: number;
-	/**
-	 * The distribution of the numbers generated. This is one of the provided static distribution properties of the Random class (`.uniform`, `.normal`, etc.)
-	 */
-	distribution: Function;
-	/**
-	 * A uniform distribution
-	 */
-	static uniform: Function;
-	/**
-	 * A normal distribution
-	 */
-	static normal: Function;
-	/**
-	 * Creates a new random number generator. If either of the seeds are unspecified, they will be initialized to random numbers.
-	 * @param seed - The initial seed for the unstable random functions.
-	 * @param sampleSeed - The seed used for the stable random functions.
-	 * @param distribution - The initial distribution for the numbers generated. Default is `Random.uniform`
-	 */
-	constructor(seed: number, sampleSeed: number, distribution?: Function);
-	/**
-	 * Creates a new random number generator. If either of the seeds are unspecified, they will be initialized to random numbers.
-	 * @param seed - The initial seed for unstable functions
-	 * @param distribution - The initial distribution. Default is `Random.uniform`
-	 */
-	constructor(seed: number, distribution?: Function);
-	/**
-	 * Creates a new random number generator. If either of the seeds are unspecified, they will be initialized to random numbers.
-	 * @param distribution - The initial distribution
-	 */
-	constructor(distribution: Function);
-	/**
-	 * Returns a random number on [0, 1). Unstable.
-	 */
-	random(): number;
-	/**
-	 * Returns a random value in an unbounded normal distribution. Unstable
-	 * @param mu - The mean return value. Default is 0
-	 * @param sd - The standard deviation of possible return values. Default is 1
-	 */
-	normalZ(mu?: number, sd?: number): number;
-	/**
-	 * Returns a random integer on [min, max]. Unstable.
-	 * @param min - The lower bound
-	 * @param max - The upper bound
-	 */
-	int(min: number, max: number): number;
-	/**
-	 * Returns a random boolean value. Unstable.
-	 * @param chance - The probability that the return value is true. Default is 0.5
-	 */
-	bool(chance?: number): boolean;
-	/**
-	 * Returns a random sign, with a 50/50 chance to be -1 or 1. Unstable.
-	 */
-	sign(): number;
-	/**
-	 * Returns a random floating-point value on [min, max). Unstable.
-	 * @param min - The lower bound. Default is -1
-	 * @param max - The upper bound. Default is the negative of min
-	 */
-	range(min?: number, max?: number): number;
-	/**
-	 * Returns a random valid index for a given array. Unstable.
-	 * @param arr - The array to choose an index for
-	 */
-	index(arr: any[]): number;
-	/**
-	 * Returns a random angle in radians on [0, 2π). Unstable.
-	 */
-	angle(): number;
-	/**
-	 * Returns a random single character utf-16 string. Unstable.
-	 */
-	char(): string;
-	/**
-	 * Returns a random opaque color. Unstable.
-	 * @param result - The destination for the color. Default is a new color.
-	 */
-	color(result?: Color): Color;
-	/**
-	 * Returns a random point on the edge of a circle centered at the origin.
-	 * @param radius - The radius of the circle. Default is 1
-	 */
-	circle(radius?: number): Vector2;
-	/**
-	 * Returns a random point on the edge of a semicircle centered at the origin.
-	 * @param normal - The direction the semicircle is facing
-	 * @param radius - The radius of the semicircle. Default is 1
-	 */
-	semicircle(normal: Vector2, radius?: number): void;
-	/**
-	 * Returns a random point on the surface of a sphere centered at the origin.
-	 * @param radius - The radius of the sphere. Default is 1
-	 */
-	sphere(radius?: number): Vector3;
-	/**
-	 * Returns a random point on the surface of a hemisphere centered at the origin and facing in a given direction.
-	 * @param normal - The direction the hemisphere is facing
-	 * @param radius - The radius of the hemisphere. Default is 1
-	 */
-	hemisphere(normal: Vector3, radius?: number): void;
-	/**
-	 * Returns a random point within a given convex shape.
-	 * This method only works with `.distribution` being `Random.uniform`.
-	 * Unstable.
-	 * @param region - The region within which to generate the point
-	 */
-	inShape(region: Shape): Vector;
-	/**
-	 * Randomly orders an array in-place. Unstable.
-	 * @param arr - The array to reorder
-	 */
-	shuffle(arr: any[]): any[];
-	/**
-	 * Chooses an (optionally weighted) random element from an array. Unstable.
-	 * @param values - The values to choose from
-	 */
-	choice(values: Iterable): any;
-	/**
-	 * Chooses an (optionally weighted) random element from an array. Unstable.
-	 * @param values - The values to choose from
-	 * @param percentages - The weight of each value. These can be multiplied by any constant factor
-	 */
-	choice(values: Iterable, percentages: number[]): any;
-	/**
-	 * Randomly selects a sample (with replacement) from a given collection of values. Unstable.
-	 * @param values - The values to sample from
-	 * @param quantity - The size of the sample
-	 */
-	sample(values: Iterable, quantity: number): any[];
-	/**
-	 * Randomly selects a sample (without replacement) from a given collection of values. Unstable.
-	 * @param values - The values to sample from
-	 * @param quantity - The size of the sample
-	 */
-	sampleWithoutReplacement(values: Iterable, quantity: number): any[];
-	/**
-	 * Returns the sum of a specified number of octaves of a specified type of noise.
-	 * @param octaves - The number of octaves
-	 * @param algorithm - The stable algorithm of which octaves are being generated
-	 * @param noiseArgs - The arguments to the noise function
-	 */
-	octave(octaves: number, algorithm: Function, ...noiseArgs: number[]): number;
-	/**
-	 * Samples 1D Perlin noise.
-	 * @param x - The sample location
-	 * @param f - The frequency of the Perlin noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	perlin(x: number, f?: number, seed?: number): number;
-	/**
-	 * Samples 2D Perlin noise.
-	 * @param x - The sample location's x coordinate
-	 * @param y - The sample location's y coordinate
-	 * @param f - The frequency of the Perlin noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	perlin2D(x: number, y: number, f?: number, seed?: number): number;
-	/**
-	 * Samples 3D Perlin noise.
-	 * @param x - The sample location's x coordinate
-	 * @param y - The sample location's y coordinate
-	 * @param z - The sample location's z coordinate
-	 * @param f - The frequency of the Perlin noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	perlin3D(x: number, y: number, z: number, f?: number, seed?: number): number;
-	/**
-	 * Samples 1D Voronoi noise.
-	 * @param x - The sample location
-	 * @param f - The frequency of the Voronoi noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	voronoi(x: number, f?: number, seed?: number): number;
-	/**
-	 * Samples 2D Voronoi noise.
-	 * @param x - The sample location's x coordinate
-	 * @param y - The sample location's y coordinate
-	 * @param f - The frequency of the Voronoi noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	voronoi2D(x: number, y: number, f?: number, seed?: number): number;
-	/**
-	 * Samples 3D Voronoi noise.
-	 * @param x - The sample location's x coordinate
-	 * @param y - The sample location's y coordinate
-	 * @param z - The sample location's z coordinate
-	 * @param f - The frequency of the Voronoi noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	voronoi3D(x: number, y: number, z: number, f?: number, seed?: number): number;
-	/**
-	 * Chooses a new random seed and sampleSeed for the random number generator.
-	 */
-	reSeed(): void;
-	/**
-	 * The current seed for the unstable random functions. e.g. `.random()`, `.angle()`, `.range()`, etc.
-	 */
-	static seed: number;
-	/**
-	 * The seed for the stable random functions. e.g. `.perlin3D()`, `.voronoi()`, etc.
-	 */
-	static sampleSeed: number;
-	/**
-	 * Returns a random number on [0, 1). Unstable.
-	 */
-	static random(): number;
-	/**
-	 * Returns a random value in an unbounded normal distribution. Unstable
-	 * @param mu - The mean return value. Default is 0
-	 * @param sd - The standard deviation of possible return values. Default is 1
-	 */
-	static normalZ(mu?: number, sd?: number): number;
-	/**
-	 * Returns a random integer on [min, max]. Unstable.
-	 * @param min - The lower bound
-	 * @param max - The upper bound
-	 */
-	static int(min: number, max: number): number;
-	/**
-	 * Returns a random boolean value. Unstable.
-	 * @param chance - The probability that the return value is true. Default is 0.5
-	 */
-	static bool(chance?: number): boolean;
-	/**
-	 * Returns a random sign, with a 50/50 chance to be -1 or 1. Unstable.
-	 */
-	static sign(): number;
-	/**
-	 * Returns a random floating-point value on [min, max). Unstable.
-	 * @param min - The lower bound. Default is -1
-	 * @param max - The upper bound. Default is the negative of min
-	 */
-	static range(min?: number, max?: number): number;
-	/**
-	 * Returns a random valid index for a given array. Unstable.
-	 * @param arr - The array to choose an index for
-	 */
-	static index(arr: any[]): number;
-	/**
-	 * Returns a random angle in radians on [0, 2π). Unstable.
-	 */
-	static angle(): number;
-	/**
-	 * Returns a random single character utf-16 string. Unstable.
-	 */
-	static char(): string;
-	/**
-	 * Returns a random opaque color. Unstable.
-	 * @param result - The destination for the color. Default is a new color.
-	 */
-	static color(result?: Color): Color;
-	/**
-	 * Returns a random point on the edge of a circle centered at the origin.
-	 * @param radius - The radius of the circle. Default is 1
-	 */
-	static circle(radius?: number): Vector2;
-	/**
-	 * Returns a random point on the edge of a semicircle centered at the origin.
-	 * @param normal - The direction the semicircle is facing
-	 * @param radius - The radius of the semicircle. Default is 1
-	 */
-	static semicircle(normal: Vector2, radius?: number): void;
-	/**
-	 * Returns a random point on the surface of a sphere centered at the origin.
-	 * @param radius - The radius of the sphere. Default is 1
-	 */
-	static sphere(radius?: number): Vector3;
-	/**
-	 * Returns a random point on the surface of a hemisphere centered at the origin and facing in a given direction.
-	 * @param normal - The direction the hemisphere is facing
-	 * @param radius - The radius of the hemisphere. Default is 1
-	 */
-	static hemisphere(normal: Vector3, radius?: number): void;
-	/**
-	 * Returns a random point within a given convex shape.
-	 * This method only works with `.distribution` being `Random.uniform`.
-	 * Unstable.
-	 * @param region - The region within which to generate the point
-	 */
-	static inShape(region: Shape): Vector;
-	/**
-	 * Randomly orders an array in-place. Unstable.
-	 * @param arr - The array to reorder
-	 */
-	static shuffle(arr: any[]): any[];
-	/**
-	 * Chooses an (optionally weighted) random element from an array. Unstable.
-	 * @param values - The values to choose from
-	 */
-	static choice(values: Iterable): any;
-	/**
-	 * Chooses an (optionally weighted) random element from an array. Unstable.
-	 * @param values - The values to choose from
-	 * @param percentages - The weight of each value. These can be multiplied by any constant factor
-	 */
-	static choice(values: Iterable, percentages: number[]): any;
-	/**
-	 * Randomly selects a sample (with replacement) from a given collection of values. Unstable.
-	 * @param values - The values to sample from
-	 * @param quantity - The size of the sample
-	 */
-	static sample(values: Iterable, quantity: number): any[];
-	/**
-	 * Randomly selects a sample (without replacement) from a given collection of values. Unstable.
-	 * @param values - The values to sample from
-	 * @param quantity - The size of the sample
-	 */
-	static sampleWithoutReplacement(values: Iterable, quantity: number): any[];
-	/**
-	 * Returns the sum of a specified number of octaves of a specified type of noise.
-	 * @param octaves - The number of octaves
-	 * @param algorithm - The stable algorithm of which octaves are being generated
-	 * @param noiseArgs - The arguments to the noise function
-	 */
-	static octave(octaves: number, algorithm: Function, ...noiseArgs: number[]): number;
-	/**
-	 * Samples 1D Perlin noise.
-	 * @param x - The sample location
-	 * @param f - The frequency of the Perlin noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	static perlin(x: number, f?: number, seed?: number): number;
-	/**
-	 * Samples 2D Perlin noise.
-	 * @param x - The sample location's x coordinate
-	 * @param y - The sample location's y coordinate
-	 * @param f - The frequency of the Perlin noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	static perlin2D(x: number, y: number, f?: number, seed?: number): number;
-	/**
-	 * Samples 3D Perlin noise.
-	 * @param x - The sample location's x coordinate
-	 * @param y - The sample location's y coordinate
-	 * @param z - The sample location's z coordinate
-	 * @param f - The frequency of the Perlin noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	static perlin3D(x: number, y: number, z: number, f?: number, seed?: number): number;
-	/**
-	 * Samples 1D Voronoi noise.
-	 * @param x - The sample location
-	 * @param f - The frequency of the Voronoi noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	static voronoi(x: number, f?: number, seed?: number): number;
-	/**
-	 * Samples 2D Voronoi noise.
-	 * @param x - The sample location's x coordinate
-	 * @param y - The sample location's y coordinate
-	 * @param f - The frequency of the Voronoi noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	static voronoi2D(x: number, y: number, f?: number, seed?: number): number;
-	/**
-	 * Samples 3D Voronoi noise.
-	 * @param x - The sample location's x coordinate
-	 * @param y - The sample location's y coordinate
-	 * @param z - The sample location's z coordinate
-	 * @param f - The frequency of the Voronoi noise. Default is 1
-	 * @param seed - The seed for the noise. Default is sampleSeed
-	 */
-	static voronoi3D(x: number, y: number, z: number, f?: number, seed?: number): number;
-	/**
-	 * Chooses a new random seed and sampleSeed for the random number generator.
-	 */
-	static reSeed(): void;
+	constructor(position: Vector2, radius: number);
 }
 
 /**
@@ -2757,427 +3070,6 @@ declare class Vector4 extends Vector {
 }
 
 /**
- * Represents an inclusive interval.
- */
-declare class Range implements Copyable {
-	/**
-	 * The lower bound of the interval
-	 */
-	min: number;
-	/**
-	 * The upper bound of the interval
-	 */
-	max: number;
-	/**
-	 * Creates a new interval, optionally with a specific min and max.
-	 * If the arguments are not in ascending order, they will be reversed.
-	 * If no arguments are provided, the interval will be empty.
-	 */
-	constructor();
-	/**
-	 * Creates a new interval, optionally with a specific min and max.
-	 * If the arguments are not in ascending order, they will be reversed.
-	 * If no arguments are provided, the interval will be empty.
-	 * @param min - The lower bound
-	 * @param max - The upper bound
-	 */
-	constructor(min: number, max: number);
-	/**
-	 * Returns the mean value of the range.
-	 */
-	get middle(): number;
-	/**
-	 * Returns the size of the interval represented by the range.
-	 */
-	get length(): number;
-	/**
-	 * Returns the set intersection between the caller and another range.
-	 * @param range - The range to clip against
-	 */
-	clip(range: this): this;
-	/**
-	 * Returns the distance from a specified value to the closest bound of the range.
-	 * If the value is inside the range, the distance will be positive, otherwise, it will be negative.
-	 * @param value - The value to check the depth of
-	 */
-	getDepth(value: number): number;
-	/**
-	 * Checks whether a value is within the current bounds of the range.
-	 * @param value - The value to check
-	 */
-	includes(value: number): this;
-	/**
-	 * Expands the range to include a specified value.
-	 * @param value - The value to include
-	 */
-	include(value: number): void;
-	/**
-	 * Checks if there is any overlap between the caller and another range.
-	 * @param range - The range to check against
-	 */
-	intersect(range: this): boolean;
-	/**
-	 * Increases the size of the range by evenly moving both bounds away from the center.
-	 * @param padding - The amount to change each bound by. For example, a padding value of 10 will increase the length of the range by 20
-	 */
-	expand(padding: number): void;
-	/**
-	 * Returns the smallest range that contains every one of a collection of values.
-	 * @param values - The set of values to bound
-	 */
-	static fromValues(values: number[]): Range;
-	/**
-	 * Creates a copy of the object and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the object into. This must be the same type as the caller
-	 */
-	get(destination?: this): this;
-}
-
-/**
- * Represents a solid shape.
- * Within the documentation of this class, `Vector` refers to either `Vector2` or `Vector3` depending on whether the 2D or 3D subclass is used.
- * Similarly, `Matrix` refers to either `Matrix3` or `Matrix4`.
- * This is an abstract superclass and should not be constructed.
- */
-declare class Shape<Matrix = any, Vector = any> {
-	/**
-	 * The geometric center of the shape
-	 */
-	middle: Vector;
-	/**
-	 * Returns a copy of the shape after a certain transformation is applied to all its points.
-	 * @param transform - The transformation to apply to the shape
-	 */
-	getModel(transform: Matrix): this;
-	/**
-	 * Returns a copy of the shape scaled about a specified point.
-	 * @param factor - The scale factor on each axis. If this is a number, it applies to all axes equally
-	 * @param position - The scaling center. Default is the middle of the shape
-	 */
-	scale(factor: Vector | number, position?: Vector): this;
-	/**
-	 * Returns a copy of the shape centered at a specified location.
-	 * @param newCenter - The location of the new center
-	 */
-	center(newCenter: Vector): this;
-	/**
-	 * Returns a copy of the shape translated by a specified amount.
-	 * @param displacement - The amount to displace the shape by
-	 */
-	move(displacement: Vector): this;
-	/**
-	 * Checks if two shapes are congruent.
-	 * @param other - The Shape to compare against
-	 */
-	equals(other: this): boolean;
-	/**
-	 * Checks if two shapes intersect.
-	 * @param shape - The Shape to check intersections with
-	 */
-	intersect(shape: this): boolean;
-	/**
-	 * Returns the closest point within the shape to a specified other point, including the boundary.
-	 * @param point - The target point
-	 */
-	closestPointTo(point: Vector): Vector;
-	/**
-	 * Returns the distance from a specified point to the shape.
-	 * If the point is inside the shape, this will return 0.
-	 * @param point - The target point
-	 */
-	distanceTo(point: Vector): number;
-	/**
-	 * Checks if a point is inside the shape, including points on the boundary.
-	 * @param point - The point to check
-	 */
-	containsPoint(point: Vector): boolean;
-	/**
-	 * Traces a ray until it intersects the caller.
-	 * If the ray misses the shape, returns Infinity.
-	 * If it hits, it returns the distance that the ray traveled prior to intersection.
-	 * @param origin - The starting point of the ray
-	 * @param direction - The unit vector in the direction of the ray
-	 */
-	rayCast(origin: Vector, direction: Vector): number;
-	/**
-	 * Creates a copy of the object and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the object into. This must be the same type as the caller
-	 */
-	get(destination?: this): this;
-}
-
-/**
- * Represents a 2D shape.
- */
-declare class Shape2D extends Shape<Matrix3, Vector2> {
-	/**
-	 * The area of the shape at the time of construction
-	 */
-	area: number;
-	/**
-	 * Returns the smallest axis-aligned rectangle that contains the entire shape.
-	 */
-	getBoundingBox(): Rect;
-}
-
-/**
- * Represents a line segment.
- */
-declare class Line extends Shape2D {
-	/**
-	 * The start point of the line segment
-	 */
-	a: Vector2;
-	/**
-	 * The end point of the line segment
-	 */
-	b: Vector2;
-	/**
-	 * A vector from the start point of the line segment to the end point
-	 */
-	vector: Vector2;
-	/**
-	 * A normal vector to the line segment. Left-handed (in Screen-Space)
-	 */
-	normal: Vector2;
-	/**
-	 * THe length of the line segment
-	 */
-	length: number;
-	/**
-	 * The slope of the line segment. If the line segment is vertical, this is infinite
-	 */
-	slope: number;
-	/**
-	 * The y-intercept of the line segment if it were extended into a line
-	 */
-	intercept: number;
-	/**
-	 * Creates a new Line.
-	 * @param x - The x coordinate of the start point of the line segment
-	 * @param y - The y coordinate of the start point of the line segment
-	 * @param x2 - The x coordinate of the end point of the line segment
-	 * @param y2 - The y coordinate of the end point of the line segment
-	 */
-	constructor(x: number, y: number, x2: number, y2: number);
-	/**
-	 * Creates a new Line.
-	 * @param start - The start point of the line segment
-	 * @param end - The end point of the line segment
-	 */
-	constructor(start: Vector2, end: Vector2);
-	/**
-	 * Computes the linear interpolation along the line segment (from `.a` to `.b`) for a specific `t` value.
-	 * @param t - The parameter value for the interpolation on [0, 1]
-	 */
-	evaluate(t: number): Vector2;
-	/**
-	 * Creates a new line segment with a specified slope and intercept.
-	 * The start point is at the y-intercept, and the end point is at x = 1.
-	 * @param m - The slope of the line segment
-	 * @param b - The y-intercept of the line segment
-	 */
-	static fromSlopeIntercept(m: number, b: number): Line;
-}
-
-/**
- * Represents a contiguous 2D polygon with no holes.
- */
-declare class Polygon extends Shape2D {
-	/**
-	 * The vertices of the border of the polygon, they are in a clockwise order.
-	 */
-	vertices: Vector2[];
-	/**
-	 * Creates a new Polygon.
-	 * @param vertices - The vertices for the new polygon. They can be ordered either clockwise or counter-clockwise
-	 */
-	constructor(vertices: Vector2[]);
-	/**
-	 * Returns the edges of the polygon.
-	 */
-	getEdges(): Line[];
-	/**
-	 * Returns the edges of the polygon.
-	 */
-	getFaces(): Line[];
-	/**
-	 * Returns a copy of the polygon rotated clockwise (in Screen-Space) by a specified angle.
-	 * @param angle - The angle to rotate by (in radians)
-	 */
-	rotate(angle: number): this;
-	/**
-	 * Checks whether a given point is inside the polygon (including the boundary).
-	 * The behavior of this method is undefined if the polygon is concave.
-	 * @param point - The point to check
-	 */
-	containsPoint(point: Vector2): boolean;
-	/**
-	 * Returns a new regular polygon centered at the origin with a specified amount of sides and radius.
-	 * @param sides - The number of sides of the polygon
-	 * @param radius - The distance from the center to each vertex
-	 */
-	static regular(sides: number, radius: number): Polygon;
-}
-
-/**
- * Represents an axis-aligned rectangle.
- */
-declare class Rect extends Polygon {
-	/**
-	 * The x coordinate of the upper-left corner of the rectangle
-	 */
-	x: number;
-	/**
-	 * The y coordinate of the upper-left corner of the rectangle
-	 */
-	y: number;
-	/**
-	 * The width of the rectangle
-	 */
-	width: number;
-	/**
-	 * The height of the rectangle
-	 */
-	height: number;
-	/**
-	 * The upper-left corner of the rectangle
-	 */
-	min: Vector2;
-	/**
-	 * The lower-right corner of the rectangle
-	 */
-	max: Vector2;
-	/**
-	 * The horizontal interval that contains the rectangle
-	 */
-	xRange: Range;
-	/**
-	 * The vertical interval that contains the rectangle
-	 */
-	yRange: Range;
-	/**
-	 * Creates a new Rect. The width and height can be negative and will extend the rectangle to the left and top respectively.
-	 * @param x - The x coordinate of the upper-left corner of the rectangle
-	 * @param y - The y coordinate of the upper-left corner of the rectangle
-	 * @param width - The width of the rectangle
-	 * @param height - The height of the rectangle
-	 */
-	constructor(x: number, y: number, width: number, height: number);
-	/**
-	 * Returns the largest rectangle with a given aspect ratio that fits within the caller, centered at the center of the caller.
-	 * @param width - The width of the hypothetical rectangle from which to determine the aspect ratio
-	 * @param height - The height of the hypothetical rectangle from which to determine the aspect ratio
-	 */
-	largestWithin(width: number, height: number): this;
-	/**
-	 * Returns the region of intersection between the caller and another rectangle.
-	 * @param rect - The rectangle to intersect with
-	 */
-	clip(rect: this): this;
-	/**
-	 * Given a rectangle in the same coordinate space as the caller, returns a representation of it a re-scaled and translated space where (0, 0) is the upper left corner of the caller, and (1, 1) is the lower right.
-	 * This method is the inverse of `.fromUV()`.
-	 * @param rect - A rectangle in the same coordinate space as the caller
-	 */
-	toUV(rect: this): this;
-	/**
-	 * Given a rectangle in the normalized coordinate space of the caller (where (0, 0) is the upper left corner and (1, 1) is the lower right), produces a representation of it in the same coordinate space as the caller.
-	 * This method is the inverse of `.toUV()`.
-	 * @param uv - A rectangle in the normalized coordinate space of the caller
-	 */
-	fromUV(uv: this): this;
-	/**
-	 * Returns a new rectangle with the specified minimum and maximum coordinates.
-	 * @param min - The upper-left corner of the rectangle
-	 * @param max - The lower-right corner of the rectangle
-	 */
-	static fromMinMax(min: Vector2, max: Vector2): Rect;
-	/**
-	 * Returns a new rectangle with the specified vertical and horizontal spans.
-	 * @param xRange - The horizontal span of the rectangle
-	 * @param yRange - The vertical span of the rectangle
-	 */
-	static fromRanges(xRange: Range, yRange: Range): Rect;
-	/**
-	 * Returns a new rectangle with specified dimensions centered at the origin.
-	 * @param dimensions - A vector containing (width, height)
-	 */
-	static fromDimensions(dimensions: Vector2): Rect;
-	/**
-	 * Returns a new rectangle with specified dimensions centered at the origin.
-	 * @param width - The width of the rectangle
-	 * @param height - The height of the rectangle
-	 */
-	static fromDimensions(width: number, height: number): Rect;
-	/**
-	 * Returns the smallest bounding rectangle around a collection of points.
-	 * @param points - The points to create a bounding box for
-	 */
-	static bound(points: Vector2[]): Rect;
-	/**
-	 * Returns the smallest bounding rectangle around a collection of rectangles.
-	 * @param boxes - The rectangles to create a bounding box for
-	 */
-	static composeBoundingBoxes(boxes: Rect[]): Rect;
-}
-
-/**
- * Represents a circle.
- */
-declare class Circle extends Shape2D {
-	/**
-	 * The center of the circle
-	 */
-	position: Vector2;
-	/**
-	 * The radius of the circle
-	 */
-	radius: number;
-	/**
-	 * Creates a new Circle.
-	 * @param position - The center of the circle
-	 * @param radius - The radius of the circle
-	 */
-	constructor(position: Vector2, radius: number);
-}
-
-/**
- * Represents a quartic spline with four control points.
- */
-declare class Spline<Vector = any> {
-	/**
-	 * The first control point
-	 */
-	a: Vector;
-	/**
-	 * The second control point
-	 */
-	b: Vector;
-	/**
-	 * The third control point
-	 */
-	c: Vector;
-	/**
-	 * The fourth control point
-	 */
-	d: Vector;
-	/**
-	 * Creates a new Spline based on a set of control points.
-	 * @param a - The first control point
-	 * @param b - The second control point
-	 * @param c - The third control point
-	 * @param d - The fourth control point
-	 */
-	constructor(a: Vector, b: Vector, c: Vector, d: Vector);
-	/**
-	 * Evaluates the point on the spline at a specified parameter value t.
-	 * @param t - The parameter value
-	 */
-	evaluate(t: number): Vector;
-}
-
-/**
  * Represents a complex number of the form a + bi, where a and b are real numbers.
  * Multiplication and division (`times`, `over`, `mul`, `div`) are defined as they typically are for complex numbers, rather than the element-wise version provided by Operable.
  */
@@ -3435,445 +3327,559 @@ declare class Quaternion extends Complex {
 }
 
 /**
- * Contains a collection of useful static methods for manipulating 3D shapes and figures.
- * This class cannot be constructed.
+ * Represents a seeded random number generator.
+ * All instance methods of this class are available statically, so `Random.int(3, 5)` is valid and uses statically stored state of the class itself.
+ * The random number generation functions of this class are organized into two categories: stable and unstable.
+ * Stable functions will produce the same value when called with the same arguments.
+ * Unstable functions don't take any seeding parameters and change their return value on each call.
+ * ```js
+ * let total = 0;
+ * let count = 0;
+ * 
+ * intervals.continuous(() => {
+ * 	total += Random.int(1, 10); // generate a random value each frame
+ * 	count++;
+ * 	const mean = total / count; // compute the mean of the random values
+ * 	renderer.draw(new Color("black")).text(Font.Arial20, mean, 10, 10);
+ * });
+ * ```
  */
-declare class Geometry3D {
+declare class Random {
 	/**
-	 * Returns the smallest convex Polyhedron which contains a given set of points.
-	 * The behavior is undefined if the points are all coplanar.
-	 * @param points - The points to create a convex hull for. There must be at least 4
+	 * The current seed for the unstable random functions. e.g. `.random()`, `.angle()`, `.range()`, etc.
 	 */
-	static convexHull(points: Vector3[]): Polyhedron;
+	seed: number;
 	/**
-	 * Subdivides a frustum along the z axis.
-	 * @param frustum - The frustum to subdivide
-	 * @param portions - How to slice the frustum. If this is a number, the frustum will be sliced into that many pieces of equal size. If this is an array, each element provides a weight proportional to the size of each piece of the frustum. The weights may be scaled by any constant
+	 * The seed for the stable random functions. e.g. `.perlin3D()`, `.voronoi()`, etc.
 	 */
-	static subdivideFrustum(frustum: Frustum, portions: number[] | number): Frustum[];
+	sampleSeed: number;
+	/**
+	 * The distribution of the numbers generated. This is one of the provided static distribution properties of the Random class (`.uniform`, `.normal`, etc.)
+	 */
+	distribution: Function;
+	/**
+	 * A uniform distribution
+	 */
+	static uniform: Function;
+	/**
+	 * A normal distribution
+	 */
+	static normal: Function;
+	/**
+	 * Creates a new random number generator. If either of the seeds are unspecified, they will be initialized to random numbers.
+	 * @param seed - The initial seed for the unstable random functions.
+	 * @param sampleSeed - The seed used for the stable random functions.
+	 * @param distribution - The initial distribution for the numbers generated. Default is `Random.uniform`
+	 */
+	constructor(seed: number, sampleSeed: number, distribution?: Function);
+	/**
+	 * Creates a new random number generator. If either of the seeds are unspecified, they will be initialized to random numbers.
+	 * @param seed - The initial seed for unstable functions
+	 * @param distribution - The initial distribution. Default is `Random.uniform`
+	 */
+	constructor(seed: number, distribution?: Function);
+	/**
+	 * Creates a new random number generator. If either of the seeds are unspecified, they will be initialized to random numbers.
+	 * @param distribution - The initial distribution
+	 */
+	constructor(distribution: Function);
+	/**
+	 * Returns a random number on [0, 1). Unstable.
+	 */
+	random(): number;
+	/**
+	 * Returns a random value in an unbounded normal distribution. Unstable
+	 * @param mu - The mean return value. Default is 0
+	 * @param sd - The standard deviation of possible return values. Default is 1
+	 */
+	normalZ(mu?: number, sd?: number): number;
+	/**
+	 * Returns a random integer on [min, max]. Unstable.
+	 * @param min - The lower bound
+	 * @param max - The upper bound
+	 */
+	int(min: number, max: number): number;
+	/**
+	 * Returns a random boolean value. Unstable.
+	 * @param chance - The probability that the return value is true. Default is 0.5
+	 */
+	bool(chance?: number): boolean;
+	/**
+	 * Returns a random sign, with a 50/50 chance to be -1 or 1. Unstable.
+	 */
+	sign(): number;
+	/**
+	 * Returns a random floating-point value on [min, max). Unstable.
+	 * @param min - The lower bound. Default is -1
+	 * @param max - The upper bound. Default is the negative of min
+	 */
+	range(min?: number, max?: number): number;
+	/**
+	 * Returns a random valid index for a given array. Unstable.
+	 * @param arr - The array to choose an index for
+	 */
+	index(arr: any[]): number;
+	/**
+	 * Returns a random angle in radians on [0, 2π). Unstable.
+	 */
+	angle(): number;
+	/**
+	 * Returns a random single character utf-16 string. Unstable.
+	 */
+	char(): string;
+	/**
+	 * Returns a random opaque color. Unstable.
+	 * @param result - The destination for the color. Default is a new color.
+	 */
+	color(result?: Color): Color;
+	/**
+	 * Returns a random point on the edge of a circle centered at the origin.
+	 * @param radius - The radius of the circle. Default is 1
+	 */
+	circle(radius?: number): Vector2;
+	/**
+	 * Returns a random point on the edge of a semicircle centered at the origin.
+	 * @param normal - The direction the semicircle is facing
+	 * @param radius - The radius of the semicircle. Default is 1
+	 */
+	semicircle(normal: Vector2, radius?: number): void;
+	/**
+	 * Returns a random point on the surface of a sphere centered at the origin.
+	 * @param radius - The radius of the sphere. Default is 1
+	 */
+	sphere(radius?: number): Vector3;
+	/**
+	 * Returns a random point on the surface of a hemisphere centered at the origin and facing in a given direction.
+	 * @param normal - The direction the hemisphere is facing
+	 * @param radius - The radius of the hemisphere. Default is 1
+	 */
+	hemisphere(normal: Vector3, radius?: number): void;
+	/**
+	 * Returns a random point within a given convex shape.
+	 * This method only works with `.distribution` being `Random.uniform`.
+	 * Unstable.
+	 * @param region - The region within which to generate the point
+	 */
+	inShape(region: Shape): Vector;
+	/**
+	 * Randomly orders an array in-place. Unstable.
+	 * @param arr - The array to reorder
+	 */
+	shuffle(arr: any[]): any[];
+	/**
+	 * Chooses an (optionally weighted) random element from an array. Unstable.
+	 * @param values - The values to choose from
+	 */
+	choice(values: Iterable): any;
+	/**
+	 * Chooses an (optionally weighted) random element from an array. Unstable.
+	 * @param values - The values to choose from
+	 * @param percentages - The weight of each value. These can be multiplied by any constant factor
+	 */
+	choice(values: Iterable, percentages: number[]): any;
+	/**
+	 * Randomly selects a sample (with replacement) from a given collection of values. Unstable.
+	 * @param values - The values to sample from
+	 * @param quantity - The size of the sample
+	 */
+	sample(values: Iterable, quantity: number): any[];
+	/**
+	 * Randomly selects a sample (without replacement) from a given collection of values. Unstable.
+	 * @param values - The values to sample from
+	 * @param quantity - The size of the sample
+	 */
+	sampleWithoutReplacement(values: Iterable, quantity: number): any[];
+	/**
+	 * Returns the sum of a specified number of octaves of a specified type of noise.
+	 * @param octaves - The number of octaves
+	 * @param algorithm - The stable algorithm of which octaves are being generated
+	 * @param noiseArgs - The arguments to the noise function
+	 */
+	octave(octaves: number, algorithm: Function, ...noiseArgs: number[]): number;
+	/**
+	 * Samples 1D Perlin noise.
+	 * @param x - The sample location
+	 * @param f - The frequency of the Perlin noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	perlin(x: number, f?: number, seed?: number): number;
+	/**
+	 * Samples 2D Perlin noise.
+	 * @param x - The sample location's x coordinate
+	 * @param y - The sample location's y coordinate
+	 * @param f - The frequency of the Perlin noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	perlin2D(x: number, y: number, f?: number, seed?: number): number;
+	/**
+	 * Samples 3D Perlin noise.
+	 * @param x - The sample location's x coordinate
+	 * @param y - The sample location's y coordinate
+	 * @param z - The sample location's z coordinate
+	 * @param f - The frequency of the Perlin noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	perlin3D(x: number, y: number, z: number, f?: number, seed?: number): number;
+	/**
+	 * Samples 1D Voronoi noise.
+	 * @param x - The sample location
+	 * @param f - The frequency of the Voronoi noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	voronoi(x: number, f?: number, seed?: number): number;
+	/**
+	 * Samples 2D Voronoi noise.
+	 * @param x - The sample location's x coordinate
+	 * @param y - The sample location's y coordinate
+	 * @param f - The frequency of the Voronoi noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	voronoi2D(x: number, y: number, f?: number, seed?: number): number;
+	/**
+	 * Samples 3D Voronoi noise.
+	 * @param x - The sample location's x coordinate
+	 * @param y - The sample location's y coordinate
+	 * @param z - The sample location's z coordinate
+	 * @param f - The frequency of the Voronoi noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	voronoi3D(x: number, y: number, z: number, f?: number, seed?: number): number;
+	/**
+	 * Chooses a new random seed and sampleSeed for the random number generator.
+	 */
+	reSeed(): void;
+	/**
+	 * The current seed for the unstable random functions. e.g. `.random()`, `.angle()`, `.range()`, etc.
+	 */
+	static seed: number;
+	/**
+	 * The seed for the stable random functions. e.g. `.perlin3D()`, `.voronoi()`, etc.
+	 */
+	static sampleSeed: number;
+	/**
+	 * Returns a random number on [0, 1). Unstable.
+	 */
+	static random(): number;
+	/**
+	 * Returns a random value in an unbounded normal distribution. Unstable
+	 * @param mu - The mean return value. Default is 0
+	 * @param sd - The standard deviation of possible return values. Default is 1
+	 */
+	static normalZ(mu?: number, sd?: number): number;
+	/**
+	 * Returns a random integer on [min, max]. Unstable.
+	 * @param min - The lower bound
+	 * @param max - The upper bound
+	 */
+	static int(min: number, max: number): number;
+	/**
+	 * Returns a random boolean value. Unstable.
+	 * @param chance - The probability that the return value is true. Default is 0.5
+	 */
+	static bool(chance?: number): boolean;
+	/**
+	 * Returns a random sign, with a 50/50 chance to be -1 or 1. Unstable.
+	 */
+	static sign(): number;
+	/**
+	 * Returns a random floating-point value on [min, max). Unstable.
+	 * @param min - The lower bound. Default is -1
+	 * @param max - The upper bound. Default is the negative of min
+	 */
+	static range(min?: number, max?: number): number;
+	/**
+	 * Returns a random valid index for a given array. Unstable.
+	 * @param arr - The array to choose an index for
+	 */
+	static index(arr: any[]): number;
+	/**
+	 * Returns a random angle in radians on [0, 2π). Unstable.
+	 */
+	static angle(): number;
+	/**
+	 * Returns a random single character utf-16 string. Unstable.
+	 */
+	static char(): string;
+	/**
+	 * Returns a random opaque color. Unstable.
+	 * @param result - The destination for the color. Default is a new color.
+	 */
+	static color(result?: Color): Color;
+	/**
+	 * Returns a random point on the edge of a circle centered at the origin.
+	 * @param radius - The radius of the circle. Default is 1
+	 */
+	static circle(radius?: number): Vector2;
+	/**
+	 * Returns a random point on the edge of a semicircle centered at the origin.
+	 * @param normal - The direction the semicircle is facing
+	 * @param radius - The radius of the semicircle. Default is 1
+	 */
+	static semicircle(normal: Vector2, radius?: number): void;
+	/**
+	 * Returns a random point on the surface of a sphere centered at the origin.
+	 * @param radius - The radius of the sphere. Default is 1
+	 */
+	static sphere(radius?: number): Vector3;
+	/**
+	 * Returns a random point on the surface of a hemisphere centered at the origin and facing in a given direction.
+	 * @param normal - The direction the hemisphere is facing
+	 * @param radius - The radius of the hemisphere. Default is 1
+	 */
+	static hemisphere(normal: Vector3, radius?: number): void;
+	/**
+	 * Returns a random point within a given convex shape.
+	 * This method only works with `.distribution` being `Random.uniform`.
+	 * Unstable.
+	 * @param region - The region within which to generate the point
+	 */
+	static inShape(region: Shape): Vector;
+	/**
+	 * Randomly orders an array in-place. Unstable.
+	 * @param arr - The array to reorder
+	 */
+	static shuffle(arr: any[]): any[];
+	/**
+	 * Chooses an (optionally weighted) random element from an array. Unstable.
+	 * @param values - The values to choose from
+	 */
+	static choice(values: Iterable): any;
+	/**
+	 * Chooses an (optionally weighted) random element from an array. Unstable.
+	 * @param values - The values to choose from
+	 * @param percentages - The weight of each value. These can be multiplied by any constant factor
+	 */
+	static choice(values: Iterable, percentages: number[]): any;
+	/**
+	 * Randomly selects a sample (with replacement) from a given collection of values. Unstable.
+	 * @param values - The values to sample from
+	 * @param quantity - The size of the sample
+	 */
+	static sample(values: Iterable, quantity: number): any[];
+	/**
+	 * Randomly selects a sample (without replacement) from a given collection of values. Unstable.
+	 * @param values - The values to sample from
+	 * @param quantity - The size of the sample
+	 */
+	static sampleWithoutReplacement(values: Iterable, quantity: number): any[];
+	/**
+	 * Returns the sum of a specified number of octaves of a specified type of noise.
+	 * @param octaves - The number of octaves
+	 * @param algorithm - The stable algorithm of which octaves are being generated
+	 * @param noiseArgs - The arguments to the noise function
+	 */
+	static octave(octaves: number, algorithm: Function, ...noiseArgs: number[]): number;
+	/**
+	 * Samples 1D Perlin noise.
+	 * @param x - The sample location
+	 * @param f - The frequency of the Perlin noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	static perlin(x: number, f?: number, seed?: number): number;
+	/**
+	 * Samples 2D Perlin noise.
+	 * @param x - The sample location's x coordinate
+	 * @param y - The sample location's y coordinate
+	 * @param f - The frequency of the Perlin noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	static perlin2D(x: number, y: number, f?: number, seed?: number): number;
+	/**
+	 * Samples 3D Perlin noise.
+	 * @param x - The sample location's x coordinate
+	 * @param y - The sample location's y coordinate
+	 * @param z - The sample location's z coordinate
+	 * @param f - The frequency of the Perlin noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	static perlin3D(x: number, y: number, z: number, f?: number, seed?: number): number;
+	/**
+	 * Samples 1D Voronoi noise.
+	 * @param x - The sample location
+	 * @param f - The frequency of the Voronoi noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	static voronoi(x: number, f?: number, seed?: number): number;
+	/**
+	 * Samples 2D Voronoi noise.
+	 * @param x - The sample location's x coordinate
+	 * @param y - The sample location's y coordinate
+	 * @param f - The frequency of the Voronoi noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	static voronoi2D(x: number, y: number, f?: number, seed?: number): number;
+	/**
+	 * Samples 3D Voronoi noise.
+	 * @param x - The sample location's x coordinate
+	 * @param y - The sample location's y coordinate
+	 * @param z - The sample location's z coordinate
+	 * @param f - The frequency of the Voronoi noise. Default is 1
+	 * @param seed - The seed for the noise. Default is sampleSeed
+	 */
+	static voronoi3D(x: number, y: number, z: number, f?: number, seed?: number): number;
+	/**
+	 * Chooses a new random seed and sampleSeed for the random number generator.
+	 */
+	static reSeed(): void;
 }
 
 /**
- * Represents a 3D shape.
+ * Represents the way in which dimensions are prioritized in `Geometry.gridToRects()`.
  */
-declare class Shape3D extends Shape<Matrix4, Vector3> {
+declare enum RectPriority {
 	/**
-	 * The amount of space contained within the shape
+	 * The rectangles should be approximately square, with a difference in dimensions of at most one tile
 	 */
-	volume: number;
+	SQUARE,
 	/**
-	 * Returns the smallest axis-aligned rectangular prism that contains the entire shape.
+	 * The rectangles should become as wide as possible, and then grow vertically
 	 */
-	getBoundingBox(): Prism;
+	HORIZONTAL,
+	/**
+	 * The rectangles should become as tall as possible, and then grow horizontally
+	 */
+	VERTICAL
 }
 
 /**
- * Represents a line segment in 3D space.
+ * Provides a collection of 2D geometric algorithms that operate on shapes and vectors.
+ * All methods of this class are static and do not mutate their arguments.
  */
-declare class Line3D extends Shape3D {
+declare class Geometry {
 	/**
-	 * The beginning of the line segment
+	 * Applies a single smoothing step to a connected sequence of line segments.
+	 * @param path - The path to be smoothed
 	 */
-	a: Vector3;
+	static smoothConnector(path: Vector2[]): Vector2[];
 	/**
-	 * The end of the line segment
+	 * Applies a single smoothing step to a polygon.
+	 * @param shape - The shape to be smoothed
 	 */
-	b: Vector3;
+	static smoothPolygon(shape: Polygon): Polygon;
 	/**
-	 * The length of the line segment
+	 * Simplifies a polygon by removing a specified proportion of the vertices.
+	 * @param polygon - The polygon to simplify
+	 * @param percent - The percentage of vertices to remove
 	 */
-	length: number;
+	static simplify(polygon: Polygon, percent: number): Polygon;
 	/**
-	 * The vector from `.a` to `.b`
+	 * Simplifies a polygon by reducing all adjacent colinear edges into a single edge each.
+	 * @param polygon - The polygon to simplify
 	 */
-	vector: Vector3;
+	static reducePolygonEdges(polygon: Polygon): Polygon;
 	/**
-	 * Computes the linear interpolation along the line segment (from `.a` to `.b`) for a specific `t` value.
-	 * @param t - The parameter value for the interpolation on [0, 1]
+	 * Inflates a polygon along its normals by a specified distance.
+	 * @param polygon - The polygon to inflate
+	 * @param distance - The distance to extrude by
 	 */
-	evaluate(t: number): Vector3;
+	static inflate(polygon: Polygon, distance: number): Polygon;
 	/**
-	 * Returns the points on the caller and a given line segment that with minimal distance.
-	 * The distance between these points gives the distance between the line segments.
-	 * The first element of the return value is the point on the caller, and the second is the point on the argument.
-	 * @param other - The line segment to compare with
+	 * Simplifies a polygon by combining adjacent edges that are nearly colinear.
+	 * @param polygon - The polygon to simplify
+	 * @param dtheta - The maximum angular difference in direction between two consecutive edges where they will be combined
 	 */
-	getClosestPoints(other: this): Vector3[];
-}
-
-/**
- * Represents a triangle in 3D space.
- */
-declare class Triangle extends Shape3D {
+	static joinEdges(polygon: Polygon, dtheta: number): Polygon;
 	/**
-	 * The first vertex of the triangle
+	 * Creates a triangular decomposition of the provided convex polygon.
+	 * The triangles are returned as arrays of three vectors.
+	 * @param shape - The convex polygon to decompose
 	 */
-	a: Vector3;
+	static triangulate(shape: Polygon): Vector2[][];
 	/**
-	 * The second vertex of the triangle
+	 * Returns a new list of the unique vectors among a given list, with vectors within a certain tolerance being considered equal.
+	 * @param vectors - A list of a single type of vector
 	 */
-	b: Vector3;
+	static unique(vectors: Vector[]): Vector[];
 	/**
-	 * The third vertex of the triangle
+	 * Returns the smallest convex Polygon which contains a given set of points.
+	 * The behavior is undefined if the points are all colinear.
+	 * @param points - The points to create a convex hull for. There must be at least 3
 	 */
-	c: Vector3;
+	static convexHull(points: Vector2[]): Polygon;
 	/**
-	 * The unit surface normal of the triangle
+	 * Checks whether a list of points are in clockwise order (in Screen-Space).
+	 * Note that this requires there to be at least 3 points.
+	 * @param vertices - The points to check
 	 */
-	normal: Vector3;
+	static isListClockwise(vertices: Vector2[]): boolean;
 	/**
-	 * The area of the triangle
+	 * Combines a set of grid-aligned squares into a small number of rectangles occupying the same space using a greedy algorithm.
+	 * These are then scaled by a certain factor about the origin of the grid.
+	 * @param srcGrid - A grid of booleans representing the squares. The first index of the boolean is the x coordinate, the second index is the y, and the value of the boolean determines whether or not a square exists in that space
+	 * @param cellSize - The factor to scale the result by
+	 * @param priority - How the dimensions of the rectangles should be prioritized in the greedy algorithm. Default is `RectPriority.SQUARE`
 	 */
-	area: number;
+	static gridToRects(srcGrid: boolean[][], cellSize: number, priority?: RectPriority): Rect[];
 	/**
-	 * Creates a new triangle.
-	 * @param points - The points of the triangle
+	 * Combines a set of grid-aligned squares into the minimum number of polygons occupying the same space.
+	 * These are then scaled by a certain factor about the origin of the grid. Holes within groups of squares will be removed.
+	 * @param srcGrid - A grid of booleans representing the squares. The first index of the boolean is the x coordinate, the second index is the y, and the value of the boolean determines whether or not a square exists in that space
+	 * @param cellSize - The factor to scale the result by
 	 */
-	constructor(...points: Vector3[]);
+	static gridToExactPolygons(srcGrid: boolean[][], cellSize: number): Polygon[];
 	/**
-	 * Returns the plane in which the triangle resides.
+	 * Same as `.gridToExactPolygons()`, except that the returned Polygons have their concave vertices removed. Note that this filtering step only happens once, so the result may have still have concave vertices.
+	 * @param grid - A boolean grid representing the squares
+	 * @param cellSize - The factor to scale the result by
 	 */
-	get plane(): Plane;
-}
-
-/**
- * Represents an append-only structure for building procedural polyhedra.
- * Vertices and triangles can be added through various means, and can at any point be converted into a Polyhedron.
- */
-declare class PolyhedronBuilder {
+	static gridToPolygons(grid: boolean[][], cellSize: number): Polygon[];
 	/**
-	 * The vertices of the polyhedron. These can be added to directly, if desired
+	 * Finds the closest point from a list of points to a given point.
+	 * @param target - The point distances are checked from
+	 * @param points - The points to compare
 	 */
-	vertices: Vector3[];
+	static closest(target: Vector, points: Vector[]): Vector;
 	/**
-	 * The indices of the vertices of the triangular faces of the polyhedron. These can be added to directly, if desired
+	 * Finds the farthest point from a list of points to a given point.
+	 * @param target - The point distances are checked from
+	 * @param points - The points to compare
 	 */
-	indices: number[];
+	static farthest(target: Vector, points: Vector[]): Vector;
 	/**
-	 * Whether the polyhedron should be constructed lazily, i.e. whether it is guaranteed to not contain duplicate vertices or degenerate triangles. Starts as false
+	 * Normalizes an angle to be on the interval [0, 2π).
+	 * @param theta - The angle to normalize
 	 */
-	lazy: boolean;
+	static normalizeAngle(theta: number): number;
 	/**
-	 * Creates a new building structure, with no vertices or indices.
+	 * Finds the shortest angular displacement between two angles.
+	 * @param a - The first angle
+	 * @param b - The second angle
 	 */
-	constructor();
+	static signedAngularDist(a: number, b: number): number;
 	/**
-	 * Creates a new Polyhedron out of the current state of the builder.
-	 * The Polyhedron is disconnected, in the sense that future changes to the builder will not be reflected in the created Polyhedron.
+	 * Returns the closest intersection of a ray with a collection of shapes.
+	 * The return value is either null (if the ray-cast misses) or an object with two properties:
+	 * a `.hitPoint` property containing the location of the ray intersection, and a `.hitShape` property containing the shape that the ray intersected.
+	 * The dimensionality of the ray specification and the shapes must match, but this function will work for both Vector2/Shape2D and Vector3/Shape3D configurations.
+	 * @param rayOrigin - The starting point of the ray
+	 * @param rayDirection - The direction of the ray
+	 * @param shapes - The Shapes to ray-cast against
 	 */
-	get polyhedron(): Polyhedron;
+	static rayCast(rayOrigin: Vector, rayDirection: Vector, shapes: Shape[]): { hitShape: Shape, hitPoint: Vector } | null;
 	/**
-	 * Adds an additional triangle for every existing triangle, with the opposite winding direction.
+	 * Decomposes any polygon into a collection of convex polygons that occupy the same space.
+	 * @param polygon - The polygon to subdivide
 	 */
-	double(): void;
+	static subdividePolygon(polygon: Polygon): Polygon[];
 	/**
-	 * Adds a new vertex, and returns its index.
-	 * @param vertex - The vertex to add
+	 * Returns the point of intersection between a line segment and a ray, or null if they don't intersect
+	 * @param rayOrigin - The origin of the ray
+	 * @param rayDirection - The direction of the ray
+	 * @param line - The line
 	 */
-	addVertex(vertex: Vector3): number;
+	static intersectRayLine(rayOrigin: Vector2, rayDirection: Vector2, line: Line): Vector2 | null;
 	/**
-	 * Adds a new sequence of vertices, and returns the index of the first vertex in the sequence
-	 * @param vertices - The vertices to add
+	 * Returns the point of intersection between two line segments, or null if they don't intersect
+	 * @param a - The first line
+	 * @param b - The second line
 	 */
-	addVertices(vertices: Vector3[]): number;
+	static intersectLineLine(a: Line, b: Line): Vector2 | null;
 	/**
-	 * Adds the entire contents of a Polyhedron to the builder, and returns the index of the first vertex added.
-	 * @param polyhedron - The Polyhedron to add
-	 * @param flip - Whether to flip all the faces in the added Polyhedron. This does not modify the first argument in-place. Default is false
+	 * Returns the region of intersection between two convex polygons, or null if they don't intersect.
+	 * @param a - The first polygon
+	 * @param b - The second polygon
 	 */
-	addPolyhedron(polyhedron: Polyhedron, flip?: boolean): number;
-	/**
-	 * Adds a list of vertices representing the edge of a convex polygon, and adds triangles in a "triangle fan" formation to connect them.
-	 * Returns the index of the first vertex added.
-	 * @param vertices - The vertices of the convex polygon
-	 * @param flip - Whether to swap the winding direction of the faces to be opposite the order of the vertices. Default is false
-	 */
-	addConvexVertices(vertices: Vector3[], flip?: boolean): number;
-}
-
-/**
- * Represents a closed 3D polyhedron as a collection of contiguous triangles.
- */
-declare class Polyhedron extends Shape3D {
-	/**
-	 * The vertices of the polyhedron
-	 */
-	vertices: Vector3[];
-	/**
-	 * An array representing the triangles of the polyhedron. Every three indices in the array specify the locations in the `.vertices` array which make up a triangle
-	 */
-	indices: number[];
-	/**
-	 * The number of faces of the polyhedron. This property is equivalent to `indices.length / 3`
-	 */
-	faceCount: number;
-	/**
-	 * Creates a new polyhedron.
-	 * @param vertices - The vertices of the polyhedron
-	 * @param indices - The vertex indices for the triangular faces of the polyhedron
-	 */
-	constructor(vertices: Vector3[], indices: number[]);
-	/**
-	 * Returns a set of unique lines that represent the edges of the faces of the polyhedron.
-	 */
-	getEdges(): Line3D[];
-	/**
-	 * Returns the vertex indices of the nth face of the polyhedron.
-	 * @param index - The index of the face
-	 */
-	getFaceIndices(index: number): number[];
-	/**
-	 * Returns the nth face in the polyhedron.
-	 * @param index - The index of the face
-	 */
-	getFace(index: number): Triangle;
-	/**
-	 * Returns a set of triangles making up the surface of the polyhedron.
-	 */
-	getFaces(): Triangle[];
-	/**
-	 * Returns a set of planes whose negative half-spaces' intersection form the polyhedron.
-	 * This method has undefined behavior for a concave polyhedron.
-	 */
-	getPlanes(): Plane[];
-	/**
-	 * Returns an undirected adjacency map between the face indices of the polyhedron.
-	 * In the map, faces are represented by their index in the return value of `.getFaces()`, and all faces are included as keys.
-	 */
-	getFaceAdjacency(): Map<number, number[]>
-	/**
-	 * Subdivides each triangle in the polyhedron into a power of 4 number of additional triangles.
-	 * The subdivided mesh is a copy and is returned.
-	 * @param count - The power of 4 to multiply the triangle count by. Default is 1
-	 */
-	subdivide(count?: number): this;
-	/**
-	 * Creates a new polyhedron by transforming every vertex using a given function.
-	 * @param vertexTransform - The function to apply to each vertex
-	 */
-	map(vertexTransform: (arg0: Vector3) => Vector3): this;
-	/**
-	 * Creates a new polyhedron from a list of triangles which form a closed surface.
-	 * @param triangles - The triangles to use as the surface
-	 */
-	static fromTriangles(triangles: Triangle[]): Polyhedron;
-	/**
-	 * Creates a polyhedron that resembles a sphere to a given level of precision.
-	 * @param sphere - The sphere to approximate
-	 * @param steps - The amount of vertices to use around the great circles of the sphere. Default is 8
-	 */
-	static fromSphere(sphere: Sphere, steps?: number): Polyhedron;
-	/**
-	 * Creates a polyhedron that resembles a capsule.
-	 * @param capsule - The capsule to approximate
-	 * @param steps - The amount of vertices to use around the circular cross-sections of the capsule. Default is 8
-	 */
-	static fromCapsule(capsule: Capsule, steps?: number): void;
-	/**
-	 * Creates a polyhedron that resembles a right circular cone to a given level of precision
-	 * @param axis - A line segment from the center of the cone's base to the peak
-	 * @param radius - The radius of the circular base
-	 * @param steps - The amount of vertices around the circular base. Default is 8
-	 */
-	static fromCone(axis: Line3D, radius: number, steps?: number): void;
-	/**
-	 * Creates a polyhedron that resembles a right circular cylinder to a given level of precision.
-	 * @param longAxis - A line segment between the centers of the two circular faces
-	 * @param radius - The radius of the cylinder
-	 * @param steps - The amount of vertices to use around the circular faces. Default is 8
-	 */
-	static fromCylinder(longAxis: Line3D, radius: number, steps?: number): Polyhedron;
-}
-
-/**
- * Represents an axis-aligned rectangular prism.
- */
-declare class Prism extends Polyhedron {
-	/**
-	 * The C coordinate of the left-upper-front corner
-	 */
-	x: number;
-	/**
-	 * The C coordinate of the left-upper-front corner
-	 */
-	y: number;
-	/**
-	 * The C coordinate of the left-upper-front corner
-	 */
-	z: number;
-	/**
-	 * The x axis size of the prism
-	 */
-	width: number;
-	/**
-	 * The y axis size of the prism
-	 */
-	height: number;
-	/**
-	 * The z axis size of the prism
-	 */
-	depth: number;
-	/**
-	 * The interval of the C axis occupied by the prism
-	 */
-	xRange: Range;
-	/**
-	 * The interval of the C axis occupied by the prism
-	 */
-	yRange: Range;
-	/**
-	 * The interval of the C axis occupied by the prism
-	 */
-	zRange: Range;
-	/**
-	 * The left-upper-front corner
-	 */
-	min: Vector3;
-	/**
-	 * The right-lower-back corner
-	 */
-	max: Vector3;
-	/**
-	 * Creates a new rectangular prism.
-	 * @param min - The left-upper-front corner of the prism
-	 * @param max - The right-lower-back corner of the prism
-	 */
-	constructor(min: Vector3, max: Vector3);
-	/**
-	 * Returns a prism representing the points in both the caller and another given prism.
-	 * @param prism - The prism to intersect with
-	 */
-	clip(prism: this): this;
-	/**
-	 * Creates a rectangular prism from a set of intervals.
-	 * @param xRange - The interval on the x axis occupied by the prism
-	 * @param yRange - The interval on the y axis occupied by the prism
-	 * @param zRange - The interval on the z axis occupied by the prism
-	 */
-	static fromRanges(xRange: Range, yRange: Range, zRange: Range): Prism;
-	/**
-	 * Creates a rectangular prism from a given minimum and maximum point.
-	 * @param min - The left-upper-front corner of the prism
-	 * @param max - The right-lower-back corner of the prism
-	 */
-	static fromMinMax(min: Vector3, max: Vector3): Prism;
-	/**
-	 * Creates a rectangular prism centered at the origin with given dimensions.
-	 * @param dimensions - A vector containing (width, height, depth) of the prism
-	 */
-	static fromDimensions(dimensions: Vector3): Prism;
-	/**
-	 * Creates a rectangular prism centered at the origin with given dimensions.
-	 * @param width - The width of the prism
-	 * @param height - The height of the prism
-	 * @param depth - The depth of the prism
-	 */
-	static fromDimensions(width: number, height: number, depth: number): Prism;
-	/**
-	 * Computes the smallest rectangular prism that contains a set of points and returns it.
-	 * @param points - The points to contain
-	 */
-	static bound(points: Vector3[]): Prism;
-	/**
-	 * Computes the smallest bounding rectangular prism the contains a set of other rectangular prisms.
-	 * @param boxes - The boxes to contain
-	 */
-	static composeBoundingBoxes(boxes: Prism[]): Prism;
-}
-
-/**
- * Represents an infinite plane in 3D space.
- */
-declare class Plane extends Shape3D {
-	/**
-	 * The unit normal vector to the plane
-	 */
-	normal: Vector3;
-	/**
-	 * The distance from the plane to the origin
-	 */
-	distance: number;
-	/**
-	 * Creates a new plane.
-	 */
-	constructor();
-	/**
-	 * Returns the signed distance from the caller to a given point.
-	 * @param point - The point to find the signed distance to
-	 */
-	signedDist(point: Vector3): number;
-	/**
-	 * Reflects a point in-place about the caller and returns it.
-	 * @param point - The point to reflect
-	 */
-	reflect(point: Vector3): Vector3;
-	/**
-	 * Returns a copy of a point reflected about the caller.
-	 * @param point - The point to reflect
-	 */
-	reflected(point: Vector3): Vector3;
-}
-
-/**
- * Represents the frustum of a projection matrix.
- * This is the space projected (via a perspective divide) by a given matrix into the region [-1, 1].
- */
-declare class Frustum extends Polyhedron {
-	/**
-	 * The planes bounding the frustum
-	 */
-	planes: Plane[];
-	/**
-	 * Creates a frustum for a given projection matrix.
-	 * @param projection - The projection for which to create a frustum
-	 */
-	constructor(projection: Matrix4);
-}
-
-/**
- * Represents a 3D sphere, the collection of points within a given distance of a center.
- */
-declare class Sphere extends Shape3D {
-	/**
-	 * The center of the sphere
-	 */
-	position: Vector3;
-	/**
-	 * The maximum distance from the center of the sphere to its bounds
-	 */
-	radius: number;
-	/**
-	 * Creates a new sphere.
-	 * @param position - The center of the sphere
-	 * @param radius - The radius of the sphere
-	 */
-	constructor(position: Vector3, radius: number);
-	/**
-	 * Returns a sphere which contains all of the given spheres.
-	 * It is not guaranteed to be a newly allocated sphere, nor is it guaranteed to be the smallest possible bounding sphere.
-	 * @param spheres - The bounding spheres to compose together. This must include at least one sphere
-	 */
-	static composeBoundingBalls(spheres: Sphere[]): Sphere;
-}
-
-/**
- * Represents an arbitrarily aligned capsule (the set of points which are a fixed radius away from a line segment).
- */
-declare class Capsule extends Shape3D {
-	/**
-	 * The core line segment which all points are equidistant to
-	 */
-	axis: Line3D;
-	/**
-	 * The radius of the capsule
-	 */
-	radius: number;
-	/**
-	 * Creates a new capsule.
-	 * @param axis - The central line segment
-	 * @param radius - The radius of the capsule
-	 */
-	constructor(axis: Line3D, radius: number);
+	static intersectPolygonPolygon(a: Polygon, b: Polygon): Polygon | null;
 }
 
 /**
@@ -4656,809 +4662,6 @@ declare class AnimationStateMachine extends ImageType {
 }
 
 /**
- * Represents a camera in a scene targeting a particular size of rendering surface.
- * The transformation represented by this matrix is from World-Space to Camera-Space.
- * `Vector` in the context of this class refers to either `Vector2` or `Vector3` depending on whether Camera2D or Camera3D is used.
- * Changes to camera position and orientation should be made before the screen is cleared, to avoid objects being rendered from multiple different camera positions over the course of the frame.
- */
-declare interface Camera<Vector> extends Matrix {
-	/**
-	 * The location of the camera in World-Space
-	 */
-	position: Vector;
-	/**
-	 * The magnification level of the camera
-	 */
-	zoom: number;
-	/**
-	 * The clockwise roll (in radians) of the camera. Starts at 0
-	 */
-	rotation: number;
-	/**
-	 * Returns the caller.
-	 */
-	get matrix(): Matrix;
-	/**
-	 * Sets the zoom to 1.
-	 */
-	restoreZoom(): void;
-	/**
-	 * Zooms in by a specified amount.
-	 * @param amount - The amount to zoom in by
-	 */
-	zoomIn(amount: number): void;
-	/**
-	 * Zooms out by a specified amount.
-	 * @param amount - The amount to zoom out by
-	 */
-	zoomOut(amount: number): void;
-	/**
-	 * Multiplies the current zoom value.
-	 * @param factor - The amount to multiply the current zoom
-	 */
-	zoomBy(factor: number): void;
-	/**
-	 * Smoothly moves the camera toward a new position value.
-	 * @param point - The new position to move toward
-	 * @param ferocity - The degree to which the camera should move toward the new position, on [0, 1]
-	 */
-	moveTowards(point: Vector, ferocity: number): void;
-	/**
-	 * Maps a given point from Camera-Space to World-Space.
-	 * @param point - The point to transform
-	 */
-	cameraToWorld(point: Vector): Vector;
-	/**
-	 * Maps a given point from World-Space to Camera-Space.
-	 * @param point - The point to transform
-	 */
-	worldToCamera(point: Vector): Vector;
-	/**
-	 * Assuming a renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
-	 * @param render - The function to call while in the World-Space context
-	 * @param renderer - The renderer which `render()` writes to, which should be transformed
-	 */
-	drawInWorldSpace(render: () => void, renderer?: Artist): void;
-	/**
-	 * Assuming a renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
-	 * @param render - The function to call while in the Camera-Space context
-	 * @param renderer - The renderer which `render()` writes to, which should be transformed
-	 */
-	drawInCameraSpace(render: () => void, renderer: Artist): void;
-	/**
-	 * Creates an undisplaced camera for a provided rendering surface, targeting the entire surface.
-	 * In 2D, this camera is positioned at the center of the surface, and in 3D it is positioned at (0, 0, 0) and pointing forward.
-	 * @param surface - The rendering surface to target
-	 */
-	static forSurface(surface: CanvasImage | Frame): Camera;
-}
-
-/**
- * Represents the camera in a 2D scene.
- */
-declare class Camera2D extends Matrix3 implements Camera<Vector2> {
-	/**
-	 * Smoothly moves the camera toward a new rotation value.
-	 * @param angle - The new rotation to move toward (in radians)
-	 * @param ferocity - The degree to which the camera should move toward the new position, on [0, 1]
-	 */
-	rotateTowards(angle: number, ferocity: number): void;
-	/**
-	 * Moves the camera such that the entire viewport is entire a given axis-aligned rectangular boundary.
-	 * If the boundary is smaller than the viewport, the behavior is undefined.
-	 * @param boundary - The boundary in which the camera's viewport must exist
-	 */
-	constrain(boundary: Rect): void;
-	/**
-	 * Moves the camera such that the entire viewport is entire a given axis-aligned rectangular boundary.
-	 * If the boundary is smaller than the viewport, the behavior is undefined.
-	 * @param x - The x coordinate of the upper-left corner of the boundary
-	 * @param y - The y coordinate of the upper-left corner of the boundary
-	 * @param width - The width of the boundary
-	 * @param height - The height of the boundary
-	 */
-	constrain(x: number, y: number, width: number, height: number): void;
-	/**
-	 * Zooms in/out about a specific point (in World-Space) by a specific factor.
-	 * @param center - The zoom center
-	 * @param factor - The zoom multiplier
-	 */
-	zoomAbout(center: Vector2, factor: number): void;
-	/**
-	 * Returns the axis-aligned bounding box of the current viewport.
-	 */
-	get screen(): Rect;
-	/**
-	 * The location of the camera in World-Space
-	 */
-	position: Vector;
-	/**
-	 * The magnification level of the camera
-	 */
-	zoom: number;
-	/**
-	 * The clockwise roll (in radians) of the camera. Starts at 0
-	 */
-	rotation: number;
-	/**
-	 * Returns the caller.
-	 */
-	get matrix(): Matrix;
-	/**
-	 * Sets the zoom to 1.
-	 */
-	restoreZoom(): void;
-	/**
-	 * Zooms in by a specified amount.
-	 * @param amount - The amount to zoom in by
-	 */
-	zoomIn(amount: number): void;
-	/**
-	 * Zooms out by a specified amount.
-	 * @param amount - The amount to zoom out by
-	 */
-	zoomOut(amount: number): void;
-	/**
-	 * Multiplies the current zoom value.
-	 * @param factor - The amount to multiply the current zoom
-	 */
-	zoomBy(factor: number): void;
-	/**
-	 * Smoothly moves the camera toward a new position value.
-	 * @param point - The new position to move toward
-	 * @param ferocity - The degree to which the camera should move toward the new position, on [0, 1]
-	 */
-	moveTowards(point: Vector, ferocity: number): void;
-	/**
-	 * Maps a given point from Camera-Space to World-Space.
-	 * @param point - The point to transform
-	 */
-	cameraToWorld(point: Vector): Vector;
-	/**
-	 * Maps a given point from World-Space to Camera-Space.
-	 * @param point - The point to transform
-	 */
-	worldToCamera(point: Vector): Vector;
-	/**
-	 * Assuming a renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
-	 * @param render - The function to call while in the World-Space context
-	 * @param renderer - The renderer which `render()` writes to, which should be transformed
-	 */
-	drawInWorldSpace(render: () => void, renderer?: Artist): void;
-	/**
-	 * Assuming a renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
-	 * @param render - The function to call while in the Camera-Space context
-	 * @param renderer - The renderer which `render()` writes to, which should be transformed
-	 */
-	drawInCameraSpace(render: () => void, renderer: Artist): void;
-	/**
-	 * Creates an undisplaced camera for a provided rendering surface, targeting the entire surface.
-	 * In 2D, this camera is positioned at the center of the surface, and in 3D it is positioned at (0, 0, 0) and pointing forward.
-	 * @param surface - The rendering surface to target
-	 */
-	static forSurface(surface: CanvasImage | Frame): Camera;
-}
-
-/**
- * Represents a color to be used in rendering.
- * It is stored as an RGB triple with an additional opacity component.
- */
-declare class Color extends Operable {
-	/**
-	 * The red component of the color, on [0, 255]
-	 */
-	red: number;
-	/**
-	 * The green component of the color, on [0, 255]
-	 */
-	green: number;
-	/**
-	 * The blue component of the color, on [0, 255]
-	 */
-	blue: number;
-	/**
-	 * The alpha (opacity) component of the color, on [0, 1]
-	 */
-	alpha: number;
-	/**
-	 * Whether or not all the color's channels will be clamped within their respective bounds after all operations. This starts as true
-	 */
-	limited: boolean;
-	/**
-	 * The grayscale intensity of the color, on [0, 1]
-	 */
-	brightness: number;
-	/**
-	 * The numeric components of the color, `["red", "green", "blue", "alpha"]`
-	 */
-	static modValues: string[];
-	/**
-	 * The smallest visually meaningful change in alpha, 1/255.
-	 */
-	static EPSILON: number;
-	/**
-	 * Creates a new Color.
-	 * @param color - Any valid CSS color representation
-	 */
-	constructor(color: string);
-	/**
-	 * Creates a new Color.
-	 * @param red - The red component of the color, on [0, 255]
-	 * @param green - The green component of the color, on [0, 255]
-	 * @param blue - The blue component of the color, on [0, 255]
-	 * @param alpha - The alpha (opacity) component of the color, on [0, 1]. Default is 1
-	 */
-	constructor(red: number, green: number, blue: number, alpha?: number);
-	/**
-	 * Returns the hexadecimal representation of the color as a 32-bit integer.
-	 * In most-to-least significant byte order, the format returned will be `RRGGBBAA`.
-	 */
-	get hex(): number;
-	/**
-	 * Returns a copy of the color with an alpha of 1.
-	 */
-	get opaque(): this;
-	/**
-	 * Returns the inverse of the caller, with the same alpha as the caller.
-	 * The inverse is defined as white minus the caller.
-	 */
-	get inverse(): this;
-	/**
-	 * Returns a copy of the color, now with `.limited = false`.
-	 * As such, the return value can be multiplied and added without getting clamped.
-	 */
-	get unlimited(): this;
-	/**
-	 * Returns the CSS rgba color string representing the color.
-	 */
-	getRGBA(): string;
-	/**
-	 * Returns the CSS hex color string representing the color.
-	 */
-	getHex(): string;
-	/**
-	 * Returns the GLSL vec4 string representing the color.
-	 */
-	getGLSL(): string;
-	/**
-	 * Returns a valid CSS string representation of the color.
-	 */
-	toString(): string;
-	/**
-	 * Returns a copy of a specified color with a specified alpha.
-	 * @param color - The color to use for the RGB portion of the result
-	 * @param alpha - The new alpha value
-	 */
-	static alpha(color: Color, alpha: number): Color;
-	/**
-	 * Returns a copy of a color with a specified change in saturation.
-	 * @param color - The base color
-	 * @param factor - The multiplier on the current saturation of the color
-	 */
-	static saturate(color: Color, factor: number): Color;
-	/**
-	 * Returns a new grayscale color with a specified brightness.
-	 * @param intensity - The grayscale intensity on [0, 1]
-	 */
-	static grayScale(intensity: number): Color;
-	/**
-	 * Creates a new color whose channels aren't clamped within the normal range (`.limited = false`).
-	 * @param color - Any valid CSS color representation
-	 */
-	static unlimited(color: string): Color;
-	/**
-	 * Creates a new color whose channels aren't clamped within the normal range (`.limited = false`).
-	 * @param red - The red component of the color, on [0, 255]
-	 * @param green - The green component of the color, on [0, 255]
-	 * @param blue - The blue component of the color, on [0, 255]
-	 * @param alpha - The alpha (opacity) component of the color, on [0, 1]. Default is 1
-	 */
-	static unlimited(red: number, green: number, blue: number, alpha?: number): Color;
-}
-
-/**
- * Represents a font, including family, side, and styling.
- * Fonts can be used in the text rendering functions of Artist.
- * ```js
- * const font = new Font(15, "Consolas").italic(); // italic 15px Consolas
- * 
- * renderer.draw(new Color("black")).text(font, "Hello World!", 0, 0);
- * ```
- */
-declare class Font {
-	/**
-	 * The size of the font in CSS pixels
-	 */
-	size: number;
-	/**
-	 * The string identifier for the font family
-	 */
-	family: string;
-	/**
-	 * Whether the font is bold
-	 */
-	bolded: boolean;
-	/**
-	 * Whether the font is italic
-	 */
-	italicized: boolean;
-	/**
-	 * The height of a line of text in the font. This determines spacing between multi-line strings
-	 */
-	lineHeight: number;
-	/**
-	 * The number of spaces a tab is equivalent to for this font
-	 */
-	tabSize: number;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif5: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif10: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif15: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif20: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif25: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif30: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif35: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif40: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif45: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif50: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif55: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif60: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif65: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif70: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif75: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif80: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif85: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif90: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif95: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Serif100: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial5: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial10: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial15: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial20: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial25: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial30: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial35: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial40: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial45: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial50: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial55: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial60: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial65: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial70: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial75: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial80: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial85: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial90: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial95: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Arial100: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive5: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive10: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive15: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive20: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive25: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive30: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive35: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive40: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive45: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive50: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive55: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive60: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive65: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive70: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive75: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive80: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive85: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive90: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive95: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Cursive100: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace5: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace10: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace15: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace20: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace25: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace30: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace35: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace40: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace45: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace50: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace55: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace60: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace65: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace70: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace75: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace80: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace85: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace90: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace95: Font;
-	/**
-	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
-	 */
-	static Monospace100: Font;
-	/**
-	 * Creates a new font which is non-italic and non-bold.
-	 * The font will have a tab size of 4.
-	 * @param size - The size and line height of the font
-	 * @param family - The font family
-	 */
-	constructor(size: number, family: string);
-	/**
-	 * Returns a copy of the caller with its `.family` property changed to a given value.
-	 * @param family - The new font family
-	 */
-	withFamily(family: string): this;
-	/**
-	 * Returns a copy of the caller with its `.size` property changed to a given value.
-	 * The ratio of `.lineHeight` to `.size` will remain constant.
-	 * @param size - The new font size, in CSS pixels
-	 */
-	withSize(size: number): this;
-	/**
-	 * Returns a copy of the caller with its `.lineHeight` property changed to a given value.
-	 * The line height represents the vertical distance between two subsequent lines.
-	 * @param lineHeight - The new font's line height, in CSS pixels
-	 */
-	withLineHeight(lineHeight: number): this;
-	/**
-	 * Returns a copy of the caller with its `.tabSize` property changed to a given value.
-	 * @param tabSize - The amount of spaces a tab will correspond to
-	 */
-	withTabSize(tabSize: number): this;
-	/**
-	 * Returns a copy of the caller with its `.bolded` property changed to a given value.
-	 * @param bold - Whether the new font should be bold. Default is true
-	 */
-	bold(bold?: boolean): this;
-	/**
-	 * Returns a copy of the caller with its `.italicized` property changed to a given value.
-	 * @param italic - Whether the new font should be italic. Default is true
-	 */
-	italic(italic?: boolean): this;
-	/**
-	 * Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
-	 * @param text - The text to pack
-	 * @param maxWidth - The maximum allowed width of a single line in the output text
-	 */
-	packText(text: string, maxWidth: number): string;
-	/**
-	 * Returns the width and height of a string of text, optionally after being packed into a fixed max width.
-	 * The return value contains `.width` and `.height` properties, both of which are Numbers.
-	 * @param text - The text to be measured
-	 * @param maxWidth - The maximum allowed width of a single line before wrapping occurs. Default is Infinity
-	 */
-	getTextBounds(text: string, maxWidth?: number): { width: number, height: number };
-	/**
-	 * Returns the width of a string of text.
-	 * @param text - The text to measure
-	 * @param maxWidth - The maximum allowed width of a single line before wrapping occurs. Defaults is Infinity
-	 */
-	getTextWidth(text: string, maxWidth?: number): number;
-	/**
-	 * Returns the height of a string of text.
-	 * @param text - The text to measure
-	 * @param packWidth - The maximum allowed width of a single line before wrapping occurs. Default is Infinity
-	 */
-	getTextHeight(text: string, packWidth?: number): number;
-	/**
-	 * Converts the Font to a valid CSS font string.
-	 */
-	toString(): string;
-}
-
-/**
- * Represents an offscreen drawing surface that can be rendered as an image.
- * It is based on the HTML5 Canvas API.
- * ```js
- * const frame = new Frame(100, 200);
- * 
- * // add shapes to the frame
- * frame.renderer.stroke(new Color("blue"), 2).rect(10, 10, 20, 20);
- * frame.renderer.draw(new Color("red")).circle(30, 100, 50);
- * 
- * // render the frame to the screen
- * renderer.image(frame).default(0, 0);
- * ```
- */
-declare class Frame extends ImageType implements Copyable {
-	/**
-	 * The renderer local to the frame that can be used to modify its contents
-	 */
-	renderer: CanvasArtist2D;
-	/**
-	 * Creates a new Frame.
-	 * @param width - The natural width of the frame
-	 * @param height - The natural height of the frame
-	 * @param pixelRatio - The pixel ratio for the frame. The default is `window.devicePixelRatio`
-	 */
-	constructor(width: number, height: number, pixelRatio?: number);
-	/**
-	 * Returns a copy of the frame stretched to a new set of dimensions.
-	 * @param width - The width of the stretched image
-	 * @param height - The height of the stretched image
-	 */
-	stretch(width: number, height: number): this;
-	/**
-	 * Returns a frame containing a rectangular region of the caller.
-	 * @param region - The region to extract
-	 */
-	clip(region: Rect): this;
-	/**
-	 * Returns a frame containing a rectangular region of the caller.
-	 * @param x - The x coordinate of the upper-left corner of the region.
-	 * @param y - The y coordinate of the upper-left corner of the region.
-	 * @param width - The width of the region
-	 * @param height - The height of the region
-	 */
-	clip(x: number, y: number, width: number, height: number): this;
-	/**
-	 * Returns a frame containing the (optionally clipped) contents of an image.
-	 * If no clipping parameters are provided, the whole image will be copied.
-	 * The copy will have the same pixel ratio as the original image.
-	 * @param image - The image to copy data from
-	 */
-	static fromImageType(image: ImageType): Frame;
-	/**
-	 * Returns a frame containing the (optionally clipped) contents of an image.
-	 * If no clipping parameters are provided, the whole image will be copied.
-	 * The copy will have the same pixel ratio as the original image.
-	 * @param image - The image to copy data from
-	 * @param region - The region to extract
-	 */
-	static fromImageType(image: ImageType, region: Rect): Frame;
-	/**
-	 * Returns a frame containing the (optionally clipped) contents of an image.
-	 * If no clipping parameters are provided, the whole image will be copied.
-	 * The copy will have the same pixel ratio as the original image.
-	 * @param image - The image to copy data from
-	 * @param x - The x coordinate of the upper-left corner of the region.
-	 * @param y - The y coordinate of the upper-left corner of the region.
-	 * @param width - The width of the region
-	 * @param height - The height of the region
-	 */
-	static fromImageType(image: ImageType, x: number, y: number, width: number, height: number): Frame;
-	/**
-	 * Creates a copy of the object and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the object into. This must be the same type as the caller
-	 */
-	get(destination?: this): this;
-}
-
-/**
  * Represents the renderable result of a GLSL fragment shader invoked for every pixel in a rectangular region.
  * The entry point for the shader is a function of the form:
  * ```glsl
@@ -5581,125 +4784,6 @@ declare class Gradient {
 	 * @param t - The parameter value to sample at
 	 */
 	sample(t: number): Operable;
-}
-
-/**
- * Represents a single variable that can be graphed on a GraphPlane.
- */
-declare class Graph {
-	/**
-	 * The displayed name of the variable
-	 */
-	name: string;
-	/**
-	 * A function which returns the current value of the variable
-	 */
-	y: () => number;
-	/**
-	 * The minimum displayed value of the variable. This is the lower bound of the vertical axis
-	 */
-	minY: number;
-	/**
-	 * The maximum displayed value of the variable. This is the upper bound of the vertical axis
-	 */
-	maxY: number;
-	/**
-	 * The color of the graph of this variable
-	 */
-	color: Color;
-	/**
-	 * The number of decimal places to display for the value of this variable
-	 */
-	decimalPlaces: number;
-	/**
-	 * The plane on which this graph is displayed
-	 */
-	plane: GraphPlane;
-	/**
-	 * Creates a new Graph.
-	 * @param name - The displayed name of the variable
-	 * @param y - A function which returns the current value of the variable
-	 * @param minY - The minimum displayed value of the variable
-	 * @param maxY - The maximum displayed value of the variable
-	 * @param color - The color of the graph of this variable
-	 * @param decimalPlaces - The number of decimal places to display for the value of this variable. Default is 2
-	 */
-	constructor(name: string, y: () => number, minY: number, maxY: number, color: Color, decimalPlaces?: number);
-}
-
-/**
- * Represents a renderable, updating graph of one or more variables.
- * This class is to be used for debugging or technical visualization purposes, rather than in games or tools.
- * This class should not be constructed and should instead be created using `Intervals.prototype.makeGraphPlane()`.
- * ```js
- * // graph the value of perlin noise
- * const graph = intervals.makeGraphPlane([
- * 	new Graph("Perlin", () => {
- * 		const time = intervals.frameCount;
- * 		return Random.perlin(time, 0.01);
- * 	}, 0, 1, new Color("white"))
- * ]);
- * 
- * intervals.continuous(() => {
- * 	renderer.image(graph).default(10, 10);
- * });
- * ```
- */
-declare class GraphPlane extends Frame {
-	/**
-	 * The graphs displayed on this plane
-	 */
-	graphs: Graph[];
-	/**
-	 * The total number of frames displayed on the graph plane
-	 */
-	frameLimit: number;
-}
-
-/**
- * Represents a 2D grid of grayscale values.
- * ```js
- * const perlinMap = new GrayMap(100, 100, (x, y) => {
- * 	return Random.perlin2D(x, y, 0.1);
- * });
- * ```
- */
-declare class GrayMap implements Serializable {
-	/**
-	 * The width of the map
-	 */
-	width: number;
-	/**
-	 * The height of the map
-	 */
-	height: number;
-	/**
-	 * The intensity values (on [0, 1]) of the map
-	 */
-	data: number[][];
-	/**
-	 * Creates a new GrayMap based on an intensity function.
-	 * @param width - The width of the map
-	 * @param height - The height of the map
-	 * @param rule - A function to be called for each coordinate pair to generate the intensity values
-	 */
-	constructor(width: number, height: number, rule: (arg0: number, arg1: number) => number);
-	/**
-	 * Returns the grayscale value at a specified point, or -1 if the point is out of bounds.
-	 * @param x - The x coordinate of the sample point
-	 * @param y - The y coordinate of the sample point
-	 */
-	get(x: number, y: number): number;
-	/**
-	 * Writes the object to a buffer and returns it.
-	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
-	 */
-	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
-	/**
-	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
-	 * @param buffer - A source buffer to read the data from
-	 */
-	static fromByteBuffer(buffer: ByteBuffer): Serializable;
 }
 
 /**
@@ -6370,158 +5454,26 @@ declare class StaticImage extends ImageType {
 }
 
 /**
- * Represents a 2D grid of pixels which can be directly accessed and modified.
- * ```js
- * const texture = new Texture(300, 300);
- * 
- * // create a voronoi texture
- * texture.shader((x, y, dest) => {
- * 	const intensity = Random.voronoi2D(x, y, 0.1);
- * 	dest.set(Color.grayScale(intensity));
- * });
- * ```
+ * Represents a video feed from a webcam that can be used as an image.
+ * These should be loaded using HengineWebcamResource and not constructed directly.
  */
-declare class Texture extends ImageType implements Copyable, Serializable {
+declare class WebcamCapture extends ImageType {
 	/**
-	 * The pixel data of the texture. Modifying this buffer will modify the texture
+	 * Whether or not the webcam is capturing new frames
 	 */
-	data: ByteBuffer;
+	recording: boolean;
 	/**
-	 * Whether or not pixel coordinate parameters to methods will be wrapped around the edges of the texture space. Starts as false
+	 * Returns a copy of the current view from the webcam.
 	 */
-	loops: boolean;
+	getFrame(): Frame;
 	/**
-	 * Returns a 2D array of the colors for all pixels in the texture.
-	 * The first index is the x coordinate, the second the y
+	 * Stops the webcam from recording.
 	 */
-	get pixels(): Color[][];
+	pause(): void;
 	/**
-	 * Returns a 2D array of the brightness values for all pixels in the texture.
-	 * The first index is the x coordinate, the second the y.
+	 * Resumes recording from the webcam.
 	 */
-	get brightness(): number[][];
-	/**
-	 * Returns a 2D array of the red channel values for all pixels in the texture.
-	 * The first index is the x coordinate, the second the y.
-	 */
-	get red(): number[][];
-	/**
-	 * Returns a 2D array of the green channel values for all pixels in the texture.
-	 * The first index is the x coordinate, the second the y.
-	 */
-	get green(): number[][];
-	/**
-	 * Returns a 2D array of the blue channel values for all pixels in the texture.
-	 * The first index is the x coordinate, the second the y.
-	 */
-	get blue(): number[][];
-	/**
-	 * Returns a 2D array of the alpha channel values for all pixels in the texture.
-	 * The first index is the x coordinate, the second the y.
-	 */
-	get alpha(): number[][];
-	/**
-	 * Clears the texture to contain only transparent black pixels.
-	 */
-	clear(): void;
-	/**
-	 * Checks whether the given coordinates are valid pixel coordinates.
-	 * This method ignores potential coordinate wrapping.
-	 * @param x - The x coordinate to check
-	 * @param y - The y coordinate to check
-	 */
-	validPixel(x: number, y: number): boolean;
-	/**
-	 * Returns a reference to the color of the pixel at a specific location.
-	 * This color object is managed by the texture, and will only be valid until the next call to this method.
-	 * If the color data is needed more permanently, create a copy of the return value.
-	 * @param x - The x coordinate of the pixel
-	 * @param y - The y coordinate of the pixel
-	 * @param valid - Whether or not the pixel coordinates are known to be valid. Default is false
-	 */
-	getPixel(x: number, y: number, valid?: boolean): Color;
-	/**
-	 * Applies an in-place mapping to every pixel in the texture. Returns the caller.
-	 * @param mapping - A shader function called for every pixel. The return value of this function, but it takes in three arguments: the x and y coordinates of the pixel, and the pixel color. Modifying the state of the pixel color argument will change the pixel color in the texture
-	 */
-	shader(mapping: (arg0: number, arg1: number, arg2: Color) => void): this;
-	/**
-	 * Changes the color of a specified pixel in the texture.
-	 * @param x - The x coordinate of the pixel
-	 * @param y - The y coordinate of the pixel
-	 * @param color - The new color of the pixel
-	 * @param valid - Whether or not the pixel coordinates are known to be valid. Default is false
-	 */
-	setPixel(x: number, y: number, color: Color, valid?: boolean): void;
-	/**
-	 * Applies an in-place box blur with a specified radius to the texture. Returns the caller.
-	 * @param radius - The radius of the box blur
-	 */
-	blur(radius: number): this;
-	/**
-	 * Returns a texture containing a rectangular region of the caller.
-	 * @param region - The region to extract
-	 */
-	clip(region: Rect): this;
-	/**
-	 * Returns a texture containing a rectangular region of the caller.
-	 * @param x - The x coordinate of the upper-left corner of the region.
-	 * @param y - The y coordinate of the upper-left corner of the region.
-	 * @param width - The width of the region
-	 * @param height - The height of the region
-	 */
-	clip(x: number, y: number, width: number, height: number): this;
-	/**
-	 * Returns a texture containing the (optionally clipped) contents of an image.
-	 * If no clipping parameters are provided, the whole image will be copied.
-	 * The copy will have the same dimensions as the original, so if the original has a pixel ratio greater than 1, this operation will result in a loss of detail.
-	 * @param image - The image to copy data from
-	 */
-	static fromImageType(image: ImageType): Texture;
-	/**
-	 * Returns a texture containing the (optionally clipped) contents of an image.
-	 * If no clipping parameters are provided, the whole image will be copied.
-	 * The copy will have the same dimensions as the original, so if the original has a pixel ratio greater than 1, this operation will result in a loss of detail.
-	 * @param image - The image to copy data from
-	 * @param region - The region to extract
-	 */
-	static fromImageType(image: ImageType, region: Rect): Texture;
-	/**
-	 * Returns a texture containing the (optionally clipped) contents of an image.
-	 * If no clipping parameters are provided, the whole image will be copied.
-	 * The copy will have the same dimensions as the original, so if the original has a pixel ratio greater than 1, this operation will result in a loss of detail.
-	 * @param image - The image to copy data from
-	 * @param x - The x coordinate of the upper-left corner of the region.
-	 * @param y - The y coordinate of the upper-left corner of the region.
-	 * @param width - The width of the region
-	 * @param height - The height of the region
-	 */
-	static fromImageType(image: ImageType, x: number, y: number, width: number, height: number): Texture;
-	/**
-	 * Creates a new grayscale texture based on a 2D grid of brightness values.
-	 * @param brightness - The brightness values for each pixel in the texture. The first index is the x coordinate, the second the y
-	 */
-	static grayScale(brightness: number[][]): Texture;
-	/**
-	 * Returns a promise resolving to a new texture containing the image data from a data: url.
-	 * @param url - The data: url
-	 */
-	static fromDataURI(url: string): Promise;
-	/**
-	 * Creates a copy of the object and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the object into. This must be the same type as the caller
-	 */
-	get(destination?: this): this;
-	/**
-	 * Writes the object to a buffer and returns it.
-	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
-	 */
-	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
-	/**
-	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
-	 * @param buffer - A source buffer to read the data from
-	 */
-	static fromByteBuffer(buffer: ByteBuffer): Serializable;
+	play(): void;
 }
 
 /**
@@ -6553,6 +5505,446 @@ declare class TileMap {
 	 * @param names - The list of identifiers for each tile
 	 */
 	static regular(image: ImageType, tileWidth: number, tileHeight: number, names: any[]): TileMap;
+}
+
+/**
+ * Represents a color to be used in rendering.
+ * It is stored as an RGB triple with an additional opacity component.
+ */
+declare class Color extends Operable {
+	/**
+	 * The red component of the color, on [0, 255]
+	 */
+	red: number;
+	/**
+	 * The green component of the color, on [0, 255]
+	 */
+	green: number;
+	/**
+	 * The blue component of the color, on [0, 255]
+	 */
+	blue: number;
+	/**
+	 * The alpha (opacity) component of the color, on [0, 1]
+	 */
+	alpha: number;
+	/**
+	 * Whether or not all the color's channels will be clamped within their respective bounds after all operations. This starts as true
+	 */
+	limited: boolean;
+	/**
+	 * The grayscale intensity of the color, on [0, 1]
+	 */
+	brightness: number;
+	/**
+	 * The numeric components of the color, `["red", "green", "blue", "alpha"]`
+	 */
+	static modValues: string[];
+	/**
+	 * The smallest visually meaningful change in alpha, 1/255.
+	 */
+	static EPSILON: number;
+	/**
+	 * Creates a new Color.
+	 * @param color - Any valid CSS color representation
+	 */
+	constructor(color: string);
+	/**
+	 * Creates a new Color.
+	 * @param red - The red component of the color, on [0, 255]
+	 * @param green - The green component of the color, on [0, 255]
+	 * @param blue - The blue component of the color, on [0, 255]
+	 * @param alpha - The alpha (opacity) component of the color, on [0, 1]. Default is 1
+	 */
+	constructor(red: number, green: number, blue: number, alpha?: number);
+	/**
+	 * Returns the hexadecimal representation of the color as a 32-bit integer.
+	 * In most-to-least significant byte order, the format returned will be `RRGGBBAA`.
+	 */
+	get hex(): number;
+	/**
+	 * Returns a copy of the color with an alpha of 1.
+	 */
+	get opaque(): this;
+	/**
+	 * Returns the inverse of the caller, with the same alpha as the caller.
+	 * The inverse is defined as white minus the caller.
+	 */
+	get inverse(): this;
+	/**
+	 * Returns a copy of the color, now with `.limited = false`.
+	 * As such, the return value can be multiplied and added without getting clamped.
+	 */
+	get unlimited(): this;
+	/**
+	 * Returns the CSS rgba color string representing the color.
+	 */
+	getRGBA(): string;
+	/**
+	 * Returns the CSS hex color string representing the color.
+	 */
+	getHex(): string;
+	/**
+	 * Returns the GLSL vec4 string representing the color.
+	 */
+	getGLSL(): string;
+	/**
+	 * Returns a valid CSS string representation of the color.
+	 */
+	toString(): string;
+	/**
+	 * Returns a copy of a specified color with a specified alpha.
+	 * @param color - The color to use for the RGB portion of the result
+	 * @param alpha - The new alpha value
+	 */
+	static alpha(color: Color, alpha: number): Color;
+	/**
+	 * Returns a copy of a color with a specified change in saturation.
+	 * @param color - The base color
+	 * @param factor - The multiplier on the current saturation of the color
+	 */
+	static saturate(color: Color, factor: number): Color;
+	/**
+	 * Returns a new grayscale color with a specified brightness.
+	 * @param intensity - The grayscale intensity on [0, 1]
+	 */
+	static grayScale(intensity: number): Color;
+	/**
+	 * Creates a new color whose channels aren't clamped within the normal range (`.limited = false`).
+	 * @param color - Any valid CSS color representation
+	 */
+	static unlimited(color: string): Color;
+	/**
+	 * Creates a new color whose channels aren't clamped within the normal range (`.limited = false`).
+	 * @param red - The red component of the color, on [0, 255]
+	 * @param green - The green component of the color, on [0, 255]
+	 * @param blue - The blue component of the color, on [0, 255]
+	 * @param alpha - The alpha (opacity) component of the color, on [0, 1]. Default is 1
+	 */
+	static unlimited(red: number, green: number, blue: number, alpha?: number): Color;
+}
+
+/**
+ * Represents an offscreen image onto which 3D graphics can be drawn.
+ * By default, rendering will be done in the frame's World-Space, though this can be changed via `.camera.drawInCameraSpace()`.
+ */
+declare class Frame3D extends ImageType {
+	/**
+	 * The renderer which can be used to add meshes and lights to the frame
+	 */
+	renderer: Artist3D;
+	/**
+	 * The view from which the objects will be rendered
+	 */
+	camera: Camera3D;
+	/**
+	 * Creates a new Frame3D.
+	 * @param width - The natural width of the canvas
+	 * @param height - The natural height of the canvas
+	 * @param pixelRatio - The width, in pixels, of a single unit of natural width in the image. Default is the pixel ratio for the user's monitor
+	 */
+	constructor(width: number, height: number, pixelRatio?: number);
+}
+
+/**
+ * Represents a camera in a scene targeting a particular size of rendering surface.
+ * The transformation represented by this matrix is from World-Space to Camera-Space.
+ * `Vector` in the context of this class refers to either `Vector2` or `Vector3` depending on whether Camera2D or Camera3D is used.
+ * Changes to camera position and orientation should be made before the screen is cleared, to avoid objects being rendered from multiple different camera positions over the course of the frame.
+ */
+declare interface Camera<Vector> extends Matrix {
+	/**
+	 * The location of the camera in World-Space
+	 */
+	position: Vector;
+	/**
+	 * The magnification level of the camera
+	 */
+	zoom: number;
+	/**
+	 * The clockwise roll (in radians) of the camera. Starts at 0
+	 */
+	rotation: number;
+	/**
+	 * Returns the caller.
+	 */
+	get matrix(): Matrix;
+	/**
+	 * Sets the zoom to 1.
+	 */
+	restoreZoom(): void;
+	/**
+	 * Zooms in by a specified amount.
+	 * @param amount - The amount to zoom in by
+	 */
+	zoomIn(amount: number): void;
+	/**
+	 * Zooms out by a specified amount.
+	 * @param amount - The amount to zoom out by
+	 */
+	zoomOut(amount: number): void;
+	/**
+	 * Multiplies the current zoom value.
+	 * @param factor - The amount to multiply the current zoom
+	 */
+	zoomBy(factor: number): void;
+	/**
+	 * Smoothly moves the camera toward a new position value.
+	 * @param point - The new position to move toward
+	 * @param ferocity - The degree to which the camera should move toward the new position, on [0, 1]
+	 */
+	moveTowards(point: Vector, ferocity: number): void;
+	/**
+	 * Maps a given point from Camera-Space to World-Space.
+	 * @param point - The point to transform
+	 */
+	cameraToWorld(point: Vector): Vector;
+	/**
+	 * Maps a given point from World-Space to Camera-Space.
+	 * @param point - The point to transform
+	 */
+	worldToCamera(point: Vector): Vector;
+	/**
+	 * Assuming a renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
+	 * @param render - The function to call while in the World-Space context
+	 * @param renderer - The renderer which `render()` writes to, which should be transformed
+	 */
+	drawInWorldSpace(render: () => void, renderer?: Artist): void;
+	/**
+	 * Assuming a renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
+	 * @param render - The function to call while in the Camera-Space context
+	 * @param renderer - The renderer which `render()` writes to, which should be transformed
+	 */
+	drawInCameraSpace(render: () => void, renderer: Artist): void;
+	/**
+	 * Creates an undisplaced camera for a provided rendering surface, targeting the entire surface.
+	 * In 2D, this camera is positioned at the center of the surface, and in 3D it is positioned at (0, 0, 0) and pointing forward.
+	 * @param surface - The rendering surface to target
+	 */
+	static forSurface(surface: CanvasImage | Frame): Camera;
+}
+
+/**
+ * Represents the camera in a 2D scene.
+ */
+declare class Camera2D extends Matrix3 implements Camera<Vector2> {
+	/**
+	 * Smoothly moves the camera toward a new rotation value.
+	 * @param angle - The new rotation to move toward (in radians)
+	 * @param ferocity - The degree to which the camera should move toward the new position, on [0, 1]
+	 */
+	rotateTowards(angle: number, ferocity: number): void;
+	/**
+	 * Moves the camera such that the entire viewport is entire a given axis-aligned rectangular boundary.
+	 * If the boundary is smaller than the viewport, the behavior is undefined.
+	 * @param boundary - The boundary in which the camera's viewport must exist
+	 */
+	constrain(boundary: Rect): void;
+	/**
+	 * Moves the camera such that the entire viewport is entire a given axis-aligned rectangular boundary.
+	 * If the boundary is smaller than the viewport, the behavior is undefined.
+	 * @param x - The x coordinate of the upper-left corner of the boundary
+	 * @param y - The y coordinate of the upper-left corner of the boundary
+	 * @param width - The width of the boundary
+	 * @param height - The height of the boundary
+	 */
+	constrain(x: number, y: number, width: number, height: number): void;
+	/**
+	 * Zooms in/out about a specific point (in World-Space) by a specific factor.
+	 * @param center - The zoom center
+	 * @param factor - The zoom multiplier
+	 */
+	zoomAbout(center: Vector2, factor: number): void;
+	/**
+	 * Returns the axis-aligned bounding box of the current viewport.
+	 */
+	get screen(): Rect;
+	/**
+	 * The location of the camera in World-Space
+	 */
+	position: Vector;
+	/**
+	 * The magnification level of the camera
+	 */
+	zoom: number;
+	/**
+	 * The clockwise roll (in radians) of the camera. Starts at 0
+	 */
+	rotation: number;
+	/**
+	 * Returns the caller.
+	 */
+	get matrix(): Matrix;
+	/**
+	 * Sets the zoom to 1.
+	 */
+	restoreZoom(): void;
+	/**
+	 * Zooms in by a specified amount.
+	 * @param amount - The amount to zoom in by
+	 */
+	zoomIn(amount: number): void;
+	/**
+	 * Zooms out by a specified amount.
+	 * @param amount - The amount to zoom out by
+	 */
+	zoomOut(amount: number): void;
+	/**
+	 * Multiplies the current zoom value.
+	 * @param factor - The amount to multiply the current zoom
+	 */
+	zoomBy(factor: number): void;
+	/**
+	 * Smoothly moves the camera toward a new position value.
+	 * @param point - The new position to move toward
+	 * @param ferocity - The degree to which the camera should move toward the new position, on [0, 1]
+	 */
+	moveTowards(point: Vector, ferocity: number): void;
+	/**
+	 * Maps a given point from Camera-Space to World-Space.
+	 * @param point - The point to transform
+	 */
+	cameraToWorld(point: Vector): Vector;
+	/**
+	 * Maps a given point from World-Space to Camera-Space.
+	 * @param point - The point to transform
+	 */
+	worldToCamera(point: Vector): Vector;
+	/**
+	 * Assuming a renderer is currently in Camera-Space, transforms to World-Space, calls a rendering function, and then transforms back to Camera-Space.
+	 * @param render - The function to call while in the World-Space context
+	 * @param renderer - The renderer which `render()` writes to, which should be transformed
+	 */
+	drawInWorldSpace(render: () => void, renderer?: Artist): void;
+	/**
+	 * Assuming a renderer is currently in World-Space, transforms to Camera-Space, calls a rendering function, and then transforms back to World-Space.
+	 * @param render - The function to call while in the Camera-Space context
+	 * @param renderer - The renderer which `render()` writes to, which should be transformed
+	 */
+	drawInCameraSpace(render: () => void, renderer: Artist): void;
+	/**
+	 * Creates an undisplaced camera for a provided rendering surface, targeting the entire surface.
+	 * In 2D, this camera is positioned at the center of the surface, and in 3D it is positioned at (0, 0, 0) and pointing forward.
+	 * @param surface - The rendering surface to target
+	 */
+	static forSurface(surface: CanvasImage | Frame): Camera;
+}
+
+/**
+ * Represents a single variable that can be graphed on a GraphPlane.
+ */
+declare class Graph {
+	/**
+	 * The displayed name of the variable
+	 */
+	name: string;
+	/**
+	 * A function which returns the current value of the variable
+	 */
+	y: () => number;
+	/**
+	 * The minimum displayed value of the variable. This is the lower bound of the vertical axis
+	 */
+	minY: number;
+	/**
+	 * The maximum displayed value of the variable. This is the upper bound of the vertical axis
+	 */
+	maxY: number;
+	/**
+	 * The color of the graph of this variable
+	 */
+	color: Color;
+	/**
+	 * The number of decimal places to display for the value of this variable
+	 */
+	decimalPlaces: number;
+	/**
+	 * The plane on which this graph is displayed
+	 */
+	plane: GraphPlane;
+	/**
+	 * Creates a new Graph.
+	 * @param name - The displayed name of the variable
+	 * @param y - A function which returns the current value of the variable
+	 * @param minY - The minimum displayed value of the variable
+	 * @param maxY - The maximum displayed value of the variable
+	 * @param color - The color of the graph of this variable
+	 * @param decimalPlaces - The number of decimal places to display for the value of this variable. Default is 2
+	 */
+	constructor(name: string, y: () => number, minY: number, maxY: number, color: Color, decimalPlaces?: number);
+}
+
+/**
+ * Represents a renderable, updating graph of one or more variables.
+ * This class is to be used for debugging or technical visualization purposes, rather than in games or tools.
+ * This class should not be constructed and should instead be created using `Intervals.prototype.makeGraphPlane()`.
+ * ```js
+ * // graph the value of perlin noise
+ * const graph = intervals.makeGraphPlane([
+ * 	new Graph("Perlin", () => {
+ * 		const time = intervals.frameCount;
+ * 		return Random.perlin(time, 0.01);
+ * 	}, 0, 1, new Color("white"))
+ * ]);
+ * 
+ * intervals.continuous(() => {
+ * 	renderer.image(graph).default(10, 10);
+ * });
+ * ```
+ */
+declare class GraphPlane extends Frame {
+	/**
+	 * The graphs displayed on this plane
+	 */
+	graphs: Graph[];
+	/**
+	 * The total number of frames displayed on the graph plane
+	 */
+	frameLimit: number;
+}
+
+/**
+ * Represents a video that can have the current frame rendered.
+ * These should be loaded using HengineVideoResource and not constructed directly.
+ */
+declare class VideoView extends ImageType {
+	/**
+	 * Whether or not the video loops.
+	 */
+	loops: boolean;
+	/**
+	 * Whether or not the video is currently playing
+	 */
+	playing: boolean;
+	/**
+	 * Pauses playback of the video.
+	 */
+	pause(): void;
+	/**
+	 * Resumes playback of the video.
+	 */
+	play(): void;
+}
+
+/**
+ * Represents a 2D renderer based on the WebGL API.
+ * This renderer cannot render text or concave polygons.
+ * Creating instances of this class is drastically more expensive than creating a CanvasArtist2D, but after it's created, it is generally 10x-100x faster than CanvasArtist2D.
+ * Since this is implemented using WebGL, creating a high number of instances of this class should be avoided to prevent context-switching overhead.
+ * This should not be constructed directly, and should instead be used in conjunction with FastFrame.
+ */
+declare class WebGLArtist2D extends Artist2D {
+	
+}
+
+/**
+ * Represents a WebGL-based implementation of Frame.
+ */
+declare class FastFrame extends Frame {
+	/**
+	 * The renderer for the frame
+	 */
+	renderer: WebGLArtist2D;
 }
 
 /**
@@ -6737,258 +6129,6 @@ declare class Transform3D extends Transform<Matrix4, Vector3, Vector3> {
 	 * @param angle - The rotation to apply, in axis-angle form
 	 */
 	rotate(angle: Vector3): void;
-}
-
-/**
- * Represents a video that can have the current frame rendered.
- * These should be loaded using HengineVideoResource and not constructed directly.
- */
-declare class VideoView extends ImageType {
-	/**
-	 * Whether or not the video loops.
-	 */
-	loops: boolean;
-	/**
-	 * Whether or not the video is currently playing
-	 */
-	playing: boolean;
-	/**
-	 * Pauses playback of the video.
-	 */
-	pause(): void;
-	/**
-	 * Resumes playback of the video.
-	 */
-	play(): void;
-}
-
-/**
- * Represents a video feed from a webcam that can be used as an image.
- * These should be loaded using HengineWebcamResource and not constructed directly.
- */
-declare class WebcamCapture extends ImageType {
-	/**
-	 * Whether or not the webcam is capturing new frames
-	 */
-	recording: boolean;
-	/**
-	 * Returns a copy of the current view from the webcam.
-	 */
-	getFrame(): Frame;
-	/**
-	 * Stops the webcam from recording.
-	 */
-	pause(): void;
-	/**
-	 * Resumes recording from the webcam.
-	 */
-	play(): void;
-}
-
-/**
- * Represents a 2D renderer based on the WebGL API.
- * This renderer cannot render text or concave polygons.
- * Creating instances of this class is drastically more expensive than creating a CanvasArtist2D, but after it's created, it is generally 10x-100x faster than CanvasArtist2D.
- * Since this is implemented using WebGL, creating a high number of instances of this class should be avoided to prevent context-switching overhead.
- * This should not be constructed directly, and should instead be used in conjunction with FastFrame.
- */
-declare class WebGLArtist2D extends Artist2D {
-	
-}
-
-/**
- * Represents a WebGL-based implementation of Frame.
- */
-declare class FastFrame extends Frame {
-	/**
-	 * The renderer for the frame
-	 */
-	renderer: WebGLArtist2D;
-}
-
-/**
- * Represents a cube map usable in via a GPUInterface.
- * All faces must be square and equal in size.
- */
-declare interface CubeMap {
-	/**
-	 * The face of the cube map on the positive x side. If this is a Sampler, the sampling strategy will be used on all sides
-	 */
-	posX: ImageType | Sampler;
-	/**
-	 * The face of the cube map on the negative x side
-	 */
-	negX: ImageType;
-	/**
-	 * The face of the cube map on the positive y side
-	 */
-	posY: ImageType;
-	/**
-	 * The face of the cube map on the negative y side
-	 */
-	negY: ImageType;
-	/**
-	 * The face of the cube map on the positive z side
-	 */
-	posZ: ImageType;
-	/**
-	 * The face of the cube map on the negative z side
-	 */
-	negZ: ImageType;
-}
-
-/**
- * Represents an array of GLSL structs.
- * These structs may be nested.
- * These are used to represent GLSL dynamic-length array uniforms and the output of GPUComputations, but should not be constructed directly.
- * For a struct such as:
- * ```glsl
- * struct Circle {
- * 	vec2 position;
- * 	float radius;
- * 	vec3 color;
- * };
- * ```
- * A GPUArray could be used as follows:
- * ```js
- * // gpu is a GPUInterface
- * const circle = {
- * 	position: new Vector2(100, 200),
- * 	radius: 22.5,
- * 	color: new Color("magenta")
- * };
- * gpu.getUniform("circles").append(circle);
- * ```
- */
-declare class GPUArray {
-	/**
-	 * A buffer containing all the structs' data. This can be read from freely at any location, but cannot be written to
-	 */
-	buffer: ByteBuffer;
-	/**
-	 * Retrieves the number of structs in the array.
-	 */
-	get length(): number;
-	/**
-	 * Sets the value of the array and returns the caller.
-	 * This will overwrite all previous data.
-	 * @param value - An array of objects with the same structure as the struct
-	 */
-	set(value: object[]): this;
-	/**
-	 * Sets the value of the array and returns the caller.
-	 * This will overwrite all previous data.
-	 * @param value - Another GPU array to copy from. This must represent the same type of structs. Using this signature is faster, and should be done whenever possible
-	 */
-	set(value: this): this;
-	/**
-	 * Appends a struct to the end of the array and returns the caller.
-	 * @param value - An object with the same structure as the struct
-	 */
-	append(value: object): this;
-	/**
-	 * Writes to a specified location in the array and returns the caller.
-	 * This may increase the size of the array, but cannot be used to create holes.
-	 * @param data - An array of objects with the same structure as the struct
-	 * @param offset - The first index to write to in the array. Default is 0
-	 * @param length - The amount of elements to write. If not specified, this will be as many as possible
-	 * @param srcOffset - The first index to read from the data argument. If not specified, this will be the same as the offset argument
-	 */
-	write(data: object[], offset?: number, length?: number, srcOffset?: number): this;
-	/**
-	 * Reads from a specified location in the array into a provided array of objects, and returns the destination array.
-	 * @param data - An array of objects with the same structure as the struct
-	 * @param offset - The first index to read from in the array. Default is 0
-	 * @param length - The amount of elements to read. If not specified, this will be as many as possible
-	 * @param dstOffset - The first index to write to in the data argument. If not specified, this will be the same as the offset argument
-	 */
-	read(data: object[], offset?: number, length?: number, dstOffset?: number): object[];
-}
-
-/**
- * Represents the way in which samples of an image are interpolated in GLSL.
- */
-declare enum FilterMode {
-	/**
-	 * The exact value of the nearest texel is used as the sample
-	 */
-	NEAREST,
-	/**
-	 * The values of the 4 nearest texels are linearly interpolated to produce the sample
-	 */
-	LINEAR
-}
-
-/**
- * Describes how a Sampler should be constructed.
- * All properties of this interface are optional.
- */
-declare interface SamplerSettings {
-	/**
-	 * Whether the samples will repeat when out-of-bounds coordinates are used. Default is false
-	 */
-	wrap?: boolean;
-	/**
-	 * How the samples should be interpolated when sampling from non-integer coordinates. Default is `FilterMode.NEAREST` for Textures, and `FilterMode.LINEAR` for all others
-	 */
-	filter?: FilterMode;
-	/**
-	 * Whether sampling at shallow angles should be done on down-scaled mipmaps instead of the full-resolution image. Default is false
-	 */
-	mipmap?: boolean;
-}
-
-/**
- * This describes the way in which a GLSL `sampler*` reads data from a texture.
- * This can be used in place of an ImageType when specifying a `sampler*` uniform.
- */
-declare class Sampler {
-	/**
-	 * 
-	 * @param image - The image(s) to sample from
-	 * @param settings - How the sampler should be configured. Default is an empty object
-	 */
-	constructor(image: ImageType | ImageType[] | CubeMap, settings?: SamplerSettings);
-	/**
-	 * Creates a sampler for a given image which is suitable for 3D rendering.
-	 * Any sampler can in theory be used for 3D rendering, but performance may be improved through the use of this factory.
-	 * @param image - The image to sample from
-	 */
-	static for3D(image: ImageType): Sampler;
-}
-
-/**
- * Represents a GLSL program.
- */
-declare interface GPUInterface {
-	/**
-	 * The source code of the program
-	 */
-	glsl: string;
-	/**
-	 * Sets the value of a uniform in the program.
-	 * @param name - The name of the uniform
-	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
-	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
-	 */
-	setUniform(name: string, value: any, force?: boolean): void;
-	/**
-	 * Sets the value of many uniforms at once.
-	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
-	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
-	 */
-	setUniforms(uniforms: object, force?: boolean): void;
-	/**
-	 * Retrieves the current value of a given uniform.
-	 * For the return type of this function, see the GLSL API.
-	 * @param name - The name of the uniform
-	 */
-	getUniform(name: string): any;
-	/**
-	 * Checks whether a given uniform exists.
-	 * @param name - The name of the uniform to check
-	 */
-	hasUniform(name: string): boolean;
 }
 
 /**
@@ -7195,39 +6335,790 @@ declare class Camera3D extends Matrix4 implements Camera<Vector3> {
 }
 
 /**
- * Represents an offscreen image onto which 3D graphics can be drawn.
- * By default, rendering will be done in the frame's World-Space, though this can be changed via `.camera.drawInCameraSpace()`.
+ * Represents a 2D grid of grayscale values.
+ * ```js
+ * const perlinMap = new GrayMap(100, 100, (x, y) => {
+ * 	return Random.perlin2D(x, y, 0.1);
+ * });
+ * ```
  */
-declare class Frame3D extends ImageType {
+declare class GrayMap implements Serializable {
 	/**
-	 * The renderer which can be used to add meshes and lights to the frame
+	 * The width of the map
 	 */
-	renderer: Artist3D;
+	width: number;
 	/**
-	 * The view from which the objects will be rendered
+	 * The height of the map
 	 */
-	camera: Camera3D;
+	height: number;
 	/**
-	 * Creates a new Frame3D.
-	 * @param width - The natural width of the canvas
-	 * @param height - The natural height of the canvas
-	 * @param pixelRatio - The width, in pixels, of a single unit of natural width in the image. Default is the pixel ratio for the user's monitor
+	 * The intensity values (on [0, 1]) of the map
 	 */
-	constructor(width: number, height: number, pixelRatio?: number);
+	data: number[][];
+	/**
+	 * Creates a new GrayMap based on an intensity function.
+	 * @param width - The width of the map
+	 * @param height - The height of the map
+	 * @param rule - A function to be called for each coordinate pair to generate the intensity values
+	 */
+	constructor(width: number, height: number, rule: (arg0: number, arg1: number) => number);
+	/**
+	 * Returns the grayscale value at a specified point, or -1 if the point is out of bounds.
+	 * @param x - The x coordinate of the sample point
+	 * @param y - The y coordinate of the sample point
+	 */
+	get(x: number, y: number): number;
+	/**
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 */
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
 }
 
 /**
- * Represents a material applied to a MeshChunk.
+ * Represents a 2D grid of pixels which can be directly accessed and modified.
+ * ```js
+ * const texture = new Texture(300, 300);
+ * 
+ * // create a voronoi texture
+ * texture.shader((x, y, dest) => {
+ * 	const intensity = Random.voronoi2D(x, y, 0.1);
+ * 	dest.set(Color.grayScale(intensity));
+ * });
+ * ```
  */
-declare class Material implements Copyable {
+declare class Texture extends ImageType implements Copyable, Serializable {
 	/**
-	 * A optional name for the material. Materials loaded from files will use their file-provided names. Starts as "anonymous"
+	 * The pixel data of the texture. Modifying this buffer will modify the texture
 	 */
-	name: string;
+	data: ByteBuffer;
 	/**
-	 * Whether or not light can pass through the material
+	 * Whether or not pixel coordinate parameters to methods will be wrapped around the edges of the texture space. Starts as false
 	 */
-	transparent: boolean;
+	loops: boolean;
+	/**
+	 * Returns a 2D array of the colors for all pixels in the texture.
+	 * The first index is the x coordinate, the second the y
+	 */
+	get pixels(): Color[][];
+	/**
+	 * Returns a 2D array of the brightness values for all pixels in the texture.
+	 * The first index is the x coordinate, the second the y.
+	 */
+	get brightness(): number[][];
+	/**
+	 * Returns a 2D array of the red channel values for all pixels in the texture.
+	 * The first index is the x coordinate, the second the y.
+	 */
+	get red(): number[][];
+	/**
+	 * Returns a 2D array of the green channel values for all pixels in the texture.
+	 * The first index is the x coordinate, the second the y.
+	 */
+	get green(): number[][];
+	/**
+	 * Returns a 2D array of the blue channel values for all pixels in the texture.
+	 * The first index is the x coordinate, the second the y.
+	 */
+	get blue(): number[][];
+	/**
+	 * Returns a 2D array of the alpha channel values for all pixels in the texture.
+	 * The first index is the x coordinate, the second the y.
+	 */
+	get alpha(): number[][];
+	/**
+	 * Clears the texture to contain only transparent black pixels.
+	 */
+	clear(): void;
+	/**
+	 * Checks whether the given coordinates are valid pixel coordinates.
+	 * This method ignores potential coordinate wrapping.
+	 * @param x - The x coordinate to check
+	 * @param y - The y coordinate to check
+	 */
+	validPixel(x: number, y: number): boolean;
+	/**
+	 * Returns a reference to the color of the pixel at a specific location.
+	 * This color object is managed by the texture, and will only be valid until the next call to this method.
+	 * If the color data is needed more permanently, create a copy of the return value.
+	 * @param x - The x coordinate of the pixel
+	 * @param y - The y coordinate of the pixel
+	 * @param valid - Whether or not the pixel coordinates are known to be valid. Default is false
+	 */
+	getPixel(x: number, y: number, valid?: boolean): Color;
+	/**
+	 * Applies an in-place mapping to every pixel in the texture. Returns the caller.
+	 * @param mapping - A shader function called for every pixel. The return value of this function, but it takes in three arguments: the x and y coordinates of the pixel, and the pixel color. Modifying the state of the pixel color argument will change the pixel color in the texture
+	 */
+	shader(mapping: (arg0: number, arg1: number, arg2: Color) => void): this;
+	/**
+	 * Changes the color of a specified pixel in the texture.
+	 * @param x - The x coordinate of the pixel
+	 * @param y - The y coordinate of the pixel
+	 * @param color - The new color of the pixel
+	 * @param valid - Whether or not the pixel coordinates are known to be valid. Default is false
+	 */
+	setPixel(x: number, y: number, color: Color, valid?: boolean): void;
+	/**
+	 * Applies an in-place box blur with a specified radius to the texture. Returns the caller.
+	 * @param radius - The radius of the box blur
+	 */
+	blur(radius: number): this;
+	/**
+	 * Returns a texture containing a rectangular region of the caller.
+	 * @param region - The region to extract
+	 */
+	clip(region: Rect): this;
+	/**
+	 * Returns a texture containing a rectangular region of the caller.
+	 * @param x - The x coordinate of the upper-left corner of the region.
+	 * @param y - The y coordinate of the upper-left corner of the region.
+	 * @param width - The width of the region
+	 * @param height - The height of the region
+	 */
+	clip(x: number, y: number, width: number, height: number): this;
+	/**
+	 * Returns a texture containing the (optionally clipped) contents of an image.
+	 * If no clipping parameters are provided, the whole image will be copied.
+	 * The copy will have the same dimensions as the original, so if the original has a pixel ratio greater than 1, this operation will result in a loss of detail.
+	 * @param image - The image to copy data from
+	 */
+	static fromImageType(image: ImageType): Texture;
+	/**
+	 * Returns a texture containing the (optionally clipped) contents of an image.
+	 * If no clipping parameters are provided, the whole image will be copied.
+	 * The copy will have the same dimensions as the original, so if the original has a pixel ratio greater than 1, this operation will result in a loss of detail.
+	 * @param image - The image to copy data from
+	 * @param region - The region to extract
+	 */
+	static fromImageType(image: ImageType, region: Rect): Texture;
+	/**
+	 * Returns a texture containing the (optionally clipped) contents of an image.
+	 * If no clipping parameters are provided, the whole image will be copied.
+	 * The copy will have the same dimensions as the original, so if the original has a pixel ratio greater than 1, this operation will result in a loss of detail.
+	 * @param image - The image to copy data from
+	 * @param x - The x coordinate of the upper-left corner of the region.
+	 * @param y - The y coordinate of the upper-left corner of the region.
+	 * @param width - The width of the region
+	 * @param height - The height of the region
+	 */
+	static fromImageType(image: ImageType, x: number, y: number, width: number, height: number): Texture;
+	/**
+	 * Creates a new grayscale texture based on a 2D grid of brightness values.
+	 * @param brightness - The brightness values for each pixel in the texture. The first index is the x coordinate, the second the y
+	 */
+	static grayScale(brightness: number[][]): Texture;
+	/**
+	 * Returns a promise resolving to a new texture containing the image data from a data: url.
+	 * @param url - The data: url
+	 */
+	static fromDataURI(url: string): Promise;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
+	/**
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 */
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
+}
+
+/**
+ * Represents a font, including family, side, and styling.
+ * Fonts can be used in the text rendering functions of Artist.
+ * ```js
+ * const font = new Font(15, "Consolas").italic(); // italic 15px Consolas
+ * 
+ * renderer.draw(new Color("black")).text(font, "Hello World!", 0, 0);
+ * ```
+ */
+declare class Font {
+	/**
+	 * The size of the font in CSS pixels
+	 */
+	size: number;
+	/**
+	 * The string identifier for the font family
+	 */
+	family: string;
+	/**
+	 * Whether the font is bold
+	 */
+	bolded: boolean;
+	/**
+	 * Whether the font is italic
+	 */
+	italicized: boolean;
+	/**
+	 * The height of a line of text in the font. This determines spacing between multi-line strings
+	 */
+	lineHeight: number;
+	/**
+	 * The number of spaces a tab is equivalent to for this font
+	 */
+	tabSize: number;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif5: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif10: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif15: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif20: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif25: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif30: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif35: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif40: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif45: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif50: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif55: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif60: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif65: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif70: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif75: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif80: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif85: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif90: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif95: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Serif100: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial5: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial10: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial15: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial20: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial25: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial30: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial35: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial40: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial45: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial50: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial55: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial60: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial65: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial70: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial75: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial80: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial85: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial90: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial95: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Arial100: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive5: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive10: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive15: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive20: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive25: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive30: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive35: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive40: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive45: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive50: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive55: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive60: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive65: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive70: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive75: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive80: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive85: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive90: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive95: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Cursive100: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace5: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace10: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace15: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace20: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace25: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace30: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace35: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace40: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace45: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace50: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace55: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace60: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace65: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace70: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace75: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace80: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace85: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace90: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace95: Font;
+	/**
+	 * These are premade fonts of four common families ("Serif", "Arial", "Cursive", "Monospace") of every size that is a multiple of 5 and no more than 100. e.g. `Font.Arial10`, or `Font.Monospace95`
+	 */
+	static Monospace100: Font;
+	/**
+	 * Creates a new font which is non-italic and non-bold.
+	 * The font will have a tab size of 4.
+	 * @param size - The size and line height of the font
+	 * @param family - The font family
+	 */
+	constructor(size: number, family: string);
+	/**
+	 * Returns a copy of the caller with its `.family` property changed to a given value.
+	 * @param family - The new font family
+	 */
+	withFamily(family: string): this;
+	/**
+	 * Returns a copy of the caller with its `.size` property changed to a given value.
+	 * The ratio of `.lineHeight` to `.size` will remain constant.
+	 * @param size - The new font size, in CSS pixels
+	 */
+	withSize(size: number): this;
+	/**
+	 * Returns a copy of the caller with its `.lineHeight` property changed to a given value.
+	 * The line height represents the vertical distance between two subsequent lines.
+	 * @param lineHeight - The new font's line height, in CSS pixels
+	 */
+	withLineHeight(lineHeight: number): this;
+	/**
+	 * Returns a copy of the caller with its `.tabSize` property changed to a given value.
+	 * @param tabSize - The amount of spaces a tab will correspond to
+	 */
+	withTabSize(tabSize: number): this;
+	/**
+	 * Returns a copy of the caller with its `.bolded` property changed to a given value.
+	 * @param bold - Whether the new font should be bold. Default is true
+	 */
+	bold(bold?: boolean): this;
+	/**
+	 * Returns a copy of the caller with its `.italicized` property changed to a given value.
+	 * @param italic - Whether the new font should be italic. Default is true
+	 */
+	italic(italic?: boolean): this;
+	/**
+	 * Packs a string of text into a fixed width, adding new lines as necessary to prevent overflow.
+	 * @param text - The text to pack
+	 * @param maxWidth - The maximum allowed width of a single line in the output text
+	 */
+	packText(text: string, maxWidth: number): string;
+	/**
+	 * Returns the width and height of a string of text, optionally after being packed into a fixed max width.
+	 * The return value contains `.width` and `.height` properties, both of which are Numbers.
+	 * @param text - The text to be measured
+	 * @param maxWidth - The maximum allowed width of a single line before wrapping occurs. Default is Infinity
+	 */
+	getTextBounds(text: string, maxWidth?: number): { width: number, height: number };
+	/**
+	 * Returns the width of a string of text.
+	 * @param text - The text to measure
+	 * @param maxWidth - The maximum allowed width of a single line before wrapping occurs. Defaults is Infinity
+	 */
+	getTextWidth(text: string, maxWidth?: number): number;
+	/**
+	 * Returns the height of a string of text.
+	 * @param text - The text to measure
+	 * @param packWidth - The maximum allowed width of a single line before wrapping occurs. Default is Infinity
+	 */
+	getTextHeight(text: string, packWidth?: number): number;
+	/**
+	 * Converts the Font to a valid CSS font string.
+	 */
+	toString(): string;
+}
+
+/**
+ * Represents an externally loaded image file.
+ * These should be loaded using HengineImageResource and not constructed directly.
+ * ```js
+ * const catImage = loadResource("cat.png"); // load the HImage
+ * 
+ * renderer.image(catImage).rect(0, 0, 100, 100);
+ * ```
+ */
+declare class HImage extends ImageType {
+	/**
+	 * Checks whether an image exists at a specified file path.
+	 * Returns a promise that resolves to whether the image exists.
+	 * @param src - The file path to check
+	 */
+	static imageExists(src: string): Promise<boolean>;
+}
+
+/**
+ * Represents an image that can be rendered.
+ * This is an abstract superclass and should not be constructed.
+ */
+declare class ImageType {
+	/**
+	 * The natural rendered width of the image
+	 */
+	width: number;
+	/**
+	 * The natural rendered height of the image
+	 */
+	height: number;
+	/**
+	 * Whether the contents of the image can change over time
+	 */
+	static dynamic: boolean;
+	/**
+	 * Returns the pixel density of the image, measured as the ratio of the number of pixels in a row of the image to the natural width of the image.
+	 */
+	get pixelRatio(): number;
+	/**
+	 * Returns the width of the image in actual pixels, accounting for the pixel density of the image.
+	 */
+	get pixelWidth(): number;
+	/**
+	 * Returns the height of the image in actual pixels, accounting for the pixel density of the image.
+	 */
+	get pixelHeight(): number;
+	/**
+	 * Simultaneously updates the width and height of the image.
+	 * Updates that occur on image resizing will only happen once with a call to this method, which can improve performance as opposed to simply assigning to `.width` and `.height` in a row.
+	 * @param width - The new natural width of the image
+	 * @param height - The new natural height of the image
+	 */
+	resize(width: number, height: number): void;
+	/**
+	 * Checks whether a given point is inside the natural bounds of the image with the upper-left corner at the origin.
+	 * This operation is inclusive on the lower bound and exclusive on the upper bound.
+	 * @param point - The point to check
+	 */
+	contains(point: Vector2): boolean;
+	/**
+	 * Checks whether a given point is inside the natural bounds of the image with the upper-left corner at the origin.
+	 * This operation is inclusive on the lower bound and exclusive on the upper bound.
+	 * @param x - The x coordinate of the point to check
+	 * @param y - The y coordinate of the point to check
+	 */
+	contains(x: number, y: number): boolean;
+	/**
+	 * Returns the width of the image required for a given height to maintain the aspect ratio.
+	 * @param height - The potential height of the image
+	 */
+	inferWidth(height: number): number;
+	/**
+	 * Returns the height of the image required for a given width to maintain the aspect ratio.
+	 * @param width - The potential width of the image
+	 */
+	inferHeight(width: number): number;
+	/**
+	 * Converts the content of the image to a data: url.
+	 */
+	toDataURL(): string;
+	/**
+	 * Downloads the image as a PNG, with a specified name.
+	 * Returns a promise that resolves when the image downloads.
+	 * @param name - The name of the downloaded image, without the extension
+	 */
+	download(name: string): Promise;
+}
+
+/**
+ * Represents an offscreen drawing surface that can be rendered as an image.
+ * It is based on the HTML5 Canvas API.
+ * ```js
+ * const frame = new Frame(100, 200);
+ * 
+ * // add shapes to the frame
+ * frame.renderer.stroke(new Color("blue"), 2).rect(10, 10, 20, 20);
+ * frame.renderer.draw(new Color("red")).circle(30, 100, 50);
+ * 
+ * // render the frame to the screen
+ * renderer.image(frame).default(0, 0);
+ * ```
+ */
+declare class Frame extends ImageType implements Copyable {
+	/**
+	 * The renderer local to the frame that can be used to modify its contents
+	 */
+	renderer: CanvasArtist2D;
+	/**
+	 * Creates a new Frame.
+	 * @param width - The natural width of the frame
+	 * @param height - The natural height of the frame
+	 * @param pixelRatio - The pixel ratio for the frame. The default is `window.devicePixelRatio`
+	 */
+	constructor(width: number, height: number, pixelRatio?: number);
+	/**
+	 * Returns a copy of the frame stretched to a new set of dimensions.
+	 * @param width - The width of the stretched image
+	 * @param height - The height of the stretched image
+	 */
+	stretch(width: number, height: number): this;
+	/**
+	 * Returns a frame containing a rectangular region of the caller.
+	 * @param region - The region to extract
+	 */
+	clip(region: Rect): this;
+	/**
+	 * Returns a frame containing a rectangular region of the caller.
+	 * @param x - The x coordinate of the upper-left corner of the region.
+	 * @param y - The y coordinate of the upper-left corner of the region.
+	 * @param width - The width of the region
+	 * @param height - The height of the region
+	 */
+	clip(x: number, y: number, width: number, height: number): this;
+	/**
+	 * Returns a frame containing the (optionally clipped) contents of an image.
+	 * If no clipping parameters are provided, the whole image will be copied.
+	 * The copy will have the same pixel ratio as the original image.
+	 * @param image - The image to copy data from
+	 */
+	static fromImageType(image: ImageType): Frame;
+	/**
+	 * Returns a frame containing the (optionally clipped) contents of an image.
+	 * If no clipping parameters are provided, the whole image will be copied.
+	 * The copy will have the same pixel ratio as the original image.
+	 * @param image - The image to copy data from
+	 * @param region - The region to extract
+	 */
+	static fromImageType(image: ImageType, region: Rect): Frame;
+	/**
+	 * Returns a frame containing the (optionally clipped) contents of an image.
+	 * If no clipping parameters are provided, the whole image will be copied.
+	 * The copy will have the same pixel ratio as the original image.
+	 * @param image - The image to copy data from
+	 * @param x - The x coordinate of the upper-left corner of the region.
+	 * @param y - The y coordinate of the upper-left corner of the region.
+	 * @param width - The width of the region
+	 * @param height - The height of the region
+	 */
+	static fromImageType(image: ImageType, x: number, y: number, width: number, height: number): Frame;
 	/**
 	 * Creates a copy of the object and optionally stores it in a provided destination.
 	 * @param destination - The destination to copy the object into. This must be the same type as the caller
@@ -7236,81 +7127,188 @@ declare class Material implements Copyable {
 }
 
 /**
- * Represents a custom shader-based material with a user-specified vertex and fragment shader programs.
+ * Represents a cube map usable in via a GPUInterface.
+ * All faces must be square and equal in size.
  */
-declare class ShaderMaterial extends Material {
+declare interface CubeMap {
 	/**
-	 * Creates a new custom material.
+	 * The face of the cube map on the positive x side. If this is a Sampler, the sampling strategy will be used on all sides
 	 */
-	constructor();
+	posX: ImageType | Sampler;
+	/**
+	 * The face of the cube map on the negative x side
+	 */
+	negX: ImageType;
+	/**
+	 * The face of the cube map on the positive y side
+	 */
+	posY: ImageType;
+	/**
+	 * The face of the cube map on the negative y side
+	 */
+	negY: ImageType;
+	/**
+	 * The face of the cube map on the positive z side
+	 */
+	posZ: ImageType;
+	/**
+	 * The face of the cube map on the negative z side
+	 */
+	negZ: ImageType;
 }
 
 /**
- * Represents a basic unlit solid-color material.
+ * Represents an array of GLSL structs.
+ * These structs may be nested.
+ * These are used to represent GLSL dynamic-length array uniforms and the output of GPUComputations, but should not be constructed directly.
+ * For a struct such as:
+ * ```glsl
+ * struct Circle {
+ * 	vec2 position;
+ * 	float radius;
+ * 	vec3 color;
+ * };
+ * ```
+ * A GPUArray could be used as follows:
+ * ```js
+ * // gpu is a GPUInterface
+ * const circle = {
+ * 	position: new Vector2(100, 200),
+ * 	radius: 22.5,
+ * 	color: new Color("magenta")
+ * };
+ * gpu.getUniform("circles").append(circle);
+ * ```
  */
-declare class ColorMaterial extends Material {
+declare class GPUArray {
 	/**
-	 * The solid opaque color used everywhere on the material
+	 * A buffer containing all the structs' data. This can be read from freely at any location, but cannot be written to
 	 */
-	color: Color;
+	buffer: ByteBuffer;
 	/**
-	 * Creates a new solid-color material.
-	 * @param color - The color of the material. Must be opaque
+	 * Retrieves the number of structs in the array.
 	 */
-	constructor(color: Color);
+	get length(): number;
+	/**
+	 * Sets the value of the array and returns the caller.
+	 * This will overwrite all previous data.
+	 * @param value - An array of objects with the same structure as the struct
+	 */
+	set(value: object[]): this;
+	/**
+	 * Sets the value of the array and returns the caller.
+	 * This will overwrite all previous data.
+	 * @param value - Another GPU array to copy from. This must represent the same type of structs. Using this signature is faster, and should be done whenever possible
+	 */
+	set(value: this): this;
+	/**
+	 * Appends a struct to the end of the array and returns the caller.
+	 * @param value - An object with the same structure as the struct
+	 */
+	append(value: object): this;
+	/**
+	 * Writes to a specified location in the array and returns the caller.
+	 * This may increase the size of the array, but cannot be used to create holes.
+	 * @param data - An array of objects with the same structure as the struct
+	 * @param offset - The first index to write to in the array. Default is 0
+	 * @param length - The amount of elements to write. If not specified, this will be as many as possible
+	 * @param srcOffset - The first index to read from the data argument. If not specified, this will be the same as the offset argument
+	 */
+	write(data: object[], offset?: number, length?: number, srcOffset?: number): this;
+	/**
+	 * Reads from a specified location in the array into a provided array of objects, and returns the destination array.
+	 * @param data - An array of objects with the same structure as the struct
+	 * @param offset - The first index to read from in the array. Default is 0
+	 * @param length - The amount of elements to read. If not specified, this will be as many as possible
+	 * @param dstOffset - The first index to write to in the data argument. If not specified, this will be the same as the offset argument
+	 */
+	read(data: object[], offset?: number, length?: number, dstOffset?: number): object[];
 }
 
 /**
- * Represents a basic parameterized material based on the Blinn-Phong Shading Model.
+ * Represents the way in which samples of an image are interpolated in GLSL.
  */
-declare class SimpleMaterial extends Material {
+declare enum FilterMode {
 	/**
-	 * The base color of the material, against which ambient and diffuse lighting are calculated. Starts as white
+	 * The exact value of the nearest texel is used as the sample
 	 */
-	albedo: Color;
+	NEAREST,
 	/**
-	 * The color of light emitted from the material. Starts as black
+	 * The values of the 4 nearest texels are linearly interpolated to produce the sample
 	 */
-	emission: Color;
+	LINEAR
+}
+
+/**
+ * Describes how a Sampler should be constructed.
+ * All properties of this interface are optional.
+ */
+declare interface SamplerSettings {
 	/**
-	 * The color of specular highlights on the material. Starts as white
+	 * Whether the samples will repeat when out-of-bounds coordinates are used. Default is false
 	 */
-	specular: Color;
+	wrap?: boolean;
 	/**
-	 * The texture to use in in place of the `.albedo` color. It will be sampled according to the mesh's UVs
+	 * How the samples should be interpolated when sampling from non-integer coordinates. Default is `FilterMode.NEAREST` for Textures, and `FilterMode.LINEAR` for all others
 	 */
-	albedoTexture: ImageType | Sampler;
+	filter?: FilterMode;
 	/**
-	 * The texture to use in in place of the `.specular` color. It will be sampled according to the mesh's UVs
+	 * Whether sampling at shallow angles should be done on down-scaled mipmaps instead of the full-resolution image. Default is false
 	 */
-	specularTexture: ImageType | Sampler;
+	mipmap?: boolean;
+}
+
+/**
+ * This describes the way in which a GLSL `sampler*` reads data from a texture.
+ * This can be used in place of an ImageType when specifying a `sampler*` uniform.
+ */
+declare class Sampler {
 	/**
-	 * The exponent applied during specular highlight calculation. Higher values correspond to sharper highlights. Starts as 0
+	 * 
+	 * @param image - The image(s) to sample from
+	 * @param settings - How the sampler should be configured. Default is an empty object
 	 */
-	specularExponent: number;
+	constructor(image: ImageType | ImageType[] | CubeMap, settings?: SamplerSettings);
 	/**
-	 * The non-zero opacity of the material. Starts as 1
+	 * Creates a sampler for a given image which is suitable for 3D rendering.
+	 * Any sampler can in theory be used for 3D rendering, but performance may be improved through the use of this factory.
+	 * @param image - The image to sample from
 	 */
-	alpha: number;
+	static for3D(image: ImageType): Sampler;
+}
+
+/**
+ * Represents a GLSL program.
+ */
+declare interface GPUInterface {
 	/**
-	 * The texture whose alpha channel to use in place of the `.alpha` value. It will be sampled according to the mesh's UVs. Any material with a `.alphaTexture` is considered transparent
+	 * The source code of the program
 	 */
-	alphaTexture: ImageType | Sampler;
+	glsl: string;
 	/**
-	 * Creates a new material based on certain surface settings.
-	 * @param settings - An object where each entry corresponds to a property of SimpleMaterial
+	 * Sets the value of a uniform in the program.
+	 * @param name - The name of the uniform
+	 * @param value - The new value for the uniform. For the type of this argument, see the GLSL API
+	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
 	 */
-	constructor(settings: object);
+	setUniform(name: string, value: any, force?: boolean): void;
 	/**
-	 * Sets `.albedoTexture` and `.alphaTexture` to a given texture.
-	 * @param texture - The new color and alpha texture
+	 * Sets the value of many uniforms at once.
+	 * @param uniforms - A set of key-value pairs, where the key represents the uniform name, and the value represents the uniform value
+	 * @param force - Whether to warn of non-existent uniforms. If this is false, setting a non-existent uniform will produce no developer feedback. Default is true
 	 */
-	set colorTexture(texture: ImageType | Sampler);
+	setUniforms(uniforms: object, force?: boolean): void;
 	/**
-	 * Sets `.albedo` and `.alpha` to match a given color, and disables the current `.albedoTexture` and `.alphaTexture`.
-	 * @param color - The new color value
+	 * Retrieves the current value of a given uniform.
+	 * For the return type of this function, see the GLSL API.
+	 * @param name - The name of the uniform
 	 */
-	set color(color: Color);
+	getUniform(name: string): any;
+	/**
+	 * Checks whether a given uniform exists.
+	 * @param name - The name of the uniform to check
+	 */
+	hasUniform(name: string): boolean;
 }
 
 /**
@@ -7500,15 +7498,15 @@ declare class Artist3D extends Artist {
 	mesh(mesh: Mesh): MeshRenderer;
 	/**
 	 * Returns an object with various methods for queueing lines and outlines to be rendered.
-	 * @param color - The color of the lines to be drawn
+	 * @param color - The material or color of the lines to be drawn
 	 * @param lineWidth - The width of the lines to be drawn. Default is 1
 	 */
-	stroke(color: Color, lineWidth?: number): StrokeRenderer3D;
+	stroke(color: Color | Material, lineWidth?: number): StrokeRenderer3D;
 	/**
 	 * Returns an object with various methods for queuing solid shapes to be rendered.
-	 * @param color - The color of the shapes to be drawn
+	 * @param color - The material or color of the shapes to be drawn
 	 */
-	draw(color: Color): DrawRenderer3D;
+	draw(color: Color | Material): DrawRenderer3D;
 }
 
 /**
@@ -7774,92 +7772,106 @@ declare class StrokeRenderer3D {
 }
 
 /**
- * Represents an image that can be rendered.
- * This is an abstract superclass and should not be constructed.
+ * Represents a material applied to a MeshChunk.
  */
-declare class ImageType {
+declare class Material implements Copyable {
 	/**
-	 * The natural rendered width of the image
+	 * A optional name for the material. Materials loaded from files will use their file-provided names. Starts as "anonymous"
 	 */
-	width: number;
+	name: string;
 	/**
-	 * The natural rendered height of the image
+	 * Whether or not light can pass through the material
 	 */
-	height: number;
+	transparent: boolean;
 	/**
-	 * Whether the contents of the image can change over time
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
 	 */
-	static dynamic: boolean;
-	/**
-	 * Returns the pixel density of the image, measured as the ratio of the number of pixels in a row of the image to the natural width of the image.
-	 */
-	get pixelRatio(): number;
-	/**
-	 * Returns the width of the image in actual pixels, accounting for the pixel density of the image.
-	 */
-	get pixelWidth(): number;
-	/**
-	 * Returns the height of the image in actual pixels, accounting for the pixel density of the image.
-	 */
-	get pixelHeight(): number;
-	/**
-	 * Simultaneously updates the width and height of the image.
-	 * Updates that occur on image resizing will only happen once with a call to this method, which can improve performance as opposed to simply assigning to `.width` and `.height` in a row.
-	 * @param width - The new natural width of the image
-	 * @param height - The new natural height of the image
-	 */
-	resize(width: number, height: number): void;
-	/**
-	 * Checks whether a given point is inside the natural bounds of the image with the upper-left corner at the origin.
-	 * This operation is inclusive on the lower bound and exclusive on the upper bound.
-	 * @param point - The point to check
-	 */
-	contains(point: Vector2): boolean;
-	/**
-	 * Checks whether a given point is inside the natural bounds of the image with the upper-left corner at the origin.
-	 * This operation is inclusive on the lower bound and exclusive on the upper bound.
-	 * @param x - The x coordinate of the point to check
-	 * @param y - The y coordinate of the point to check
-	 */
-	contains(x: number, y: number): boolean;
-	/**
-	 * Returns the width of the image required for a given height to maintain the aspect ratio.
-	 * @param height - The potential height of the image
-	 */
-	inferWidth(height: number): number;
-	/**
-	 * Returns the height of the image required for a given width to maintain the aspect ratio.
-	 * @param width - The potential width of the image
-	 */
-	inferHeight(width: number): number;
-	/**
-	 * Converts the content of the image to a data: url.
-	 */
-	toDataURL(): string;
-	/**
-	 * Downloads the image as a PNG, with a specified name.
-	 * Returns a promise that resolves when the image downloads.
-	 * @param name - The name of the downloaded image, without the extension
-	 */
-	download(name: string): Promise;
+	get(destination?: this): this;
 }
 
 /**
- * Represents an externally loaded image file.
- * These should be loaded using HengineImageResource and not constructed directly.
- * ```js
- * const catImage = loadResource("cat.png"); // load the HImage
- * 
- * renderer.image(catImage).rect(0, 0, 100, 100);
- * ```
+ * Represents a custom shader-based material with a user-specified vertex and fragment shader programs.
  */
-declare class HImage extends ImageType {
+declare class ShaderMaterial extends Material {
 	/**
-	 * Checks whether an image exists at a specified file path.
-	 * Returns a promise that resolves to whether the image exists.
-	 * @param src - The file path to check
+	 * A mapping from uniform names to uniform values, with the type correspondence specified in the GLSL API. This can be used to customize the behavior of the material
 	 */
-	static imageExists(src: string): Promise<boolean>;
+	uniforms: object;
+	/**
+	 * Creates a new custom material.
+	 * @param fragmentShader - The source code for the fragment shader. The default produces an opaque white color under all circumstances
+	 * @param vertexShader - The source code for the vertex shader. The default projects the vertex position and passes no additional information to the fragment shader
+	 */
+	constructor(fragmentShader?: string, vertexShader?: string);
+}
+
+/**
+ * Represents a basic unlit solid-color material.
+ */
+declare class ColorMaterial extends Material {
+	/**
+	 * The solid opaque color used everywhere on the material
+	 */
+	color: Color;
+	/**
+	 * Creates a new solid-color material.
+	 * @param color - The color of the material. Must be opaque
+	 */
+	constructor(color: Color);
+}
+
+/**
+ * Represents a basic parameterized material based on the Blinn-Phong Shading Model.
+ */
+declare class SimpleMaterial extends Material {
+	/**
+	 * The base color of the material, against which ambient and diffuse lighting are calculated. Starts as white
+	 */
+	albedo: Color;
+	/**
+	 * The color of light emitted from the material. Starts as black
+	 */
+	emission: Color;
+	/**
+	 * The color of specular highlights on the material. Starts as white
+	 */
+	specular: Color;
+	/**
+	 * The texture to use in in place of the `.albedo` color. It will be sampled according to the mesh's UVs
+	 */
+	albedoTexture: ImageType | Sampler;
+	/**
+	 * The texture to use in in place of the `.specular` color. It will be sampled according to the mesh's UVs
+	 */
+	specularTexture: ImageType | Sampler;
+	/**
+	 * The exponent applied during specular highlight calculation. Higher values correspond to sharper highlights. Starts as 0
+	 */
+	specularExponent: number;
+	/**
+	 * The non-zero opacity of the material. Starts as 1
+	 */
+	alpha: number;
+	/**
+	 * The texture whose alpha channel to use in place of the `.alpha` value. It will be sampled according to the mesh's UVs. Any material with a `.alphaTexture` is considered transparent
+	 */
+	alphaTexture: ImageType | Sampler;
+	/**
+	 * Creates a new material based on certain surface settings.
+	 * @param settings - An object where each entry corresponds to a property of SimpleMaterial
+	 */
+	constructor(settings: object);
+	/**
+	 * Sets `.albedoTexture` and `.alphaTexture` to a given texture.
+	 * @param texture - The new color and alpha texture
+	 */
+	set colorTexture(texture: ImageType | Sampler);
+	/**
+	 * Sets `.albedo` and `.alpha` to match a given color, and disables the current `.albedoTexture` and `.alphaTexture`.
+	 * @param color - The new color value
+	 */
+	set color(color: Color);
 }
 
 /**
@@ -7887,6 +7899,31 @@ declare class SceneElement {
 	 * Removes the element from the parent element. This will take until the end of the update cycle to take effect.
 	 */
 	remove(): void;
+}
+
+/**
+ * Represents a permanently Screen-Space object in a Scene.
+ * All rendering for this class takes place in Screen-Space rather than World-Space, and should be targeted to `ui` rather than `renderer`.
+ * Culling, point-collision checks, and other related operations will all use Screen-Space coordinates rather than World-Space.
+ */
+declare class UIObject extends SceneObject<Vector2, Transform2D, Rect, Circle | Polygon> {
+	
+}
+
+/**
+ * Represents an object in a Scene that exists in the space of the world.
+ * The dimensionality of this object depends on whether the engine is in 2D or 3D mode.
+ * Only objects of this type can have PHYSICS, or be rendered in the space of a Camera.
+ */
+declare class WorldObject extends SceneObject<VectorN, TransformN, BoxN, WorldObjectBallN | WorldObjectPolytopeN> {
+	/**
+	 * The World-Space bounding box to use for graphical culling instead of the shapes of the object. Starts as null
+	 */
+	graphicalBoundingBox: Prism | Rect | null;
+	/**
+	 * Whether or not the graphics should ever be culled. This can be ignored if the scene has disabled graphics culling. Starts as true
+	 */
+	cullGraphics: boolean;
 }
 
 /**
@@ -8326,31 +8363,6 @@ declare type ScriptContainer = {
 }
 
 /**
- * Represents a permanently Screen-Space object in a Scene.
- * All rendering for this class takes place in Screen-Space rather than World-Space, and should be targeted to `ui` rather than `renderer`.
- * Culling, point-collision checks, and other related operations will all use Screen-Space coordinates rather than World-Space.
- */
-declare class UIObject extends SceneObject<Vector2, Transform2D, Rect, Circle | Polygon> {
-	
-}
-
-/**
- * Represents an object in a Scene that exists in the space of the world.
- * The dimensionality of this object depends on whether the engine is in 2D or 3D mode.
- * Only objects of this type can have PHYSICS, or be rendered in the space of a Camera.
- */
-declare class WorldObject extends SceneObject<VectorN, TransformN, BoxN, WorldObjectBallN | WorldObjectPolytopeN> {
-	/**
-	 * The World-Space bounding box to use for graphical culling instead of the shapes of the object. Starts as null
-	 */
-	graphicalBoundingBox: Prism | Rect | null;
-	/**
-	 * Whether or not the graphics should ever be culled. This can be ignored if the scene has disabled graphics culling. Starts as true
-	 */
-	cullGraphics: boolean;
-}
-
-/**
  * Makes a SceneObject draggable with the mouse.
  * If the object has PHYSICS, then it will become stationary while being dragged.
  * This forces the object to accept mouse events.
@@ -8380,172 +8392,6 @@ declare class DRAGGABLE extends ElementScript {
 	 * @param bounds - The bounds in which the object can be dragged. Default is null
 	 */
 	init(obj: SceneObject, key: string, bounds?: Rect): void;
-}
-
-/**
- * Every instance of PARTICLE_SPAWNER has a `.Particle` member class with an identical structure.
- * This represents a single particle in a particle system.
- * The Vector type used for `.position` and `.velocity` is of the same dimension as the particle spawner.
- */
-declare class Particle {
-	/**
-	 * The World-Space position of the particle
-	 */
-	position: Vector;
-	/**
-	 * The velocity per frame of the particle
-	 */
-	velocity: Vector;
-	/**
-	 * The proportion of the particle's lifespan that has elapsed. Setting this to 1 will remove the particle
-	 */
-	timer: number;
-	/**
-	 * This object is not used by the engine, and can be modified in any way to represent particle-specific data
-	 */
-	data: object;
-	/**
-	 * The particle system that created the particle
-	 */
-	spawner: PARTICLE_SPAWNER;
-}
-
-/**
- * This is an interface for the parameters to various property-setting methods on PARTICLE_SPAWNER.
- */
-declare interface SpawnerProperties {
-	/**
-	 * Whether or not particles will have air resistance applied
-	 */
-	slows?: boolean;
-	/**
-	 * Whether or not particles will have gravity applied
-	 */
-	falls?: boolean;
-	/**
-	 * Whether or not particles will be spawned passively over time
-	 */
-	active?: boolean;
-	/**
-	 * The delay (in frames) between particle spawns. This can be less than 1
-	 */
-	delay?: number;
-	/**
-	 * The duration (in frames) of each particle's lifetime
-	 */
-	lifeSpan?: number;
-	/**
-	 * The effective radius of each particle used to compute culling. This does not affect the appearance of the particles
-	 */
-	radius?: number;
-	/**
-	 * Whether or not particles should be checked for visibility before rendering
-	 */
-	cullGraphics?: boolean;
-	/**
-	 * This specifies how particles should be rendered. If this is FastFrame, they will be rendered on a separate surface and then be copied over. If this is CanvasImage, they will be rendered directly to the screen
-	 */
-	imageType?: Class<ImageType>;
-	/**
-	 * The function that is called to initialize particles.
-	 * @param particle - The particle to initialize
-	 */
-	init?(particle: Particle): void;
-	/**
-	 * The function that is called to update particles each frame.
-	 * Since this function is not culled, all non-rendering logic should be here.
-	 * This property may instead be a String containing the source code for a GPUComputation that outputs a struct matching any inclusive subset of the structure of a Particle in the system. The source code also must include a `particles[]` uniform whose type is the same as the output of the computation. This uniform will reflect the state of the particles in the system.
-	 * If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way, including timer changes. For particles to disappear when using a custom update computation, the timer property must be manually changed by the provided `float timerIncrement` uniform.
-	 * Setting this property to a function will remove the computation.
-	 * @param particle - The particle being updated
-	 */
-	update?(particle: Particle): void;
-	/**
-	 * The function that is called to render particles each frame.
-	 * This function should minimize side effects and, if possible, should be pure.
-	 * @param renderer - The renderer to draw the particle to. Its transform will be in World-Space, unless the spawner is a UIObject
-	 * @param particle - The particle to render
-	 */
-	draw?(renderer: Artist2D, particle: Particle): void;
-}
-
-/**
- * Adds particle emitting functionality to a SceneObject.
- */
-declare class PARTICLE_SPAWNER extends ElementScript {
-	/**
-	 * The function that is called to initialize particles. This will be passed the particle object for each particle created. Default is a no-op
-	 */
-	particleInit: (arg0: Particle) => void;
-	/**
-	 * The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This function will not run if the spawner has an active GPU computation. Default is a no-op.
-	 */
-	particleUpdate: (arg0: Particle) => void;
-	/**
-	 * The function that is called to render particles each frame. This will be passed an Artist and a particle object for each particle object on-screen each frame. Default is a no-op
-	 */
-	particleDraw: (arg0: Artist, arg1: Particle) => void;
-	/**
-	 * Whether or not particles will have air resistance applied. Default is false
-	 */
-	slows: boolean;
-	/**
-	 * Whether or not particles will have gravity applied. Default is false
-	 */
-	falls: boolean;
-	/**
-	 * Whether or not particles will be spawned passively over time. Default is true
-	 */
-	active: boolean;
-	/**
-	 * The delay (in frames) between particle spawns. This can be less than 1. Default is 1
-	 */
-	delay: number;
-	/**
-	 * The duration (in frames) of each particle's lifetime. Default is 100
-	 */
-	lifeSpan: number;
-	/**
-	 * The effective radius of each particle used to compute culling. This does not affect the appearance of the particles. Default is 10
-	 */
-	radius: number;
-	/**
-	 * Whether particles should be checked for visibility before rendering. Default is true
-	 */
-	cullGraphics: boolean;
-	/**
-	 * Makes an object a particle system.
-	 * @param properties - The settings to specify on the spawner. Those not specified will retain their default values
-	 */
-	init(obj: SceneObject, properties: SpawnerProperties): void;
-	/**
-	 * Sets the number of particles in the system.
-	 * @param count - The new amount of particles
-	 */
-	set particleCount(count: number);
-	/**
-	 * Returns the current number of particles in the system.
-	 */
-	get particleCount(): number;
-	/**
-	 * Removes all of the particles from the system
-	 */
-	removeAllParticles(): void;
-	/**
-	 * Sets an inclusive subset of the properties of the system.
-	 * @param properties - A collection of new setting values. Any settings not specified will be left as they were previously
-	 */
-	setProperties(properties: SpawnerProperties): void;
-	/**
-	 * Creates a collection of particles at once.
-	 * @param count - The number of particles to create
-	 * @param position - The location to create the particles at. The dimension of this vector is the same as that of the spawner. Default is the location of the spawner
-	 */
-	explode(count: number, position?: Vector): void;
-	/**
-	 * Returns the smallest axis-aligned World-Space rectangle that contains all of the particles in the system.
-	 */
-	getBoundingBox(): Prism | Rect;
 }
 
 /**
@@ -8765,281 +8611,279 @@ declare class TEXT_AREA extends ElementScript {
 }
 
 /**
- * Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer.
+ * Every instance of PARTICLE_SPAWNER has a `.Particle` member class with an identical structure.
+ * This represents a single particle in a particle system.
+ * The Vector type used for `.position` and `.velocity` is of the same dimension as the particle spawner.
  */
-declare class ByteBuffer implements Copyable, Serializable {
+declare class Particle {
 	/**
-	 * The writing API of the buffer
+	 * The World-Space position of the particle
 	 */
-	write: ByteBuffer.Writer;
+	position: Vector;
 	/**
-	 * The reading API of the buffer
+	 * The velocity per frame of the particle
 	 */
-	read: ByteBuffer.Reader;
+	velocity: Vector;
 	/**
-	 * The measuring API of the buffer
+	 * The proportion of the particle's lifespan that has elapsed. Setting this to 1 will remove the particle
 	 */
-	measure: ByteBuffer.Measurer;
+	timer: number;
 	/**
-	 * The offset into the buffer where reading and writing occur
+	 * This object is not used by the engine, and can be modified in any way to represent particle-specific data
 	 */
-	pointer: number;
+	data: object;
 	/**
-	 * The endianness of the buffer
+	 * The particle system that created the particle
 	 */
-	littleEndian: boolean;
-	/**
-	 * The number of bytes in the buffer
-	 */
-	byteLength: number;
-	/**
-	 * Creates a new ByteBuffer.
-	 * @param bytes - The number of bytes (0 initialized) in the buffer. Default is 2
-	 * @param pointer - The offset into the buffer where operations occur. Default is 0
-	 * @param littleEndian - The endianness of the buffer. Default is true
-	 */
-	constructor(bytes?: number, pointer?: number, littleEndian?: boolean);
-	/**
-	 * Creates a new ByteBuffer.
-	 * @param bytes - A buffer containing the bytes for the new buffer
-	 * @param pointer - The offset into the buffer where operations occur. Default is 0
-	 * @param littleEndian - The endianness of the buffer. Default is true
-	 */
-	constructor(bytes: ArrayBuffer, pointer?: number, littleEndian?: boolean);
-	/**
-	 * Advances the pointer by a specified amount.
-	 * @param amount - The amount of bytes to increment by
-	 */
-	advance(amount: number): void;
-	/**
-	 * Resets the pointer to the beginning of the buffer and sets all the bytes in the buffer to 0.
-	 */
-	clear(): void;
-	/**
-	 * Trims the size of the buffer to only include up to (but not including) the current pointer.
-	 */
-	finalize(): void;
-	/**
-	 * Converts the buffer to a sequence of 16-bit unicode characters.
-	 */
-	toString(): string;
-	/**
-	 * Converts the buffer to a base-64 string.
-	 */
-	toBase64(): string;
-	/**
-	 * Converts a base-64 string to a new buffer.
-	 * @param base64 - The base-64 string to convert
-	 */
-	static fromBase64(base64: string): ByteBuffer;
-	/**
-	 * Converts a series of 16-bit unicode characters into a new buffer.
-	 * @param string - The string of data
-	 */
-	static fromString(string: string): ByteBuffer;
-	/**
-	 * Returns a new byte buffer containing the bytes associated with a given value.
-	 * The returned buffer will have its pointer past the end.
-	 * @param value - A value to put into the buffer
-	 * @param type - A method name on ByteBuffer.Writer to use to serialize the value (`"string"`, `"uint8"`, `"object"`, etc). If not provided, the `.toByteBuffer()` Serializable method of the value will be used instead
-	 */
-	static of(value: Serializable, type?: string): ByteBuffer;
-	/**
-	 * Creates a copy of the object and optionally stores it in a provided destination.
-	 * @param destination - The destination to copy the object into. This must be the same type as the caller
-	 */
-	get(destination?: this): this;
-	/**
-	 * Writes the object to a buffer and returns it.
-	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
-	 */
-	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
-	/**
-	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
-	 * @param buffer - A source buffer to read the data from
-	 */
-	static fromByteBuffer(buffer: ByteBuffer): Serializable;
+	spawner: PARTICLE_SPAWNER;
 }
 
 /**
- * Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer.
+ * This is an interface for the parameters to various property-setting methods on PARTICLE_SPAWNER.
  */
-declare namespace ByteBuffer {
+declare interface SpawnerProperties {
 	/**
-	 * The writing API for a ByteBuffer.
-	 * Every method of this class increments the associated buffer's pointer to after the written data.
+	 * Whether or not particles will have air resistance applied
 	 */
-	class Writer {
-		/**
-		 * Writes an S-bit integer to the buffer. S can be 8, 16, or 32.
-		 * @param integer - The integer to write
-		 */
-		int8(integer: number): void;
-		/**
-		 * Writes an S-bit integer to the buffer. S can be 8, 16, or 32.
-		 * @param integer - The integer to write
-		 */
-		int16(integer: number): void;
-		/**
-		 * Writes an S-bit integer to the buffer. S can be 8, 16, or 32.
-		 * @param integer - The integer to write
-		 */
-		int32(integer: number): void;
-		/**
-		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
-		 * @param integer - The unsigned integer to write
-		 */
-		uint8(integer: number): void;
-		/**
-		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
-		 * @param integer - The unsigned integer to write
-		 */
-		uint16(integer: number): void;
-		/**
-		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
-		 * @param integer - The unsigned integer to write
-		 */
-		uint32(integer: number): void;
-		/**
-		 * Reads an S-bit float from the buffer. S can be 32 or 64.
-		 * @param float - The floating point value to write
-		 */
-		float32(float: number): void;
-		/**
-		 * Reads an S-bit float from the buffer. S can be 32 or 64.
-		 * @param float - The floating point value to write
-		 */
-		float64(float: number): void;
-		/**
-		 * Writes a bigint to the buffer.
-		 * @param bigint - The value to write
-		 */
-		bigInt(bigint: bigint): void;
-		/**
-		 * Writes a string to the buffer.
-		 * @param string - The value to write
-		 */
-		string(string: string): void;
-		/**
-		 * Writes a boolean to the buffer.
-		 * @param bool - The value to write
-		 */
-		bool(bool: boolean): void;
-		/**
-		 * Writes an array of values to the buffer.
-		 * @param type - The name of another method of this class that can be used to write each element of the array
-		 * @param data - The single-type array to write
-		 */
-		array(type: string, data: any[]): void;
-		/**
-		 * Writes a buffer to the buffer.
-		 * @param buffer - The value to write to the buffer
-		 */
-		byteBuffer(buffer: ByteBuffer): void;
-		/**
-		 * Writes an arbitrary, potentially cyclic object to the buffer.
-		 * This operation does not preserve the classes of the objects.
-		 * @param object - The object to write
-		 */
-		object(object: object): void;
-	}
-	
+	slows?: boolean;
 	/**
-	 * The measuring API for a ByteBuffer.
-	 * This can be used to measure the length of a sequence of writes or reads.
+	 * Whether or not particles will have gravity applied
 	 */
-	class Measurer {
-		/**
-		 * The number of bytes operated on since the last reset
-		 */
-		size: number;
-		/**
-		 * Resets the current size to 0.
-		 */
-		reset(): void;
-	}
-	
+	falls?: boolean;
 	/**
-	 * The reading API for a Bytebuffer.
-	 * Every method of this class increments the associated buffer's pointer to after the read data.
+	 * Whether or not particles will be spawned passively over time
 	 */
-	class Reader {
-		/**
-		 * Reads an S-bit integer from the buffer. S can be 8, 16, or 32.
-		 */
-		int8(): number;
-		/**
-		 * Reads an S-bit integer from the buffer. S can be 8, 16, or 32.
-		 */
-		int16(): number;
-		/**
-		 * Reads an S-bit integer from the buffer. S can be 8, 16, or 32.
-		 */
-		int32(): number;
-		/**
-		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
-		 */
-		uint8(): number;
-		/**
-		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
-		 */
-		uint16(): number;
-		/**
-		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
-		 */
-		uint32(): number;
-		/**
-		 * Reads an S-bit float from the buffer. S can be 32 or 64.
-		 */
-		float32(): number;
-		/**
-		 * Reads an S-bit float from the buffer. S can be 32 or 64.
-		 */
-		float64(): number;
-		/**
-		 * Reads a bigint from the buffer.
-		 */
-		bigInt(): bigint;
-		/**
-		 * Reads a string from the buffer.
-		 */
-		string(): string;
-		/**
-		 * Reads a boolean from the buffer.
-		 */
-		bool(): boolean;
-		/**
-		 * Reads an array of values of a single type from the buffer.
-		 * @param type - The name of another method of this class that can be used for reading each element
-		 * @param count - If specified, this value will be used as the length of the array. This allows for reading sequences of values not prefixed with a length, but not those produced by `ByteBuffer.Writer.prototype.array()`
-		 */
-		array(type: string, count?: number): any[];
-		/**
-		 * Reads a buffer from the buffer
-		 */
-		byteBuffer(): ByteBuffer;
-		/**
-		 * Reads an object from the buffer.
-		 */
-		object(): object;
-	}
+	active?: boolean;
+	/**
+	 * The delay (in frames) between particle spawns. This can be less than 1
+	 */
+	delay?: number;
+	/**
+	 * The duration (in frames) of each particle's lifetime
+	 */
+	lifeSpan?: number;
+	/**
+	 * The effective radius of each particle used to compute culling. This does not affect the appearance of the particles
+	 */
+	radius?: number;
+	/**
+	 * Whether or not particles should be checked for visibility before rendering
+	 */
+	cullGraphics?: boolean;
+	/**
+	 * This specifies how particles should be rendered. If this is FastFrame, they will be rendered on a separate surface and then be copied over. If this is CanvasImage, they will be rendered directly to the screen
+	 */
+	imageType?: Class<ImageType>;
+	/**
+	 * The function that is called to initialize particles.
+	 * @param particle - The particle to initialize
+	 */
+	init?(particle: Particle): void;
+	/**
+	 * The function that is called to update particles each frame.
+	 * Since this function is not culled, all non-rendering logic should be here.
+	 * This property may instead be a String containing the source code for a GPUComputation that outputs a struct matching any inclusive subset of the structure of a Particle in the system. The source code also must include a `particles[]` uniform whose type is the same as the output of the computation. This uniform will reflect the state of the particles in the system.
+	 * If this property is set to a String, it will add a computation to the particle system that operates on every particle each frame and prevents them from being updated in any other way, including timer changes. For particles to disappear when using a custom update computation, the timer property must be manually changed by the provided `float timerIncrement` uniform.
+	 * Setting this property to a function will remove the computation.
+	 * @param particle - The particle being updated
+	 */
+	update?(particle: Particle): void;
+	/**
+	 * The function that is called to render particles each frame.
+	 * This function should minimize side effects and, if possible, should be pure.
+	 * @param renderer - The renderer to draw the particle to. Its transform will be in World-Space, unless the spawner is a UIObject
+	 * @param particle - The particle to render
+	 */
+	draw?(renderer: Artist2D, particle: Particle): void;
 }
 
 /**
- * Classes implementing this interface can be written to and read back from a ByteBuffer with perfect fidelity.
- * This interface is used to ensure objects can be read from and written to the Files.
+ * Adds particle emitting functionality to a SceneObject.
  */
-declare interface Serializable {
+declare class PARTICLE_SPAWNER extends ElementScript {
 	/**
-	 * Writes the object to a buffer and returns it.
-	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 * The function that is called to initialize particles. This will be passed the particle object for each particle created. Default is a no-op
 	 */
-	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	particleInit: (arg0: Particle) => void;
 	/**
-	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
-	 * @param buffer - A source buffer to read the data from
+	 * The function that is called to update particles each frame. This will be passed each particle object each frame. Since this function is not culled, all non-rendering logic should be here. This function will not run if the spawner has an active GPU computation. Default is a no-op.
 	 */
-	static fromByteBuffer(buffer: ByteBuffer): Serializable;
+	particleUpdate: (arg0: Particle) => void;
+	/**
+	 * The function that is called to render particles each frame. This will be passed an Artist and a particle object for each particle object on-screen each frame. Default is a no-op
+	 */
+	particleDraw: (arg0: Artist, arg1: Particle) => void;
+	/**
+	 * Whether or not particles will have air resistance applied. Default is false
+	 */
+	slows: boolean;
+	/**
+	 * Whether or not particles will have gravity applied. Default is false
+	 */
+	falls: boolean;
+	/**
+	 * Whether or not particles will be spawned passively over time. Default is true
+	 */
+	active: boolean;
+	/**
+	 * The delay (in frames) between particle spawns. This can be less than 1. Default is 1
+	 */
+	delay: number;
+	/**
+	 * The duration (in frames) of each particle's lifetime. Default is 100
+	 */
+	lifeSpan: number;
+	/**
+	 * The effective radius of each particle used to compute culling. This does not affect the appearance of the particles. Default is 10
+	 */
+	radius: number;
+	/**
+	 * Whether particles should be checked for visibility before rendering. Default is true
+	 */
+	cullGraphics: boolean;
+	/**
+	 * Makes an object a particle system.
+	 * @param properties - The settings to specify on the spawner. Those not specified will retain their default values
+	 */
+	init(obj: SceneObject, properties: SpawnerProperties): void;
+	/**
+	 * Sets the number of particles in the system.
+	 * @param count - The new amount of particles
+	 */
+	set particleCount(count: number);
+	/**
+	 * Returns the current number of particles in the system.
+	 */
+	get particleCount(): number;
+	/**
+	 * Removes all of the particles from the system
+	 */
+	removeAllParticles(): void;
+	/**
+	 * Sets an inclusive subset of the properties of the system.
+	 * @param properties - A collection of new setting values. Any settings not specified will be left as they were previously
+	 */
+	setProperties(properties: SpawnerProperties): void;
+	/**
+	 * Creates a collection of particles at once.
+	 * @param count - The number of particles to create
+	 * @param position - The location to create the particles at. The dimension of this vector is the same as that of the spawner. Default is the location of the spawner
+	 */
+	explode(count: number, position?: Vector): void;
+	/**
+	 * Returns the smallest axis-aligned World-Space rectangle that contains all of the particles in the system.
+	 */
+	getBoundingBox(): Prism | Rect;
+}
+
+/**
+ * Represents a channel on which tones can be played.
+ */
+declare class SynthChannel {
+	/**
+	 * Stops the tone from playing, optionally after a delay.
+	 * Returns a promise that resolves when the tone stops.
+	 * @param wait - The interval (in milliseconds) to wait before stopping the sound. Default is 0
+	 */
+	stop(wait?: number): Promise;
+}
+
+/**
+ * This is an interface for tone specifications.
+ */
+declare interface Tone {
+	/**
+	 * The duration (in milliseconds) of the tone. If not specified, the tone can be stopped at will
+	 */
+	duration?: number;
+	/**
+	 * The frequency of the tone in Hertz. If not specified, `.note` must be
+	 */
+	frequency?: number;
+	/**
+	 * The letter name of the the note, optionally with a "#" appended for sharp or a "b" for flat. If not specified, `.frequency` must be
+	 */
+	note?: string;
+	/**
+	 * Which octave on a piano the note would appear in. Default is 4. This is ignored if `.frequency` is specified
+	 */
+	octave?: number;
+	/**
+	 * The volume of the tone on [0, 1]. Default is 1
+	 */
+	volume?: number;
+	/**
+	 * The name of the waveform for the tone. This is one of (`"sine"`, `"sawtooth"`, `"triangle"`, `"square"`). Default is `"sine"`
+	 */
+	wave?: string;
+}
+
+/**
+ * Represents a synthesizer which can create pure tones.
+ * ```js
+ * const synth = new Synth();
+ * synth.playSequence([
+ * 	{ frequency: 440, duration: 1000 }, // one second A note
+ * 	{ duration: 500, volume: 0 } // half second pause
+ * 	{ note: "A", duration: 1000 } // one second A note
+ * ]);
+ * ```
+ */
+declare class Synth {
+	/**
+	 * Creates a new Synth.
+	 */
+	constructor();
+	/**
+	 * Plays a tone. If the tone has a specified duration, this returns a promise that resolves when it completes. Otherwise, this returns the `.stop()` method of the SynthChannel playing this tone.
+	 * @param tone - The specification of the tone to play.
+	 */
+	play(tone: Tone): ((arg0: number) => void) | Promise;
+	/**
+	 * Plays a sequence of tones with specified durations. Returns a promise that resolves when they have all completed.
+	 * @param all - The specifications of the tones to play. See the class description
+	 * @param globals - All the properties of this object will be used as defaults for the properties of tones specified in `all`. Default is `{ }`
+	 */
+	playSequence(all: Tone[], globals?: Tone): Promise<void>;
+}
+
+/**
+ * Represents an ongoing playback of a Sound.
+ */
+declare class SoundInstance {
+	/**
+	 * The volume of the playback on [0, 1]
+	 */
+	volume: number;
+	/**
+	 * Returns the current time in milliseconds since playback began.
+	 */
+	get time(): number;
+	/**
+	 * Stops playback of the sound.
+	 */
+	stop(): void;
+}
+
+/**
+ * Represents an external sound clip.
+ * These should be loaded using HengineSoundResource and not constructed directly.
+ */
+declare class Sound {
+	/**
+	 * Whether or not the sound loops upon completion
+	 */
+	loops: boolean;
+	/**
+	 * The length, in milliseconds, of the sound
+	 */
+	duration: number;
+	/**
+	 * Starts playback of the sound in a new instance, which is returned.
+	 * Multiple sound instances can play at once.
+	 * @param volume - The volume of the playback on [0, 1]
+	 */
+	play(volume: number): SoundInstance;
 }
 
 /**
@@ -9502,116 +9346,6 @@ declare class ClipboardHandler {
 }
 
 /**
- * Represents a channel on which tones can be played.
- */
-declare class SynthChannel {
-	/**
-	 * Stops the tone from playing, optionally after a delay.
-	 * Returns a promise that resolves when the tone stops.
-	 * @param wait - The interval (in milliseconds) to wait before stopping the sound. Default is 0
-	 */
-	stop(wait?: number): Promise;
-}
-
-/**
- * This is an interface for tone specifications.
- */
-declare interface Tone {
-	/**
-	 * The duration (in milliseconds) of the tone. If not specified, the tone can be stopped at will
-	 */
-	duration?: number;
-	/**
-	 * The frequency of the tone in Hertz. If not specified, `.note` must be
-	 */
-	frequency?: number;
-	/**
-	 * The letter name of the the note, optionally with a "#" appended for sharp or a "b" for flat. If not specified, `.frequency` must be
-	 */
-	note?: string;
-	/**
-	 * Which octave on a piano the note would appear in. Default is 4. This is ignored if `.frequency` is specified
-	 */
-	octave?: number;
-	/**
-	 * The volume of the tone on [0, 1]. Default is 1
-	 */
-	volume?: number;
-	/**
-	 * The name of the waveform for the tone. This is one of (`"sine"`, `"sawtooth"`, `"triangle"`, `"square"`). Default is `"sine"`
-	 */
-	wave?: string;
-}
-
-/**
- * Represents a synthesizer which can create pure tones.
- * ```js
- * const synth = new Synth();
- * synth.playSequence([
- * 	{ frequency: 440, duration: 1000 }, // one second A note
- * 	{ duration: 500, volume: 0 } // half second pause
- * 	{ note: "A", duration: 1000 } // one second A note
- * ]);
- * ```
- */
-declare class Synth {
-	/**
-	 * Creates a new Synth.
-	 */
-	constructor();
-	/**
-	 * Plays a tone. If the tone has a specified duration, this returns a promise that resolves when it completes. Otherwise, this returns the `.stop()` method of the SynthChannel playing this tone.
-	 * @param tone - The specification of the tone to play.
-	 */
-	play(tone: Tone): ((arg0: number) => void) | Promise;
-	/**
-	 * Plays a sequence of tones with specified durations. Returns a promise that resolves when they have all completed.
-	 * @param all - The specifications of the tones to play. See the class description
-	 * @param globals - All the properties of this object will be used as defaults for the properties of tones specified in `all`. Default is `{ }`
-	 */
-	playSequence(all: Tone[], globals?: Tone): Promise<void>;
-}
-
-/**
- * Represents an ongoing playback of a Sound.
- */
-declare class SoundInstance {
-	/**
-	 * The volume of the playback on [0, 1]
-	 */
-	volume: number;
-	/**
-	 * Returns the current time in milliseconds since playback began.
-	 */
-	get time(): number;
-	/**
-	 * Stops playback of the sound.
-	 */
-	stop(): void;
-}
-
-/**
- * Represents an external sound clip.
- * These should be loaded using HengineSoundResource and not constructed directly.
- */
-declare class Sound {
-	/**
-	 * Whether or not the sound loops upon completion
-	 */
-	loops: boolean;
-	/**
-	 * The length, in milliseconds, of the sound
-	 */
-	duration: number;
-	/**
-	 * Starts playback of the sound in a new instance, which is returned.
-	 * Multiple sound instances can play at once.
-	 * @param volume - The volume of the playback on [0, 1]
-	 */
-	play(volume: number): SoundInstance;
-}
-
-/**
  * Represents a serializable file system that can be modified with a command-line-like interface.
  * File paths in this system are similar to those used in Windows, except that they use a forward slash "/" separator, and the base drive is `h:` rather than `C:`.
  * Various file types can be specified, such that complex classes can be written to the file system and retrieved.
@@ -9759,4 +9493,282 @@ declare class Files {
 	 * @param string - The data string to deserialize
 	 */
 	static fromString(string: string): Files;
+}
+
+/**
+ * Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer.
+ */
+declare class ByteBuffer implements Copyable, Serializable {
+	/**
+	 * The writing API of the buffer
+	 */
+	write: ByteBuffer.Writer;
+	/**
+	 * The reading API of the buffer
+	 */
+	read: ByteBuffer.Reader;
+	/**
+	 * The measuring API of the buffer
+	 */
+	measure: ByteBuffer.Measurer;
+	/**
+	 * The offset into the buffer where reading and writing occur
+	 */
+	pointer: number;
+	/**
+	 * The endianness of the buffer
+	 */
+	littleEndian: boolean;
+	/**
+	 * The number of bytes in the buffer
+	 */
+	byteLength: number;
+	/**
+	 * Creates a new ByteBuffer.
+	 * @param bytes - The number of bytes (0 initialized) in the buffer. Default is 2
+	 * @param pointer - The offset into the buffer where operations occur. Default is 0
+	 * @param littleEndian - The endianness of the buffer. Default is true
+	 */
+	constructor(bytes?: number, pointer?: number, littleEndian?: boolean);
+	/**
+	 * Creates a new ByteBuffer.
+	 * @param bytes - A buffer containing the bytes for the new buffer
+	 * @param pointer - The offset into the buffer where operations occur. Default is 0
+	 * @param littleEndian - The endianness of the buffer. Default is true
+	 */
+	constructor(bytes: ArrayBuffer, pointer?: number, littleEndian?: boolean);
+	/**
+	 * Advances the pointer by a specified amount.
+	 * @param amount - The amount of bytes to increment by
+	 */
+	advance(amount: number): void;
+	/**
+	 * Resets the pointer to the beginning of the buffer and sets all the bytes in the buffer to 0.
+	 */
+	clear(): void;
+	/**
+	 * Trims the size of the buffer to only include up to (but not including) the current pointer.
+	 */
+	finalize(): void;
+	/**
+	 * Converts the buffer to a sequence of 16-bit unicode characters.
+	 */
+	toString(): string;
+	/**
+	 * Converts the buffer to a base-64 string.
+	 */
+	toBase64(): string;
+	/**
+	 * Converts a base-64 string to a new buffer.
+	 * @param base64 - The base-64 string to convert
+	 */
+	static fromBase64(base64: string): ByteBuffer;
+	/**
+	 * Converts a series of 16-bit unicode characters into a new buffer.
+	 * @param string - The string of data
+	 */
+	static fromString(string: string): ByteBuffer;
+	/**
+	 * Returns a new byte buffer containing the bytes associated with a given value.
+	 * The returned buffer will have its pointer past the end.
+	 * @param value - A value to put into the buffer
+	 * @param type - A method name on ByteBuffer.Writer to use to serialize the value (`"string"`, `"uint8"`, `"object"`, etc). If not provided, the `.toByteBuffer()` Serializable method of the value will be used instead
+	 */
+	static of(value: Serializable, type?: string): ByteBuffer;
+	/**
+	 * Creates a copy of the object and optionally stores it in a provided destination.
+	 * @param destination - The destination to copy the object into. This must be the same type as the caller
+	 */
+	get(destination?: this): this;
+	/**
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 */
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
+}
+
+/**
+ * Represents a sequence of bytes, and allows writing and reading of various types to and from the buffer.
+ */
+declare namespace ByteBuffer {
+	/**
+	 * The writing API for a ByteBuffer.
+	 * Every method of this class increments the associated buffer's pointer to after the written data.
+	 */
+	class Writer {
+		/**
+		 * Writes an S-bit integer to the buffer. S can be 8, 16, or 32.
+		 * @param integer - The integer to write
+		 */
+		int8(integer: number): void;
+		/**
+		 * Writes an S-bit integer to the buffer. S can be 8, 16, or 32.
+		 * @param integer - The integer to write
+		 */
+		int16(integer: number): void;
+		/**
+		 * Writes an S-bit integer to the buffer. S can be 8, 16, or 32.
+		 * @param integer - The integer to write
+		 */
+		int32(integer: number): void;
+		/**
+		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
+		 * @param integer - The unsigned integer to write
+		 */
+		uint8(integer: number): void;
+		/**
+		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
+		 * @param integer - The unsigned integer to write
+		 */
+		uint16(integer: number): void;
+		/**
+		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
+		 * @param integer - The unsigned integer to write
+		 */
+		uint32(integer: number): void;
+		/**
+		 * Reads an S-bit float from the buffer. S can be 32 or 64.
+		 * @param float - The floating point value to write
+		 */
+		float32(float: number): void;
+		/**
+		 * Reads an S-bit float from the buffer. S can be 32 or 64.
+		 * @param float - The floating point value to write
+		 */
+		float64(float: number): void;
+		/**
+		 * Writes a bigint to the buffer.
+		 * @param bigint - The value to write
+		 */
+		bigInt(bigint: bigint): void;
+		/**
+		 * Writes a string to the buffer.
+		 * @param string - The value to write
+		 */
+		string(string: string): void;
+		/**
+		 * Writes a boolean to the buffer.
+		 * @param bool - The value to write
+		 */
+		bool(bool: boolean): void;
+		/**
+		 * Writes an array of values to the buffer.
+		 * @param type - The name of another method of this class that can be used to write each element of the array
+		 * @param data - The single-type array to write
+		 */
+		array(type: string, data: any[]): void;
+		/**
+		 * Writes a buffer to the buffer.
+		 * @param buffer - The value to write to the buffer
+		 */
+		byteBuffer(buffer: ByteBuffer): void;
+		/**
+		 * Writes an arbitrary, potentially cyclic object to the buffer.
+		 * This operation does not preserve the classes of the objects.
+		 * @param object - The object to write
+		 */
+		object(object: object): void;
+	}
+	
+	/**
+	 * The measuring API for a ByteBuffer.
+	 * This can be used to measure the length of a sequence of writes or reads.
+	 */
+	class Measurer {
+		/**
+		 * The number of bytes operated on since the last reset
+		 */
+		size: number;
+		/**
+		 * Resets the current size to 0.
+		 */
+		reset(): void;
+	}
+	
+	/**
+	 * The reading API for a Bytebuffer.
+	 * Every method of this class increments the associated buffer's pointer to after the read data.
+	 */
+	class Reader {
+		/**
+		 * Reads an S-bit integer from the buffer. S can be 8, 16, or 32.
+		 */
+		int8(): number;
+		/**
+		 * Reads an S-bit integer from the buffer. S can be 8, 16, or 32.
+		 */
+		int16(): number;
+		/**
+		 * Reads an S-bit integer from the buffer. S can be 8, 16, or 32.
+		 */
+		int32(): number;
+		/**
+		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
+		 */
+		uint8(): number;
+		/**
+		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
+		 */
+		uint16(): number;
+		/**
+		 * Reads an S-bit unsigned integer from the buffer. S can be 8, 16, or 32.
+		 */
+		uint32(): number;
+		/**
+		 * Reads an S-bit float from the buffer. S can be 32 or 64.
+		 */
+		float32(): number;
+		/**
+		 * Reads an S-bit float from the buffer. S can be 32 or 64.
+		 */
+		float64(): number;
+		/**
+		 * Reads a bigint from the buffer.
+		 */
+		bigInt(): bigint;
+		/**
+		 * Reads a string from the buffer.
+		 */
+		string(): string;
+		/**
+		 * Reads a boolean from the buffer.
+		 */
+		bool(): boolean;
+		/**
+		 * Reads an array of values of a single type from the buffer.
+		 * @param type - The name of another method of this class that can be used for reading each element
+		 * @param count - If specified, this value will be used as the length of the array. This allows for reading sequences of values not prefixed with a length, but not those produced by `ByteBuffer.Writer.prototype.array()`
+		 */
+		array(type: string, count?: number): any[];
+		/**
+		 * Reads a buffer from the buffer
+		 */
+		byteBuffer(): ByteBuffer;
+		/**
+		 * Reads an object from the buffer.
+		 */
+		object(): object;
+	}
+}
+
+/**
+ * Classes implementing this interface can be written to and read back from a ByteBuffer with perfect fidelity.
+ * This interface is used to ensure objects can be read from and written to the Files.
+ */
+declare interface Serializable {
+	/**
+	 * Writes the object to a buffer and returns it.
+	 * @param buffer - A destination buffer to write the result to. If not specified, a new buffer will be created
+	 */
+	toByteBuffer(buffer?: ByteBuffer): ByteBuffer;
+	/**
+	 * Creates an instance of the class based on data read from the current pointed-to location in a buffer. This increments the buffer's pointer to after the data of the instance.
+	 * @param buffer - A source buffer to read the data from
+	 */
+	static fromByteBuffer(buffer: ByteBuffer): Serializable;
 }
