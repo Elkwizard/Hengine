@@ -13,8 +13,7 @@ const writeFile = (fileName, content) => {
 	content = normalizeLineBreaks(content);
 	fileName = path.join(dstPath, fileName);
 	const dir = path.dirname(fileName);
-	if (!fs.existsSync(dir))
-		fs.mkdirSync(dir, { recursive: true });
+	fs.mkdirSync(dir, { recursive: true });
 	fs.writeFileSync(fileName, content, "utf-8");
 }
 
@@ -76,17 +75,18 @@ for (const name in nameToPath) {
 	docToPath.set(doc, path);
 }
 
-// preprocess search cache
-const searchIdToDoc = { };
-const searchRecords = addSearchData(docs, searchIdToDoc);
-const searchIdToPath = { };
-for (const id in searchIdToDoc)
-	searchIdToPath[id] = docToPath.get(searchIdToDoc[id]);
-const SEARCH_CACHE = makeSearchCache(searchRecords);
-writeFile("searchCache.js", `
-const SEARCH_CACHE = ${JSON.stringify(SEARCH_CACHE)};
-const SEARCH_ID_TO_PATH = ${JSON.stringify(searchIdToPath)};
-`);
+{ // preprocess search cache
+	const searchIdToDoc = { };
+	const searchRecords = addSearchData(docs, searchIdToDoc);
+	const searchIdToPath = { };
+	for (const id in searchIdToDoc)
+		searchIdToPath[id] = docToPath.get(searchIdToDoc[id]);
+	const SEARCH_CACHE = makeSearchCache(searchRecords);
+	writeFile("searchCache.js", `
+		const SEARCH_CACHE = ${JSON.stringify(SEARCH_CACHE)};
+		const SEARCH_ID_TO_PATH = ${JSON.stringify(searchIdToPath)};
+	`);
+}
 
 // create documentation and organize into files
 const pathToDocumentation = { };
@@ -100,8 +100,12 @@ for (const [doc, path] of docToPath) {
 	pathToDocumentation[path] += document(doc, docToPath, path, aliases);
 }
 
-// clear documentation
-fs.rmSync(path.join(dstPath, "Pages"), { recursive: true });
+{
+	// clear documentation
+	const pagesPath = path.join(dstPath, "Pages");
+	if (fs.existsSync(pagesPath))
+		fs.rmSync(pagesPath, { recursive: true });
+}
 
 // write documentation files to disk
 for (const file in pathToDocumentation) {
