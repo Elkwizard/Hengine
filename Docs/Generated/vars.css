@@ -33,12 +33,12 @@ html {
 	font-size: 1em;
 }
 
-::-webkit-scrollbar, ::-moz-range-track {
+::-webkit-scrollbar {
 	background: var(--background);
 	border: 1px var(--accent-3) solid;
 }
 
-::-webkit-scrollbar-thumb, ::-moz-range-thumb {
+::-webkit-scrollbar-thumb {
 	background: var(--accent-3);
 }
 
