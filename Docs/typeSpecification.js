@@ -223,7 +223,7 @@ function deepCopy(object, found = new Map()) {
 	return result;
 }
 
-module.exports = function createTypeSpecification(docs, aliases, dimension) {
+export default function createTypeSpecification(docs, aliases, dimension) {
 	docs = deepCopy(docs.filter(doc => !doc.name.isPage));
 	const nameToDoc = { };
 	for (const doc of docs)

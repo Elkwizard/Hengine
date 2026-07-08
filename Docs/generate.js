@@ -1,9 +1,9 @@
-const fs = require("fs");
-const path = require("path");
-const { parse, addInheritance } = require("./parse.js");
-const { document, stats } = require("./document.js");
-const { makeSearchCache, addSearchData } = require("./searchPreprocess.js");
-const createTypeSpecification = require("./typeSpecification.js");
+import fs from "node:fs";
+import path from "node:path";
+import { parse, addInheritance } from "./parse.js";
+import { document, stats } from "./document.js";
+import { makeSearchCache, addSearchData } from "./searchPreprocess.js";
+import createTypeSpecification from "./typeSpecification.js";
 
 const [_node, _this, sourcePath, dstPath, structurePath, typeFile] = process.argv;
 

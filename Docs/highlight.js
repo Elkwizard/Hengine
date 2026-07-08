@@ -145,7 +145,7 @@ highlighters.url = [
 	[/^\s*(\w+)\:\/*/g, "CLASS"]
 ];
 
-module.exports = {
+export {
 	highlight,
 	highlightColors,
 	inferLanguage,

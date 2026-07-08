@@ -85,4 +85,4 @@ function addSearchData(docs, idToDoc) {
 	return records;
 }
 
-module.exports = { makeSearchCache, addSearchData };
+export { makeSearchCache, addSearchData };

@@ -277,4 +277,4 @@ function addInheritance(classes) {
 	}
 }
 
-module.exports = { parse, addInheritance };
+export { parse, addInheritance };

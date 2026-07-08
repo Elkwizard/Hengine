@@ -1,5 +1,5 @@
-const path = require("path");
-const { highlight, highlighters, inferLanguage } = require("./highlight");
+import path from "node:path";
+import { highlight, highlighters, inferLanguage } from "./highlight.js";
 
 const stats = {
 	classes: 0,
@@ -234,4 +234,4 @@ function document(doc, topLevelIDs, file, aliases) {
 	return result;
 }
 
-module.exports = { document, stats };
+export { document, stats };
