@@ -60,15 +60,7 @@ class Files {
 	 * @return String
 	 */
 	get directory() {
-		const array = [];
-
-		let addr = this.directoryAddress;
-		while (addr) {
-			array.push(this.getDirectoryName(addr));
-			addr = Files.getParentAddress(this.readAddress(addr));
-		}
-
-		return `h:/${array.reverse().join("/")}`;
+		return this.getDirectoryAddressName(this.directoryAddress);
 	}
 	error(...msg) {
 		console.warn(...msg);
@@ -80,10 +72,9 @@ class Files {
 		buffer.pointer = 0;
 		entries.set("...dir", buffer.read.uint32());
 		entries.set("..dir", address);
-		while (true) {
+		while (buffer.pointer < buffer.byteLength) {
 			const name = buffer.read.string();
 			const address = buffer.read.uint32();
-			if (!address) break;
 			entries.set(name, address);
 		}
 		buffer.pointer = pointer;
@@ -102,6 +93,41 @@ class Files {
 		}
 
 		return "$null$";
+	}
+	getDirectoryAddressName(addr) {
+		const array = [];
+
+		while (addr) {
+			array.push(this.getDirectoryName(addr));
+			addr = Files.getParentAddress(this.readAddress(addr));
+		}
+
+		return `h:/${array.reverse().join("/")}`;
+	}
+	getDirectoryAddress(path) {
+		const relativePieces = Files.getPathPieces(path);
+
+		let address = this.directoryAddress;
+
+		if (relativePieces[0]?.toLowerCase?.() === "h:") {
+			address = 0;
+			relativePieces.shift();
+		}
+
+		for (const dirName of relativePieces) {
+			if (dirName === ".") continue;
+			const entries = this.getDirectoryEntries(address);
+			const dirFileName = `${dirName}.dir`;
+
+			if (!entries.has(dirFileName)) {
+				this.error(`directory '${dirName}' does not exist in '${this.directory}'`);
+				return null;
+			}
+			
+			address = entries.get(dirFileName);
+		}
+
+		return address;
 	}
 	readAddress(address) {
 		let buffer = this.files[address];
@@ -141,6 +167,16 @@ class Files {
 			}
 		}
 		return referenced;
+	}
+	/**
+	 * Returns the absolute path referred to by a given path, or null if it does not refer to any real location.
+	 * If all mentioned directories exist but the final segment of the path does not refer to an existent file, this function will still succeed and return an absolute path.
+	 * @param String path | The path to convert to absolute form
+	 * @return String/null
+	 */
+	resolvePath(path) {
+		const { directory, name } = Files.parsePath(path);
+		return `${this.getDirectoryAddressName(this.getDirectoryAddress(directory))}/${name}`;
 	}
 	/**
 	 * @type createFileType<T extends Serializable>(type: Class<T>, extensions?: string[]): void;
@@ -274,6 +310,7 @@ class Files {
 				directoryBuffer.write.string(name);
 				directoryBuffer.write.uint32(address);
 			}
+			directoryBuffer.finalize();
 
 			return true;
 		} finally {
@@ -391,26 +428,9 @@ class Files {
 	 * @return Boolean
 	 */
 	changeDirectory(path) {
-		const relativePieces = path.split("/").filter(Boolean);
-
-		if (relativePieces[0]?.toLowerCase?.() === "h:") {
-			this.directoryAddress = 0;
-			relativePieces.shift();
-		}
-
-		for (const dirName of relativePieces) {
-			if (dirName === ".") continue;
-			const entries = this.getDirectoryEntries(this.directoryAddress);
-			const dirFileName = `${dirName}.dir`;
-
-			if (!entries.has(dirFileName)) {
-				this.error(`directory '${dirName}' does not exist in '${this.directory}'`);
-				return false;
-			}
-			
-			this.directoryAddress = entries.get(dirFileName);
-		}
-
+		const address = this.getDirectoryAddress(path);
+		if (address === null) return false;
+		this.directoryAddress = address;
 		return true;
 	}
 	/**
@@ -436,18 +456,18 @@ class Files {
 	}
 	/**
 	 * Lets the user upload a file from their computer to a specified location.
-	 * Returns a promise which resolves when the file is uploaded.
-	 * @param String path | The destination path for the file
+	 * Returns a promise which resolves to the path of the file once uploaded.
+	 * @param String directory? | A path to a directory to contain the uploaded file. The uploaded file's original name will be used in the file system. Default is `"h:/"`.
 	 * @return Promise
 	 */
-	uploadFile(path = null) {
+	uploadFile(directory = "h:/") {
 		const fi = document.createElement("input");
 		fi.type = "file";
 		return new Promise(resolve => {
 			fi.addEventListener("change", () => {
 				const file = fi.files[0];
 				if (file) {
-					path ??= file.name;
+					const path = this.resolvePath(`${directory}/${file.name}`);
 					const reader = new FileReader();
 					reader.readAsArrayBuffer(file);
 					reader.addEventListener("load", () => {
@@ -485,10 +505,13 @@ class Files {
 		const index = name.lastIndexOf(".");
 		return index >= 0 ? name.slice(0, index) : name;
 	}
+	static getPathPieces(path) {
+		return path.split("/").filter(Boolean);
+	}
 	static parsePath(path) {
-		const pieces = path.split("/").filter(Boolean);
-		const directory = pieces.slice(0, -1).join("/");
-		const name = pieces.last;
+		const pieces = Files.getPathPieces(path);
+		const name = pieces.pop();
+		const directory = pieces.join("/");
 		return { directory, name };
 	}
 	static isDirectory(path) {
