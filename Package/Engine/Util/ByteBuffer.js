@@ -65,6 +65,7 @@ class ByteBuffer {
 	 */
 	finalize() {
 		this.data = this.data.slice(0, this.pointer);
+		this.byteLength = this.data.length;
 	}
 	toByteBuffer(buffer = new ByteBuffer()) {
 		buffer.write.byteBuffer(this);
