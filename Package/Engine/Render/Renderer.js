@@ -385,7 +385,7 @@ Artist2D.ImageDispatcher = class extends Artist2D.Dispatcher {
 			({ x, y } = x);
 		}
 
-		this.impl.inferWidth(x, y, width);
+		this.impl.inferHeight(x, y, width);
 	}
 };
 
