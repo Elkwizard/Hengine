@@ -1,7 +1,7 @@
 .env
 .vscode
 Tests
-*.d.ts
+**/*.d.ts
 Docs/Generated/Pages/*
 Docs/Generated/index.js
 Docs/Generated/searchCache.js
