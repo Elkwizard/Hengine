@@ -25,9 +25,9 @@ Before using the Hengine, it must be included in your HTML file in one of two po
         <body>
             <script>
                 // Load Hengine, user's main JavaScript file is index.js in this example.
-                HengineLoader.load([
-                    new HengineScriptResource("index.js")
-                ]);
+                new HengineLoadingStructure()
+					.script("index.js")
+					.load();
             </script>
         </body>
     </html>
