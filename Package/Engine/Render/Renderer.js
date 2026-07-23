@@ -538,12 +538,6 @@ class CanvasArtist2D extends Artist2D {
 		data[3] = col.alpha * 255;
 		this.c.putImageData(new ImageData(data, 1, 1), x * this.pixelRatio, y * this.pixelRatio);
 	}
-	drawImageInternal(x, y, width, height) {
-		if (!this.currentImage.renderable) return;
-		if (typeof x === "object") ({ x, y, width, height } = x);
-		if (width * height === 0) return;
-		this.c.drawImage(this.currentImageCIS, x, y, width, height);
-	}
 	/**
 	 * @name clip
 	 * Returns a clipping API.
