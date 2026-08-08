@@ -797,6 +797,7 @@ objectUtils.inherit(Polyhedron, Polygon, ["closestPointTo", "rayCast", "contains
  * @prop Range [C]Range | The interval of the C axis occupied by the prism
  * @prop Vector3 min | The left-upper-front corner
  * @prop Vector3 max | The right-lower-back corner
+ * @prop Vector3 size | The difference between the `.max` and `.min` properties
  */
 class Prism extends Polyhedron {
 	/**
@@ -882,6 +883,9 @@ class Prism extends Polyhedron {
 	get max() {
 		return new Vector3(this.xRange.max, this.yRange.max, this.zRange.max);
 	}
+	get size() {
+		return new Vector3(this.xRange.length, this.yRange.length, this.zRange.length);
+	}
 	get middle() {
 		return this.min.plus(this.max).div(2);
 	}
@@ -901,6 +905,18 @@ class Prism extends Polyhedron {
 		const yRange = this.yRange.clip(prism.yRange);
 		const zRange = this.zRange.clip(prism.zRange);
 		return Prism.fromRanges(xRange, yRange, zRange);
+	}
+	/**
+	 * Returns a copy of the caller with each side moved outward along its normal by a given displacement.
+	 * @param Number displacement | The amount to move each side outward by. Negative values will decrease the size of the resulting rectangle
+	 * @return Prism
+	 */
+	expand(displacement) {
+		return Prism.fromRanges(
+			this.xRange.expand(displacement),
+			this.yRange.expand(displacement),
+			this.zRange.expand(displacement)
+		);
 	}
 	containsPoint(point) {
 		return	this.xRange.includes(point.x) &&

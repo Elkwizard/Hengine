@@ -79,6 +79,18 @@ class Range {
 			Number.clamp(this.max, range.min, range.max)
 		);
 	}
+	/**
+	 * Returns a copy of the range with the minimum and maximum moved outwards by a given displacement.
+	 * @param Number displacement | The amount to move the minimum and maximum outwards by. Negative values will decrease the size of the range
+	 * @return Range
+	 */
+	expand(displacement) {
+		const { middle } = this;
+		return new Range(
+			Math.min(this.min - displacement, middle),
+			Math.max(this.max + displacement, middle)
+		);
+	}
 	fromIntervalValue(interval) {
 		return (this.max - this.min) * interval + this.min;
 	}
@@ -568,6 +580,7 @@ class Polygon extends Shape2D {
  * @prop Number height | The height of the rectangle
  * @prop Vector2 min | The upper-left corner of the rectangle
  * @prop Vector2 max | The lower-right corner of the rectangle
+ * @prop Vector2 size | The difference between the `.max` and `.min` properties
  * @prop Range xRange | The horizontal interval that contains the rectangle
  * @prop Range yRange | The vertical interval that contains the rectangle
  */
@@ -606,6 +619,9 @@ class Rect extends Polygon {
 	get middle() {
 		return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
 	}
+	get size() {
+		return new Vector2(this.width, this.height);
+	}
 	get vertices() {
 		return this._vertices ??= [
 			new Vector2(this.x, this.y),
@@ -638,6 +654,17 @@ class Rect extends Polygon {
 			this.width / 2 - w / 2 + this.x,
 			this.height / 2 - h / 2 + this.y,
 			w, h
+		);
+	}
+	/**
+	 * Returns a copy of the caller with each side moved outward along its normal by a given displacement.
+	 * @param Number displacement | The amount to move each side outward by. Negative values will decrease the size of the resulting rectangle
+	 * @return Rect
+	 */
+	expand(displacement) {
+		return Rect.fromRanges(
+			this.xRange.expand(displacement),
+			this.yRange.expand(displacement)
 		);
 	}
 	cullBox(box) {
