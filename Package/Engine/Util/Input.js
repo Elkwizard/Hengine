@@ -442,11 +442,14 @@ class MouseHandler extends InputHandler {
 		document.addEventListener("pointermove", ifPrimary(handleMove));
 		document.addEventListener("pointerup", ifPrimary(handleUp));
 
-		document.addEventListener("mouseout", () => this.targetAll(false));
+		document.addEventListener("mouseout", event => {
+			if (!this.getEventPosition(event))
+				this.targetAll(false);
+		});
 		document.addEventListener("contextmenu", event => event.preventDefault());
 		document.addEventListener("wheel", event => {
 			event.preventDefault();
-			this.wheelDelta += event.deltaY * [1, 16, innerHeight][event.deltaMode];
+			this.wheelDelta += event.deltaY * [1, 16, this.engine.canvas.height][event.deltaMode];
 		}, { passive: false });
 	}
 	/**
