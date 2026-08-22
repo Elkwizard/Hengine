@@ -1,6 +1,6 @@
 /**
  * @name class MathObject
- * @type interface MathObject implements Copyable
+ * @type interface MathObject extends Copyable
  * @implements Copyable
  * Represents a mathematical object, on which operations (+, -, *, /, %, **) can be performed.
  * The operations are provided as two sets of methods, one which mutates the caller, and one which creates a new object to hold the result.
