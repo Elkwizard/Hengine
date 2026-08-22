@@ -124,13 +124,13 @@ function createClassSpecification(doc) {
 	return [cls];
 }
 
-function createOverloadSpecification(name, parameters, doc, className) {
+function createOverloadSpecification(name, signature, doc, className) {
 	className = !doc.name.isStatic && className;
 
-	let returnType = doc.settings.return?.type ?? "void";
+	let returnType = signature?.returnType ?? "void";
 	if (doc.name.isAsync) returnType = `Promise<${returnType}>`;
 
-	let paramString = parameters
+	let paramString = signature.params
 		.map(param => `${param.name}: ${formatType(param.type, className)}`)
 		.join(", ");
 
@@ -148,7 +148,7 @@ function createOverloadSpecification(name, parameters, doc, className) {
 		if (doc.name.isGetter && doc.name.isStatic) {
 			result += `${name}: ${formatType(returnType, className)}`;
 		} else if (doc.name.isSetter && doc.name.isStatic) {
-			result += `${name}: ${formatType(parameters[0].type, className)}`;
+			result += `${name}: ${formatType(signature.params[0].type, className)}`;
 		} else {
 			if (doc.name.isSetter) result += "set ";
 			if (doc.name.isGetter) result += "get ";
@@ -164,23 +164,21 @@ function createOverloadSpecification(name, parameters, doc, className) {
 
 	result = createTSDoc([
 		...doc.description.split("\n"),
-		...parameters.map(param => ["param", param.name, param.description])
+		...signature.params.map(param => ["param", param.name, param.description])
 	]) + result;
 
 	return result;
 }
 
 function createFunctionSpecification(doc, className) {
-	const signatures = doc.signatures.length ? doc.signatures : [[]];
-	
 	const subs = doc.settings.name_subs?.substitutions;
 
 	const names = doc.settings.group?.elements ?? [doc.name];
 	return names
 		.flatMap(name => applySubstitutions(name.base, subs))
 		.flatMap(name => {
-			return signatures
-				.map(params => createOverloadSpecification(name, params, doc, className));
+			return doc.signatures
+				.map(signature => createOverloadSpecification(name, signature, doc, className));
 		});
 }
 

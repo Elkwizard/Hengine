@@ -56,7 +56,7 @@ function addSearchData(docs, idToDoc) {
 		addTextData(doc, id, topLevel);
 
 		for (const signature of doc.signatures) {
-			for (const param of signature)
+			for (const param of signature.params)
 				addDescriptionData(param, `${id}:${param.name}`, topLevel);
 		}
 	};

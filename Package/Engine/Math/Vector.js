@@ -251,9 +251,11 @@ class Vector extends Operable {
  * console.log(i.cross(j)); // 1
  * console.log(i.plus(j).normalize()); // (1/√2, 1/√2)
  * ```
+ * @prop Number [C] | The C-coordinate of the vector (`x` or `y`)
  * @prop Number angle | The clockwise (in Screen-Space) angle of the vector from the horizontal
  * @prop Vector2 normal | The vector with the same magnitude but perpendicular direction. Right-handed (in Screen-Space)
  * @prop<static, immutable> String[] modValues | The modifiable elements of the vector, `["x", "y"]`
+ * @name_subs C: x, y
  */
 class Vector2 extends Vector {
 	static modValues = ["x", "y"];
@@ -528,9 +530,10 @@ D2.Vector = Vector2;
 
 /**
  * Represents a 3D vector.
- * @name_subs UV: XY, XZ, YZ
+ * @prop Number [C] | The C-coordinate of the vector (`x`, `y`, or `z`)
  * @prop Number angle[UV] | The counter-clockwise angle of the vector from the horizontal on the U-V plane. e.g. `vec.angleXY` or `vec.angleYZ`
  * @prop<static, immutable> String[] modValues | The modifiable elements of the vector, `["x", "y", "z"]`
+ * @name_subs UV: XY, XZ, YZ; C: x, y, z
  */
 class Vector3 extends Vector {
 	static modValues = ["x", "y", "z"];
@@ -773,9 +776,10 @@ D3.Vector = Vector3;
 
 /**
  * Represents a 4D vector.
- * @name_subs UV: XY, XZ, XW, YZ, YW, ZW
+ * @prop Number [C] | The C-coordinate of the vector (`x`, `y`, `z`, or `w`)
  * @prop Number angle[UV] | The counter-clockwise angle of the vector from the horizontal on the U-V plane. e.g. `vec.angleYZ` or `vec.angleYW`
  * @prop<static, immutable> String[] modValues | The modifiable elements of the vector, `["x", "y", "z", "w"]`
+ * @name_subs UV: XY, XZ, XW, YZ, YW, ZW; C: x, y, z, w
  */
 class Vector4 extends Vector {
 	static modValues = ["x", "y", "z", "w"];

@@ -161,31 +161,40 @@ function parse(content, file) {
 
 		// expand @params references
 		lines = lines.flatMap(line => {
-			if (line.category === "params") {
-				const filtered = line.names.map(name => lines.find(p => p.category === "param" && p.baseName === name));
-				return filtered;
-			}
+			if (line.category === "params")
+				return line.names.map(name => lines.find(p => p.category === "param" && p.baseName === name));
 
 			return [line];
 		});
 
 		const resultLines = [];
+		const SIGNATURE_CATEGORIES = new Set(["param", "return"]);
+
+		// add implicit @signature to functions
+		if (!match.name.isClass && !lines.some(line => line.category === "signature")) {
+			const bareSignatureIndex = lines.findIndex(line => SIGNATURE_CATEGORIES.has(line.category));
+			lines.splice(
+				Math.max(bareSignatureIndex, 0),
+				0, { category: "signature" }
+			);
+		}
 		
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
-			if (line.category === "param") {
-				lines.splice(i, 0, { category: "signature" });
-				i--;
-				continue;
-			}
 
-			if (line.category === "signature") {
-				line.parameters = [];
-				while (lines[++i]?.category === "param")
-					line.parameters.push(lines[i]);
+			if (line.category === "signature") { // accumulate param/return into most recent signature
+				line.params = [];
+				line.returnType = null;
+				while (SIGNATURE_CATEGORIES.has(lines[++i]?.category)) {
+					if (lines[i].category === "param") {
+						line.params.push(lines[i]);
+					} else {
+						line.returnType = lines[i].type;
+					}
+				}
 				i--;
 				resultLines.push(line);
-			} else if (line.category === null) {
+			} else if (line.category === null) { // concatenate bare text together
 				while (lines[++i]?.category === null)
 					line.content += "\n" + lines[i].content;
 				i--;
@@ -200,8 +209,15 @@ function parse(content, file) {
 			match.properties = match.lines.filter(line => line.category === "prop");
 		} else {
 			match.signatures = match.lines
-				.filter(line => line.category === "signature")
-				.map(line => line.parameters);
+				.filter(line => line.category === "signature");
+
+			// expand single return value to previous signatures
+			let overallReturn;
+			for (let i = match.signatures.length - 1; i >= 0; i--) {
+				const signature = match.signatures[i];
+				overallReturn ??= signature.returnType;
+				signature.returnType ??= overallReturn;
+			}
 		}
 
 		match.settings = { };

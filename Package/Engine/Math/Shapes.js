@@ -1,4 +1,5 @@
 /**
+ * @type interface Range
  * Represents an inclusive interval.
  * @implements Copyable
  * @prop Number min | The lower bound of the interval
@@ -774,14 +775,14 @@ class Rect extends Polygon {
 		);
 	}
 	/**
-	 * @type <T extends Rect | Vector2>(rect: T): T;
 	 * Given a rectangle or point in the same coordinate space as the caller, returns a representation of it a re-scaled and translated space where (0, 0) is the upper left corner of the caller, and (1, 1) is the lower right.
 	 * This method is the inverse of `.fromUV()`.
 	 * @signature
 	 * @param Rect rect | A rectangle in the same coordinate space as the caller
+	 * @return Rect
 	 * @signature
 	 * @param Vector2 point | A point in the same coordinate space as the caller
-	 * @return Rect/Vector2
+	 * @return Vector2
 	 */
 	toUV(rect) {
 		const { min, max } = this;
@@ -797,10 +798,11 @@ class Rect extends Polygon {
 	 * Given a rectangle or point in the normalized coordinate space of the caller (where (0, 0) is the upper left corner and (1, 1) is the lower right), produces a representation of it in the same coordinate space as the caller. 
 	 * This method is the inverse of `.toUV()`.
 	 * @signature
-	 * @param Rect uv | A rectangle in the normalized coordinate space of the caller
+	 * @param Rect rect | A rectangle in the normalized coordinate space of the caller
+	 * @return Rect
 	 * @signature
 	 * @param Vector2 point | A point in the normalized coordinate space of the caller.
-	 * @return Rect/Vector2
+	 * @return Vector2
 	 */
 	fromUV(uv) {
 		const { min, max } = this;

@@ -49,11 +49,15 @@ function documentName(name, doc, wrapperClass) {
 
 function documentFunction(fn, wrapperClass) {
 	const names = fn.settings.group?.elements;
-	const name = names ? `${names.map(name => documentName(name, fn, wrapperClass)).join(`<span class="aux">/</span>`)}` : documentName(fn.name, fn, wrapperClass);
+	const name = names
+		? names.map(name => documentName(name, fn, wrapperClass)).join(`<span class="aux">/</span>`)
+		: documentName(fn.name, fn, wrapperClass);
 	const { signatures } = fn;
-	const returnType = fn.settings.return?.type ?? "void";
+	const returnType = signatures.every(sig => sig.returnType === signatures[0].returnType)
+		? signatures[0].returnType ?? "void"
+		: signatures.map(sig => sig.returnType).join("/");
 	const parameters = signatures
-		.map(params => {
+		.map(({ params }) => {
 			stats.parameters += params.length;
 			if (params.length)
 				return params
@@ -69,14 +73,14 @@ function documentFunction(fn, wrapperClass) {
 		fn.name.base === "constructor" || fn.name.isSetter ? "" : `<span class="type">${returnType}</span>`
 	}`;
 	const parameterDescriptions = signatures
-		.map(signature => `
+		.map(({ params }) => `
 			<div class="header">Parameters</div>
 			${
-				signature
+				params
 					.map(param => `
 						<div class="param-wrapper" id="${param.searchID}">
 							<div class="param-name">
-								<span class="param">${param.name.replace(/\.\.\.|\?/g, "")}</span>
+								<span class="param">${param.name.replace(/\.{3}|\?/g, "")}</span>
 								<span class="type">${param.type}</span>
 							</div>
 							<div class="param desc">

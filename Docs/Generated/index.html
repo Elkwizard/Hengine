@@ -413,7 +413,6 @@
 				.map(([name, value]) => {
 					const dst = `${file}/${name}`;
 					if (Array.isArray(value) || value === null) {
-						console.log(dst);
 						const docPath = `${dst}.html`;
 						const complete = COMPLETENESS[docPath];
 						return `
