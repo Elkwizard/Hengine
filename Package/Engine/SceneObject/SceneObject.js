@@ -10,7 +10,7 @@ class Controls {
 }
 
 /**
- * @type class SceneObject<Vector = any, Transform = any, Box = any, Shape = any> extends SceneElement 
+ * @type class SceneObject<Vector = any, Transform = any, Box = any, Shape = any> extends SceneNode 
  * Represents an object in a Scene.
  * These can be created by the `.add...Element()` methods of ElementContainer.
  * Every scene object has a collection of local-space shapes that make up its presence.
@@ -31,7 +31,7 @@ class Controls {
  * @prop<readonly> Number lifeSpan | The amount of frames that the object has existed for
  * @prop<readonly> Artist renderer | The renderer onto which the object will be drawn
  */
-class SceneObject extends SceneElement {
+class SceneObject extends SceneNode {
 	constructor(name, transform, container, engine) {
 		super(name, container);
 		this.transform = transform;

@@ -3,7 +3,7 @@
  * All methods on this class that add SceneObjects only take effect at the end of the update cycle.
  * @prop Class extends ElementScript defaultScript | The default element script applied to all SceneObjects in the container upon creation
  */
-class ElementContainer extends SceneElement {
+class ElementContainer extends SceneNode {
 	constructor(name = "container", container, engine) {
 		super(name, container);
 		this.elements = new Map();
@@ -253,7 +253,7 @@ class ElementContainer extends SceneElement {
 	}
 	/**
 	 * Removes a collection of elements from the container
-	 * @param SceneElement[] elements | The elements to remove from the container
+	 * @param SceneNode[] elements | The elements to remove from the container
 	 */
 	removeElements(elements) {
 		for (let i = 0; i < elements.length; i++) elements[i].remove();
@@ -266,8 +266,8 @@ class ElementContainer extends SceneElement {
 	}
 	/**
 	 * Retrieves an element from the container by name, or returns null if no such element exists.
-	 * @param String name | The name of the SceneElement to retrieve
-	 * @return SceneElement
+	 * @param String name | The name of the SceneNode to retrieve
+	 * @return SceneNode
 	 */
 	get(name) {
 		return this.elements.get(name) ?? null;
@@ -275,13 +275,13 @@ class ElementContainer extends SceneElement {
 	/**
 	 * Retrieves an element (or multiple) based on a piece of identifying information.
 	 * @signature
-	 * @param String name | The name of a scene element. Returns that element or null if no element exists with that name
+	 * @param String name | The name of a scene node. Returns that element or null if no element exists with that name
 	 * @signature
 	 * @param Class extends ElementScript script | The ElementScript to select for. Returns all elements with an instance of this script
 	 * @signature
-	 * @param (SceneElement) => Boolean mask | A pure function selecting for certain elements. Returns all elements that return true when passed to this function.
+	 * @param (SceneNode) => Boolean mask | A pure function selecting for certain elements. Returns all elements that return true when passed to this function.
 	 * @signature
-	 * @return SceneElement/SceneElement[]
+	 * @return SceneNode/SceneNode[]
 	 */
 	query(selector) {
 		if (typeof selector === "string")

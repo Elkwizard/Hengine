@@ -1050,7 +1050,7 @@ class HengineLoader {
 			"Preload/Structures.js"
 		],
 		[ // minimal dependencies
-			"SceneObject/SceneElement.js",
+			"SceneObject/SceneNode.js",
 			"SceneObject/Scripts.js",
 
 			"Manage/Scenes.js",
@@ -1147,7 +1147,7 @@ class HengineLoader {
  * @prop CanvasImage canvas | The canvas on which rendering occurs
  * @prop CanvasArtist renderer | The 2D or 3D renderer that affects the screen
  * @prop CanvasArtist2D ui | The 2D Screen-Space overlay renderer that affects the screen
- * @prop Scene scene | The scene that contains all SceneElements
+ * @prop Scene scene | The scene that contains all SceneNodes
  * @prop Intervals intervals | The timing and scheduling API for the Hengine
  * @prop Files fileSystem | The built-in, localStorage-based file system API
  * @prop Vector2 middle | The coordinates of the center of the screen, in screen space

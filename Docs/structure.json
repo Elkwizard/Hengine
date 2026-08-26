@@ -36,7 +36,7 @@
 		"SceneObject": ["SceneObject", "WorldObject", "UIObject"]
 	},
 	"Superclasses": {
-		"SceneElement": null,
+		"SceneNode": null,
 		"MathObject": null,
 		"Operable": null,
 		"Lazy": null
