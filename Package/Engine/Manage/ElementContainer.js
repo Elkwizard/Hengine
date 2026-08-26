@@ -1,7 +1,7 @@
 /**
  * Represents a non-leaf node in the element tree, and can contain SceneObjects or additional ElementContainers.
  * All methods on this class that add SceneObjects only take effect at the end of the update cycle.
- * @prop Class extends ElementScript defaultScript | The default element script applied to all SceneObjects in the container upon creation
+ * @prop Class extends ElementScript/null defaultScript | The default element script applied to all SceneObjects in the container upon creation. If this is null, no script will be added
  */
 class ElementContainer extends SceneNode {
 	constructor(name = "container", container, engine) {
@@ -108,7 +108,8 @@ class ElementContainer extends SceneNode {
 		return args;
 	}
 	initializeSceneObject(sceneObject) {
-		sceneObject.scripts.add(this.defaultScript);
+		if (this.defaultScript)
+			sceneObject.scripts.add(this.defaultScript);
 	}
 	/**
 	 * Adds a new WorldObject with a single rectangle shape to the container.
