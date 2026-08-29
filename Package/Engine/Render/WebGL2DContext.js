@@ -61,14 +61,19 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 	}
 	//#endregion
 	//#region fundamentals
-	function attribute(name, size, instanced, putFunction, data) {
+	function attribute(
+		name, size, instanced, bytes, putFunction,
+		data = new (bytes ? Uint8ClampedArray : Float32Array)(MAX_INSTANCES * size)
+	) {
+		const type = bytes ? gl.UNSIGNED_BYTE : gl.FLOAT;
+		const ArrayType = data.constructor;
 		const attr = {
 			name,
 			pointer: gl.getAttribLocation(glState.program, name),
 			size,
 			instanced,
+			data,
 			buffer: gl.createBuffer(),
-			data: data ? data : new Float32Array(MAX_INSTANCES * size),
 			changed: true,
 			enabled: false,
 			put: putFunction,
@@ -83,12 +88,12 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 					}
 	
 					gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-					const byteOffset = start * this.size * Float32Array.BYTES_PER_ELEMENT;
-					const length = (end - start) * this.size;
-					const view = new Float32Array(this.data.buffer, byteOffset, length);
+					const byteOffset = start * size * ArrayType.BYTES_PER_ELEMENT;
+					const length = (end - start) * size;
+					const view = new ArrayType(data.buffer, byteOffset, length);
 					
 					gl.bufferSubData(gl.ARRAY_BUFFER, 0, view);
-					gl.vertexAttribPointer(this.pointer, this.size, gl.FLOAT, false, 0, 0);
+					gl.vertexAttribPointer(this.pointer, size, type, bytes, 0, 0);
 				}
 			}
 		};
@@ -213,13 +218,12 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				uniform vec2 resolution;
 				
 				in float vertexID;
-				in float vertexColor;
+				in vec3 vertexColor;
 				in float vertexAlpha;
 				in float vertexLineWidth;
 				in vec3 vertexTransformRow1;
 				in vec3 vertexTransformRow2;
-				in float vertexTextureIndex;
-				in vec2 vertexTextureYAxis;
+				in vec4 vertexTextureXYAxis;
 				in vec2 vertexTextureZAxis;
 				in float vertexBooleans;
 				
@@ -255,12 +259,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 					position.y *= -1.0;
 
 					gl_Position = vec4(position, 0.0, 1.0);
-					int iColor = int(vertexColor);
-					color = vec3(
-						rshift(iColor, 16),
-						mod(float(rshift(iColor, 8)), 256.0),
-						mod(float(iColor), 256.0)
-					) / 255.0;
+					color = vertexColor;
 					alpha = vertexAlpha;
 
 					uv = vertexPosition;
@@ -268,13 +267,14 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 					size = vec2(length(transform[0]), length(transform[1]));
 					booleans = vertexBooleans;
 					lineWidth = vertexLineWidth;
-					scaleFactor = vertexTextureYAxis;
+					scaleFactor = vertexTextureZAxis;
 
 					int iBooleans = int(booleans);
 					if (boolean(${BOOLS.TEXTURED})) {
-						textureIndex = vertexTextureIndex;
+						textureIndex = vertexColor.r * 255.0;
 
-						vec2 vertexTextureXAxis = vec2(vertexColor, vertexLineWidth);
+						vec2 vertexTextureXAxis = vertexTextureXYAxis.xy;
+						vec2 vertexTextureYAxis = vertexTextureXYAxis.zw;
 						textureCoord = vertexPosition.x * vertexTextureXAxis + vertexPosition.y * vertexTextureYAxis + vertexTextureZAxis;
 						bool pixelated = boolean(${BOOLS.PIXELATED});
 						
@@ -414,7 +414,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
  					if (boolean(${BOOLS.TEXTURED})) {
 						vec2 tuv = clamp(textureCoord, textureCoordMin, textureCoordMax);
 						if (boolean(${BOOLS.PIXELATED})) tuv = (floor(tuv / ${glState.TEXTURE_SLOT_PIXEL_SIZE}) + 0.5) * ${glState.TEXTURE_SLOT_PIXEL_SIZE};
- 						int iTextureIndex = int(textureIndex);
+						int iTextureIndex = int(textureIndex);
 						${textureSelector}
 					} else {
 						${new Array(debugSlots).fill(0).map((_, i) => `{
@@ -559,18 +559,26 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				this.changed = true;
 			}
 
-			const position = attribute("vertexID", 1, false, putSize1, new Float32Array([0, 1, 2, 3]));
+			function putSize4(index, x, y, z, w) {
+				index *= 4;
+				this.data[index] = x;
+				this.data[index + 1] = y;
+				this.data[index + 2] = z;
+				this.data[index + 3] = w;
+				this.changed = true;
+			}
+
+			const position = attribute("vertexID", 1, false, false, putSize1, new Float32Array([0, 1, 2, 3]));
 			glState.vertexCount = position.data.length / position.size;
 
-			const color = attribute("vertexColor", 1, true, putSize1);
-			const alpha = attribute("vertexAlpha", 1, true, putSize1);
-			const lineWidth = attribute("vertexLineWidth", 1, true, putSize1);
-			const textureIndex = attribute("vertexTextureIndex", 1, true, putSize1);
-			const textureYAxis = attribute("vertexTextureYAxis", 2, true, putSize2);
-			const textureXAxis = attribute("vertexTextureZAxis", 2, true, putSize2);
-			const transform1 = attribute("vertexTransformRow1", 3, true, putSize3);
-			const transform2 = attribute("vertexTransformRow2", 3, true, putSize3);
-			const booleans = attribute("vertexBooleans", 1, true, putSize1);
+			const color = attribute("vertexColor", 3, true, true, putSize3);
+			const alpha = attribute("vertexAlpha", 1, true, false, putSize1);
+			const lineWidth = attribute("vertexLineWidth", 1, true, false, putSize1);
+			const textureXYAxis = attribute("vertexTextureXYAxis", 4, true, false, putSize4);
+			const textureZAxis = attribute("vertexTextureZAxis", 2, true, false, putSize2);
+			const transform1 = attribute("vertexTransformRow1", 3, true, false, putSize3);
+			const transform2 = attribute("vertexTransformRow2", 3, true, false, putSize3);
+			const booleans = attribute("vertexBooleans", 1, true, false, putSize1);
 		};
 
 		glState.gl = gl;
@@ -601,7 +609,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			vertexBooleans
 		} = attributes;
 
-		vertexColor.put(index, clamp255(r) << 16 | clamp255(g) << 8 | clamp255(b));
+		vertexColor.put(index, r, g, b);
 		vertexAlpha.put(index, a * glState.globalAlpha);
 		vertexTransformRow1.put(index, M00 * m00 + M10 * m01, M00 * m10 + M10 * m11, M00 * m20 + M10 * m21 + M20);
 		vertexTransformRow2.put(index, M01 * m00 + M11 * m01, M01 * m10 + M11 * m11, M01 * m20 + M11 * m21 + M21);
@@ -632,16 +640,16 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			vertexColor,
 			vertexAlpha,
 			vertexLineWidth,
-			vertexTextureYAxis,
+			vertexTextureZAxis,
 			vertexTransformRow1,
 			vertexTransformRow2,
 			vertexBooleans
 		} = attributes;
 
-		vertexColor.put(index, clamp255(r) << 16 | clamp255(g) << 8 | clamp255(b));
+		vertexColor.put(index, r, g, b);
 		vertexAlpha.put(index, a * glState.globalAlpha);
 		vertexLineWidth.put(index, lineWidth);
-		vertexTextureYAxis.put(index, glState.transformScaleX, glState.transformScaleY);
+		vertexTextureZAxis.put(index, glState.transformScaleX, glState.transformScaleY);
 		vertexTransformRow1.put(index, M00 * m00 + M10 * m01, M00 * m10 + M10 * m11, M00 * m20 + M10 * m21 + M20);
 		vertexTransformRow2.put(index, M01 * m00 + M11 * m01, M01 * m10 + M11 * m11, M01 * m20 + M11 * m21 + M21);
 		vertexBooleans.put(index, booleans | BOOLS.OUTLINED);
@@ -710,16 +718,16 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			vertexColor,
 			vertexAlpha,
 			vertexLineWidth,
-			vertexTextureYAxis,
+			vertexTextureZAxis,
 			vertexTransformRow1,
 			vertexTransformRow2,
 			vertexBooleans
 		} = attributes;
 
-		vertexColor.put(index, clamp255(r) << 16 | clamp255(g) << 8 | clamp255(b));
+		vertexColor.put(index, r, g, b);
 		vertexAlpha.put(index, a * glState.globalAlpha);
 		vertexLineWidth.put(index, lineWidth);
-		vertexTextureYAxis.put(index, glState.transformScaleX, glState.transformScaleY);
+		vertexTextureZAxis.put(index, glState.transformScaleX, glState.transformScaleY);
 		vertexTransformRow1.put(index, M00 * m00 + M10 * m01, M00 * m10 + M10 * m11, M00 * m20 + M10 * m21 + M20);
 		vertexTransformRow2.put(index, M01 * m00 + M11 * m01, M01 * m10 + M11 * m11, M01 * m20 + M11 * m21 + M21);
 		vertexBooleans.put(
@@ -1086,8 +1094,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		attributes.vertexColor.set(start, end, done);
 		attributes.vertexAlpha.set(start, end, done);
 		attributes.vertexLineWidth.set(start, end, done);
-		attributes.vertexTextureIndex.set(start, end, done);
-		attributes.vertexTextureYAxis.set(start, end, done);
+		attributes.vertexTextureXYAxis.set(start, end, done);
 		attributes.vertexTextureZAxis.set(start, end, done);
 		attributes.vertexTransformRow1.set(start, end, done);
 		attributes.vertexTransformRow2.set(start, end, done);
@@ -1222,10 +1229,8 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		const { spriteSheets } = glState;
 
 		const {
-			vertexTextureIndex,
 			vertexColor,
-			vertexLineWidth,
-			vertexTextureYAxis,
+			vertexTextureXYAxis,
 			vertexTextureZAxis
 		} = attributes;
 
@@ -1247,10 +1252,8 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 
 			// set attribute data
 			const { tx: x, ty: y, tw: width, th: height, sheet: { unit } } = location;
-			vertexTextureIndex.put(index, unit);
-			vertexColor.put(index, txx * width);
-			vertexLineWidth.put(index, txy * height);
-			vertexTextureYAxis.put(index, tyx * width, tyy * height);
+			vertexColor.put(index, unit, 0, 0);
+			vertexTextureXYAxis.put(index, txx * width, txy * height, tyx * width, tyy * height);
 			vertexTextureZAxis.put(index, x + tx * width, y + ty * height);
 
 			// increment instance index
