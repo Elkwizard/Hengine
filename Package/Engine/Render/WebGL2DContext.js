@@ -7,6 +7,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 
 	//#region constants
 	const MAX_INSTANCES = 100000;
+	const MAX_INSTANCE_INDEX = MAX_INSTANCES - 1;
 
 	const BOOLS = {
 		NULL: 0,
@@ -539,19 +540,19 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			glState.instancePointer = 0;
 
 			function putSize1(index, x) {
-				this.data[index * this.size] = x;
+				this.data[index] = x;
 				this.changed = true;
 			}
 
 			function putSize2(index, x, y) {
-				index *= this.size;
+				index *= 2;
 				this.data[index] = x;
 				this.data[index + 1] = y;
 				this.changed = true;
 			}
 			
 			function putSize3(index, x, y, z) {
-				index *= this.size;
+				index *= 3;
 				this.data[index] = x;
 				this.data[index + 1] = y;
 				this.data[index + 2] = z;
@@ -591,7 +592,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		const M11 = transformMatrix[4];
 		const M21 = transformMatrix[5];
 
-		const index = glState.instancePointer;
+		const index = glState.instancePointer++;
 		const {
 			vertexColor,
 			vertexAlpha,
@@ -606,8 +607,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		vertexTransformRow2.put(index, M01 * m00 + M11 * m01, M01 * m10 + M11 * m11, M01 * m20 + M11 * m21 + M21);
 		vertexBooleans.put(index, booleans);
 
-		glState.instancePointer++;
-		if (glState.instancePointer === MAX_INSTANCES) render();
+		if (index === MAX_INSTANCE_INDEX) render();
 	}
 	function outlinedInstance(
 		m00, m10, m20,
@@ -627,7 +627,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		const M11 = transformMatrix[4];
 		const M21 = transformMatrix[5];
 
-		const index = glState.instancePointer;
+		const index = glState.instancePointer++;
 		const {
 			vertexColor,
 			vertexAlpha,
@@ -638,8 +638,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			vertexBooleans
 		} = attributes;
 
-		const color = clamp255(r) << 16 | clamp255(g) << 8 | clamp255(b);
-		vertexColor.put(index, color);
+		vertexColor.put(index, clamp255(r) << 16 | clamp255(g) << 8 | clamp255(b));
 		vertexAlpha.put(index, a * glState.globalAlpha);
 		vertexLineWidth.put(index, lineWidth);
 		vertexTextureYAxis.put(index, glState.transformScaleX, glState.transformScaleY);
@@ -647,8 +646,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		vertexTransformRow2.put(index, M01 * m00 + M11 * m01, M01 * m10 + M11 * m11, M01 * m20 + M11 * m21 + M21);
 		vertexBooleans.put(index, booleans | BOOLS.OUTLINED);
 
-		glState.instancePointer++;
-		if (glState.instancePointer === MAX_INSTANCES) render();
+		if (index === MAX_INSTANCE_INDEX) render();
 	}
 	function lineInstance(
 		ax, ay, bx, by,
@@ -663,10 +661,10 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		const vx = bx - ax;
 		const vy = by - ay;
 		const mag = magnitude(vx, vy);
-		const mag1 = 1 / mag;
-		const nx = -vy * mag1;
-		const ny = vx * mag1;
-		const lw2 = lineWidth * 0.5;
+		const invMag = 1 / mag;
+		const nx = -vy * invMag;
+		const ny = vx * invMag;
+		const hlw = lineWidth * 0.5;
 
 		const extendedJoin = lineJoin === LINE_JOIN_ROUND;
 		const extendedCap = lineCap === LINE_CAP_SQUARE || lineCap === LINE_CAP_ROUND;
@@ -675,7 +673,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		const extendRight = rightCap ? extendedCap : extendedJoin;
 
 		if (extendLeft || extendRight) {
-			const factor = lw2 * mag1;
+			const factor = hlw * invMag;
 			const nvx = vx * factor;
 			const nvy = vy * factor;
 
@@ -690,14 +688,13 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 
 		}
 
-
 		// construct transform
 		const m00 = bx - ax;
 		const m01 = by - ay;
 		const m10 = nx * lineWidth;
 		const m11 = ny * lineWidth;
-		const m20 = ax - nx * lw2;
-		const m21 = ay - ny * lw2;
+		const m20 = ax - nx * hlw;
+		const m21 = ay - ny * hlw;
 
 		// create instance
 		const { transformMatrix } = glState;
@@ -708,7 +705,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		const M11 = transformMatrix[4];
 		const M21 = transformMatrix[5];
 
-		const index = glState.instancePointer;
+		const index = glState.instancePointer++;
 		const {
 			vertexColor,
 			vertexAlpha,
@@ -734,8 +731,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				lineJoin << LINE_JOIN_START_BIT
 		);
 
-		glState.instancePointer++;
-		if (glState.instancePointer === MAX_INSTANCES) render();
+		if (index === MAX_INSTANCE_INDEX) render();
 	}
 	function texturedInstance(
 		m00, m10, m20,
@@ -759,7 +755,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		const M11 = transformMatrix[4];
 		const M21 = transformMatrix[5];
 
-		const index = glState.instancePointer;
+		const index = glState.instancePointer++;
 		const {
 			vertexAlpha,
 			vertexTransformRow1,
@@ -786,8 +782,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		record.tyx = tyx;
 		record.tyy = tyy;
 
-		glState.instancePointer++;
-		if (glState.instancePointer === MAX_INSTANCES) render();
+		if (index === MAX_INSTANCE_INDEX) render();
 	}
 	//#endregion
 	//#region colored
