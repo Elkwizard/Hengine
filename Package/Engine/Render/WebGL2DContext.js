@@ -9,7 +9,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 	const MAX_INSTANCES = 100000;
 	const MAX_INSTANCE_INDEX = MAX_INSTANCES - 1;
 
-	const BOOLS = {
+	const FLAGS = {
 		NULL: 0,
 		CIRCLE: 0b00000001,
 		TRIANGLE: 0b00000010,
@@ -62,11 +62,14 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 	//#endregion
 	//#region fundamentals
 	function attribute(
-		name, size, instanced, bytes, putFunction,
-		data = new (bytes ? Uint8ClampedArray : Float32Array)(MAX_INSTANCES * size)
+		name, size, instanced, ArrayType, normalized, putFunction,
+		data = new ArrayType(MAX_INSTANCES * size)
 	) {
-		const type = bytes ? gl.UNSIGNED_BYTE : gl.FLOAT;
-		const ArrayType = data.constructor;
+		const type = {
+			Uint8ClampedArray: gl.UNSIGNED_BYTE,
+			Uint16Array: gl.UNSIGNED_SHORT,
+			Float32Array: gl.FLOAT
+		}[ArrayType.name];
 		const attr = {
 			name,
 			pointer: gl.getAttribLocation(glState.program, name),
@@ -93,7 +96,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 					const view = new ArrayType(data.buffer, byteOffset, length);
 					
 					gl.bufferSubData(gl.ARRAY_BUFFER, 0, view);
-					gl.vertexAttribPointer(this.pointer, size, type, bytes, 0, 0);
+					gl.vertexAttribPointer(this.pointer, size, type, normalized, 0, 0);
 				}
 			}
 		};
@@ -199,7 +202,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 					return result;
 				}
 			`}
-				#define boolean(b) (and(iBooleans, b) != 0)
+				#define flag(b) (and(iFlags, b) != 0)
 			`;
 
 			const textureSelector = webgl2 ? `
@@ -224,7 +227,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				in vec3 vertexTransformRow2;
 				in vec4 vertexTextureXYAxis;
 				in vec2 vertexTextureZAxis;
-				in float vertexBooleans;
+				in float vertexFlags;
 				
 				out vec2 uv;
 				out vec2 size;
@@ -236,7 +239,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				out vec2 textureCoord;
 				out vec2 textureCoordMin;
 				out vec2 textureCoordMax;
-				out float booleans;
+				out float flags;
 
 				${macros}
 
@@ -264,22 +267,22 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 					uv = vertexPosition;
 
 					size = vec2(length(transform[0]), length(transform[1]));
-					booleans = vertexBooleans;
+					flags = vertexFlags;
 					lineWidth = vertexLineWidth;
 					scaleFactor = vertexTextureZAxis;
 
-					int iBooleans = int(booleans);
-					if (boolean(${BOOLS.TEXTURED})) {
+					int iFlags = int(flags);
+					if (flag(${FLAGS.TEXTURED})) {
 						textureIndex = vertexColor.r * 255.0;
 
 						vec2 vertexTextureXAxis = vertexTextureXYAxis.xy;
 						vec2 vertexTextureYAxis = vertexTextureXYAxis.zw;
 						textureCoord = vertexPosition.x * vertexTextureXAxis + vertexPosition.y * vertexTextureYAxis + vertexTextureZAxis;
-						bool pixelated = boolean(${BOOLS.PIXELATED});
+						bool pixelated = flag(${FLAGS.PIXELATED});
 						
 						vec2 tmin = vertexTextureZAxis;
 						
-						if (boolean(${BOOLS.TRIANGLE})) {
+						if (flag(${FLAGS.TRIANGLE})) {
 							vec2 tmax1 = vertexTextureZAxis + vertexTextureXAxis;
 							vec2 tmax2 = vertexTextureZAxis + vertexTextureYAxis;
 							textureCoordMin = min(tmin, min(tmax1, tmax2));
@@ -318,7 +321,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				in float lineWidth;
 				in vec2 scaleFactor;
 				in float textureIndex;
-				in float booleans;
+				in float flags;
 				in vec2 textureCoord;
 				in vec2 textureCoordMin;
 				in vec2 textureCoordMax;
@@ -330,7 +333,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				${macros}
 
 				void main() {
-					int iBooleans = int(booleans);
+					int iFlags = int(flags);
 
 					float px;
 					float antialias = 1.0;
@@ -351,31 +354,31 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 					// vec3 color = vec3(1.0, 0.0, 0.0);
 					// float alpha = 1.0;
 
-					if (boolean(${BOOLS.CIRCLE})) {
+					if (flag(${FLAGS.CIRCLE})) {
 						px = length(1.0 / size);
 						vec2 cuv = uv - 0.5;
 						float len = length(cuv);
 						if (len > 0.5) discard;
 						antialias *= smoothstep(0.5, 0.5 - px, len);
 
-						if (boolean(${BOOLS.OUTLINED})) {
+						if (flag(${FLAGS.OUTLINED})) {
 							vec2 cuv = uv - 0.5;
 							cuv /= 1.0 - 2.0 * lineWidth * scaleFactor / size;
 							float len = length(cuv);
 							if (len < 0.5 - px) discard;
 							antialias *= smoothstep(0.5 - px, 0.5, len);
 						}
-					} else if (boolean(${BOOLS.TRIANGLE})) {
+					} else if (flag(${FLAGS.TRIANGLE})) {
 						float d = dot(uv, vec2(SQRT_2));
 						px = length(1.0 / size);
 						if (d > SQRT_2 + px) discard;
 						antialias *= smoothstep(SQRT_2 + px, SQRT_2, d);
-					} else if (boolean(${BOOLS.LINE_SEGMENT})) {
-						int lineCap = and(rshift(iBooleans, ${LINE_CAP_START_BIT}), ${0b11});
-						int lineJoin = and(rshift(iBooleans, ${LINE_JOIN_START_BIT}), ${0b11});
+					} else if (flag(${FLAGS.LINE_SEGMENT})) {
+						int lineCap = and(rshift(iFlags, ${LINE_CAP_START_BIT}), ${0b11});
+						int lineJoin = and(rshift(iFlags, ${LINE_JOIN_START_BIT}), ${0b11});
 						
-						bool lineCapLeft = boolean(${BOOLS.LEFT_LINE_CAP});
-						bool lineCapRight = boolean(${BOOLS.RIGHT_LINE_CAP});
+						bool lineCapLeft = flag(${FLAGS.LEFT_LINE_CAP});
+						bool lineCapRight = flag(${FLAGS.RIGHT_LINE_CAP});
 
 						bool lineJoinRound = lineJoin == ${LINE_CAP_ROUND};
 						bool lineCapRound = lineCap == ${LINE_CAP_ROUND};
@@ -399,7 +402,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 							antialias *= smoothstep(radius, radius - 1.0, len);
 						}
 					} else { // quad
-						if (boolean(${BOOLS.OUTLINED})) {
+						if (flag(${FLAGS.OUTLINED})) {
 							vec2 d = lineWidth * scaleFactor / size;
 							vec2 dist = 0.5 - abs(uv - 0.5);
 							vec2 px = 1.0 / size;
@@ -410,9 +413,9 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 					}
 
 					vec4 pixelColor = vec4(color, 1.0);
- 					if (boolean(${BOOLS.TEXTURED})) {
+ 					if (flag(${FLAGS.TEXTURED})) {
 						vec2 tuv = clamp(textureCoord, textureCoordMin, textureCoordMax);
-						if (boolean(${BOOLS.PIXELATED})) tuv = (floor(tuv / ${glState.TEXTURE_SLOT_PIXEL_SIZE}) + 0.5) * ${glState.TEXTURE_SLOT_PIXEL_SIZE};
+						if (flag(${FLAGS.PIXELATED})) tuv = (floor(tuv / ${glState.TEXTURE_SLOT_PIXEL_SIZE}) + 0.5) * ${glState.TEXTURE_SLOT_PIXEL_SIZE};
 						int iTextureIndex = int(textureIndex);
 						${textureSelector}
 					} else {
@@ -567,16 +570,16 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 				this.changed = true;
 			}
 
-			const position = attribute("vertexID", 1, false, false, putSize1, new Float32Array([0, 1, 2, 3]));
+			const position = attribute("vertexID", 1, false, Float32Array, false, putSize1, new Float32Array([0, 1, 2, 3]));
 			glState.vertexCount = position.data.length / position.size;
 
-			const color = attribute("vertexColor", 4, true, true, putSize4);
-			const lineWidth = attribute("vertexLineWidth", 1, true, false, putSize1);
-			const textureXYAxis = attribute("vertexTextureXYAxis", 4, true, false, putSize4);
-			const textureZAxis = attribute("vertexTextureZAxis", 2, true, false, putSize2);
-			const transform1 = attribute("vertexTransformRow1", 3, true, false, putSize3);
-			const transform2 = attribute("vertexTransformRow2", 3, true, false, putSize3);
-			const booleans = attribute("vertexBooleans", 1, true, false, putSize1);
+			const color = attribute("vertexColor", 4, true, Uint8ClampedArray, true, putSize4);
+			const lineWidth = attribute("vertexLineWidth", 1, true, Float32Array, false, putSize1);
+			const textureXYAxis = attribute("vertexTextureXYAxis", 4, true, Float32Array, false, putSize4);
+			const textureZAxis = attribute("vertexTextureZAxis", 2, true, Float32Array, false, putSize2);
+			const transform1 = attribute("vertexTransformRow1", 3, true, Float32Array, false, putSize3);
+			const transform2 = attribute("vertexTransformRow2", 3, true, Float32Array, false, putSize3);
+			const flags = attribute("vertexFlags", 1, true, Uint16Array, false, putSize1);
 		};
 
 		glState.gl = gl;
@@ -585,7 +588,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		m00, m10, m20,
 		m01, m11, m21, // transform
 		r, g, b, a, // color
-		booleans // booleans
+		flags // flags
 	) {
 		if (!glState.hasContext) return;
 		guarenteeWebGLObjects();
@@ -603,13 +606,13 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			vertexColor,
 			vertexTransformRow1,
 			vertexTransformRow2,
-			vertexBooleans
+			vertexFlags
 		} = attributes;
 
 		vertexColor.put(index, r, g, b, a * glState.globalAlpha);
 		vertexTransformRow1.put(index, M00 * m00 + M10 * m01, M00 * m10 + M10 * m11, M00 * m20 + M10 * m21 + M20);
 		vertexTransformRow2.put(index, M01 * m00 + M11 * m01, M01 * m10 + M11 * m11, M01 * m20 + M11 * m21 + M21);
-		vertexBooleans.put(index, booleans);
+		vertexFlags.put(index, flags);
 
 		if (index === MAX_INSTANCE_INDEX) render();
 	}
@@ -618,7 +621,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		m01, m11, m21, // transform
 		r, g, b, a, // color
 		lineWidth, // line width
-		booleans // booleans
+		flags // flags
 	) {
 		if (!glState.hasContext) return;
 		guarenteeWebGLObjects();
@@ -638,7 +641,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			vertexTextureZAxis,
 			vertexTransformRow1,
 			vertexTransformRow2,
-			vertexBooleans
+			vertexFlags
 		} = attributes;
 
 		vertexColor.put(index, r, g, b, a * glState.globalAlpha);
@@ -646,7 +649,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		vertexTextureZAxis.put(index, glState.transformScaleX, glState.transformScaleY);
 		vertexTransformRow1.put(index, M00 * m00 + M10 * m01, M00 * m10 + M10 * m11, M00 * m20 + M10 * m21 + M20);
 		vertexTransformRow2.put(index, M01 * m00 + M11 * m01, M01 * m10 + M11 * m11, M01 * m20 + M11 * m21 + M21);
-		vertexBooleans.put(index, booleans | BOOLS.OUTLINED);
+		vertexFlags.put(index, flags | FLAGS.OUTLINED);
 
 		if (index === MAX_INSTANCE_INDEX) render();
 	}
@@ -714,7 +717,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			vertexTextureZAxis,
 			vertexTransformRow1,
 			vertexTransformRow2,
-			vertexBooleans
+			vertexFlags
 		} = attributes;
 
 		vertexColor.put(index, r, g, b, a * glState.globalAlpha);
@@ -722,11 +725,11 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		vertexTextureZAxis.put(index, glState.transformScaleX, glState.transformScaleY);
 		vertexTransformRow1.put(index, M00 * m00 + M10 * m01, M00 * m10 + M10 * m11, M00 * m20 + M10 * m21 + M20);
 		vertexTransformRow2.put(index, M01 * m00 + M11 * m01, M01 * m10 + M11 * m11, M01 * m20 + M11 * m21 + M21);
-		vertexBooleans.put(
+		vertexFlags.put(
 			index,
-			BOOLS.LINE_SEGMENT |
-				(leftCap ? BOOLS.LEFT_LINE_CAP : 0) |
-				(rightCap ? BOOLS.RIGHT_LINE_CAP : 0) |
+			FLAGS.LINE_SEGMENT |
+				(leftCap ? FLAGS.LEFT_LINE_CAP : 0) |
+				(rightCap ? FLAGS.RIGHT_LINE_CAP : 0) |
 				lineCap << LINE_CAP_START_BIT |
 				lineJoin << LINE_JOIN_START_BIT
 		);
@@ -740,7 +743,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		txx, txy,
 		tyx, tyy, // texture uvs
 		image,
-		booleans // booleans
+		flags // flags
 	) {
 		if (!glState.hasContext) return;
 		guarenteeWebGLObjects();
@@ -759,10 +762,10 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		const {
 			vertexTransformRow1,
 			vertexTransformRow2,
-			vertexBooleans
+			vertexFlags
 		} = attributes;
 
-		vertexBooleans.put(index, booleans | BOOLS.TEXTURED | (glState.imageSmoothing ? 0 : BOOLS.PIXELATED));
+		vertexFlags.put(index, flags | FLAGS.TEXTURED | (glState.imageSmoothing ? 0 : FLAGS.PIXELATED));
 		vertexTransformRow1.put(index, M00 * m00 + M10 * m01, M00 * m10 + M10 * m11, M00 * m20 + M10 * m21 + M20);
 		vertexTransformRow2.put(index, M01 * m00 + M11 * m01, M01 * m10 + M11 * m11, M01 * m20 + M11 * m21 + M21);
 
@@ -790,7 +793,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			w, 0, x,
 			0, h, y,
 			r, g, b, a,
-			BOOLS.NULL
+			FLAGS.NULL
 		);
 	}
 
@@ -803,7 +806,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			rx * 2, 0, x - rx,
 			0, ry * 2, y - ry,
 			r, g, b, a,
-			BOOLS.CIRCLE
+			FLAGS.CIRCLE
 		);
 	}
 	function coloredTriangle(ax, ay, bx, by, cx, cy, r, g, b, a) {
@@ -811,7 +814,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			bx - ax, cx - ax, ax,
 			by - ay, cy - ay, ay,
 			r, g, b, a,
-			BOOLS.TRIANGLE
+			FLAGS.TRIANGLE
 		);
 	}
 	function coloredPolygon(vertices, red, green, blue, alpha) {
@@ -838,7 +841,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			w + lineWidth, 0, x - lw2,
 			0, h + lineWidth, y - lw2,
 			r, g, b, a, lineWidth,
-			BOOLS.NULL
+			FLAGS.NULL
 		);
 	}
 	function outlinedEllipse(x, y, rx, ry, lineWidth, r, g, b, a) {
@@ -849,7 +852,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			rx * 2 + lineWidth, 0, x - rx - lw2,
 			0, ry * 2 + lineWidth, y - ry - lw2,
 			r, g, b, a, lineWidth,
-			BOOLS.CIRCLE
+			FLAGS.CIRCLE
 		);
 	}
 	function lineSegment(ax, ay, bx, by, lineWidth, lineCap, r, g, b, a) {
@@ -961,7 +964,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			tw, 0,
 			0, th,
 			image,
-			BOOLS.NULL
+			FLAGS.NULL
 		);
 	}
 	function texturedEllipse(x, y, rx, ry, tx, ty, tw, th, image) {
@@ -974,7 +977,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			tw, 0,
 			0, th,
 			image,
-			BOOLS.CIRCLE
+			FLAGS.CIRCLE
 		);
 	}
 	function texturedTriangle(ax, ay, bx, by, cx, cy, tax, tay, tbx, tby, tcx, tcy, image) {
@@ -985,7 +988,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 			tbx - tax, tby - tay,
 			tcx - tax, tcy - tay,
 			image,
-			BOOLS.TRIANGLE
+			FLAGS.TRIANGLE
 		);
 	}
 	function texturedPolygon(vertices, textureVertices, image) {
@@ -1088,7 +1091,7 @@ function defineWebGL2DContext(bound = {}, debug = false) {
 		attributes.vertexTextureZAxis.set(start, end, done);
 		attributes.vertexTransformRow1.set(start, end, done);
 		attributes.vertexTransformRow2.set(start, end, done);
-		attributes.vertexBooleans.set(start, end, done);
+		attributes.vertexFlags.set(start, end, done);
 
 		gl.uniform1i(uniforms.renderPass, glState.drawCalls);
 
