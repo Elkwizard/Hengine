@@ -106,7 +106,7 @@ class CanvasImage extends ImageType {
 		return canvas;
 	}
 	screenDeltaToCanvas(point) {
-		return point.mul(this.screenToCanvasScale);
+		return point.times(this.screenToCanvasScale);
 	}
 	screenToCanvas(point) {
 		return point
