@@ -25,7 +25,7 @@ class Color extends Operable {
 	 */
 	constructor(r, g, b, a, constrained = true) {
 		super();
-		this.limited = constrained;
+		this.limited = true;
 		this.initialize(r, g, b, a);
 		if (!constrained) this.constrain();
 	}
@@ -170,8 +170,8 @@ class Color extends Operable {
 		const blue = Math.abs(this.blue - color.blue);
 		return red + green + blue;
 	}
-	static get empty() {
-		return new Color(0, 0, 0, 0);
+	static get zero() {
+		return Color.unlimited(0, 0, 0, 0);
 	}
 	static quadLerp(a, b, c, d, tx, ty) {
 		return Color.zero.map((value, channel) => Interpolation.quadLerp(a[channel], b[channel], c[channel], d[channel], tx, ty));
