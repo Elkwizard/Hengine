@@ -13,13 +13,6 @@ class WebGLArtist2D extends Artist2D {
 
 		this.gl = defineWebGL2DContext({}, true);
 		this.gl.create(canvas, true, pixelRatio);
-
-		this.imageType = imageType;
-
-		this.currentColor = Color.BLANK;
-		this.currentLineWidth = 1;
-		this.currentLineCap = this.gl.LINE_CAP_FLAT;
-		this.currentLineJoin = this.gl.LINE_JOIN_MITER;
 		
 		this.blendModeMap = new Map([
 			[BlendMode.COMBINE, this.gl.BLEND_MODE_COMBINE],
@@ -80,9 +73,6 @@ class WebGLArtist2D extends Artist2D {
 	}
 	resize(width, height) {
 		this.gl.resize(width, height);
-	}
-	useColor(color) {
-		this.currentColor = color;
 	}
 	clearTransformations() {
 		this.gl.setTransform(Matrix3.identity(this.currentTransform));
