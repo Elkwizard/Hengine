@@ -544,7 +544,6 @@ class GPUArray {
 	 */
 	set(value) {
 		if (value instanceof GPUArray) {
-			this.changed = true;
 			value.buffer.get(this.buffer);
 			this.length = value.length;
 		} else {
