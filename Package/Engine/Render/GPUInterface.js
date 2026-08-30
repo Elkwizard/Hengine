@@ -913,7 +913,7 @@ class GLSLProgram {
 
 			let dataArray = new DataArrayType(rows * columns * length);
 
-			if (block) {
+			if (block) { // uniform buffer block
 				const dataElementSize = DataArrayType.BYTES_PER_ELEMENT;
 				let { offset, matrixStride, arrayStride } = block.layout[name];
 				matrixStride /= dataElementSize;
@@ -932,6 +932,7 @@ class GLSLProgram {
 					};
 				} else {
 					desc.setUniform = () => {
+						block.changed = true;
 						let dataIndex = 0;
 						for (let i = 0; i < length; i++) {
 							const elementIndex = elementLength * i;
@@ -944,20 +945,18 @@ class GLSLProgram {
 						}
 					};
 				}
-			} else {
-				if (matrix) {
-					desc.setUniform = function () {
-						gl[setFunctionName](this.location, false, dataArray);
-					};
-				} else if (setWithArrayType) {
-					desc.setUniform = function () {
-						gl[setFunctionName](this.location, dataArray);
-					};
-				} else {
-					desc.setUniform = function () {
-						gl[setFunctionName](this.location, ...dataArray);
-					};
-				}
+			} else if (matrix) { // matrix or array of matrices
+				desc.setUniform = function () {
+					gl[setFunctionName](this.location, false, dataArray);
+				};
+			} else if (setWithArrayType) { // array of scalars or textures
+				desc.setUniform = function () {
+					gl[setFunctionName](this.location, dataArray);
+				};
+			} else { // scalar or texture
+				desc.setUniform = function () {
+					gl[setFunctionName](this.location, ...dataArray);
+				};
 			}
 
 			if (array && (rows !== 1 || columns !== 1)) { // an array of non-scalars
@@ -976,81 +975,77 @@ class GLSLProgram {
 						this.setUniform();
 					};
 				}
-			} else {
-				if (matrix) {
-					desc.set = function (value) {
-						for (let i = 0; i < value.length; i++)
-							dataArray[i] = value[i];
-						this.setUniform();
+			} else if (matrix) { // single matrix
+				desc.set = function (value) {
+					for (let i = 0; i < value.length; i++)
+						dataArray[i] = value[i];
+					this.setUniform();
+				};
+			} else if (this.uniformValues[name] instanceof GPUArray) { // dynamic array texture
+				const gpuArray = this.uniformValues[name];
+				desc.setup = function () {
+					gpuArray.setup(self.program);
+					dataArray[0] = gpuArray.unit;
+					self.textures[gpuArray.unit] = {
+						unit: gpuArray.unit,
+						target: gl.TEXTURE_2D,
+						texture: gl.getParameter(gl.TEXTURE_BINDING_2D)
 					};
-				} else if (this.uniformValues[name] instanceof GPUArray) {
-					const gpuArray = this.uniformValues[name];
-					desc.setup = function () {
-						gpuArray.setup(self.program);
-						dataArray[0] = gpuArray.unit;
-						self.textures[gpuArray.unit] = {
-							unit: gpuArray.unit,
-							target: gl.TEXTURE_2D,
-							texture: gl.getParameter(gl.TEXTURE_BINDING_2D)
-						};
-						this.setUniform();
-					};
+					this.setUniform();
+				};
 
-					desc.set = array => gpuArray.set(array);
-				} else if (texture) {
-					const textureUnit = this.nextTextureUnit;
-					this.checkTextureUnit(textureUnit + length - 1);
-					this.nextTextureUnit += length;
+				desc.set = array => gpuArray.set(array);
+			} else if (texture) { // texture or texture array
+				const textureUnit = this.nextTextureUnit;
+				this.checkTextureUnit(textureUnit + length - 1);
+				this.nextTextureUnit += length;
 
-					const target = {
-						array: gl.TEXTURE_2D_ARRAY,
-						cube: gl.TEXTURE_CUBE_MAP,
-						image: gl.TEXTURE_2D
-					}[texture];
-					
-					const textures = [];
+				const target = {
+					array: gl.TEXTURE_2D_ARRAY,
+					cube: gl.TEXTURE_CUBE_MAP,
+					image: gl.TEXTURE_2D
+				}[texture];
+				
+				const textures = [];
 
-					desc.setup = function () {
-						for (let i = 0; i < length; i++) {
-							const unit = textureUnit + i;
-							const filter = FilterMode.LINEAR;
-							const wrap = false;
-							const texture = GLUtils.createTexture(gl, { unit, target, filter, wrap });
-							const descriptor = { texture, target, unit, filter, wrap };
-							textures[i] = descriptor;
-							self.textures[unit] = descriptor;
-						}
-
-						dataArray.set(textures.map(tex => tex.unit));
-						this.setUniform();
-					};
-
-					if (array) {
-						desc.set = images => {
-							for (let i = 0; i < images.length; i++)
-								if (i < length) this.writeTexture(images[i], textures[i]);
-						};
-					} else {
-						desc.set = image => this.writeTexture(image, textures[0]);
+				desc.setup = function () {
+					for (let i = 0; i < length; i++) {
+						const unit = textureUnit + i;
+						const filter = FilterMode.LINEAR;
+						const wrap = false;
+						const texture = GLUtils.createTexture(gl, { unit, target, filter, wrap });
+						const descriptor = { texture, target, unit, filter, wrap };
+						textures[i] = descriptor;
+						self.textures[unit] = descriptor;
 					}
+
+					dataArray.set(textures.map(tex => tex.unit));
+					this.setUniform();
+				};
+
+				if (array) {
+					desc.set = images => {
+						for (let i = 0; i < images.length; i++)
+							if (i < length) this.writeTexture(images[i], textures[i]);
+					};
 				} else {
-					if (setWithArrayType) {
-						desc.set = function (value) {
-							dataArray.set(value);
-							this.setUniform();
-						};
-					} else if (rows !== 1) {
-						desc.set = function (value) {
-							GLSLProgram.getVectorComponents(dataArray, value);
-							this.setUniform();
-						};
-					} else {
-						desc.set = function (value) {
-							dataArray[0] = value;
-							this.setUniform();
-						};
-					}
+					desc.set = image => this.writeTexture(image, textures[0]);
 				}
+			} else if (setWithArrayType) { // array of scalars
+				desc.set = function (value) {
+					dataArray.set(value);
+					this.setUniform();
+				};
+			} else if (rows !== 1) { // single vector
+				desc.set = function (value) {
+					GLSLProgram.getVectorComponents(dataArray, value);
+					this.setUniform();
+				};
+			} else { // single scalar
+				desc.set = function (value) {
+					dataArray[0] = value;
+					this.setUniform();
+				};
 			}
 
 			let currentStruct = this.uniforms;
