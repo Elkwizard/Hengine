@@ -1021,11 +1021,7 @@ class GLSLProgram {
 							self.textures[unit] = descriptor;
 						}
 
-						if (array) {
-							dataArray.set(textures.map(tex => tex.unit));
-						} else {
-							dataArray[0] = textureUnit;
-						}
+						dataArray.set(textures.map(tex => tex.unit));
 						this.setUniform();
 					};
 
