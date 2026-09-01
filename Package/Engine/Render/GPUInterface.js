@@ -295,20 +295,28 @@ class GLSL {
 		);
 
 		// resolve nested structs
-		let expanded = false;
-		do {
-			expanded = false;
-			for (const [, struct] of this.structs) {
-				struct.fields = struct.fields.flatMap(field => {
-					if (this.structs.has(field.type)) {
-						expanded = true;
-						return this.structs.get(field.type).fields
-							.map(f => ({ type: f.type, name: field.name + "." + f.name }));
-					}
+		const computeFields = struct => {
+			struct.fields = struct.fields
+				.flatMap(field => {
+					if (field.length)
+						return Array.dim(+field.length)
+							.map((_, i) => ({ type: field.type, name: `${field.name}[${i}]`}));
+					
+					return [field];
+				})
+				.flatMap(field => {
+					if (this.structs.has(field.type))
+						return computeFields(this.structs.get(field.type))
+							.map(subfield => ({
+								type: subfield.type,
+								name: `${field.name}.${subfield.name}`
+							}));
+
 					return [field];
 				});
-			}
-		} while (expanded);
+			
+			return struct.fields;
+		};
 
 		const operations = {
 			float: [["float32", ""]],
@@ -332,7 +340,7 @@ class GLSL {
 		}
 
 		for (const struct of this.structs.values()) {
-			const { fields } = struct;
+			const fields = computeFields(struct);
 			struct.write = new Function("value", "write", fields.flatMap(field => {
 				return operations[field.type].map(([op, suffix]) => {
 					return `write.${op}(value.${field.name}${suffix});`;
