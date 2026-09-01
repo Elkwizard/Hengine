@@ -600,7 +600,9 @@ objectUtils.defineBuiltin(Array.prototype, "toString", Object.prototype.toString
 				});
 
 				return context;
-			} else return getContext.call(this, name, options);
+			}
+			
+			return getContext.call(this, name, options);
 		});
 	}
 	overrideGetContext(HTMLCanvasElement);
