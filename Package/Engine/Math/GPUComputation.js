@@ -178,7 +178,7 @@ class GPUComputation extends GPUInterface {
 		for (let i = 0; i < textures.length; i++) {
 			const tex = textures[i];
 			tex.texture.bind();
-			tex.texture.bytes = PIXEL_BYTES * length;
+			tex.texture.minBytes = PIXEL_BYTES * length;
 			if (tex.data8?.length !== tex.texture.bytes) {
 				tex.data8 = new Uint8Array(tex.texture.bytes);
 				tex.data = new TypedArray(tex.data8.buffer);

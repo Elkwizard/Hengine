@@ -67,6 +67,14 @@ class ByteBuffer {
 		this.data = this.data.slice(0, this.pointer);
 		this.byteLength = this.data.length;
 	}
+	/**
+	 * Returns an unsigned byte view into the buffer's current contents, with no offset and the same length as the buffer.
+	 * The content of this returned view is not guaranteed after modification of the buffer.
+	 * @returns Uint8Array
+	 */
+	getView() {
+		return new Uint8Array(this.data.buffer, 0, this.byteLength);
+	}
 	toByteBuffer(buffer = new ByteBuffer()) {
 		buffer.write.byteBuffer(this);
 		return buffer;

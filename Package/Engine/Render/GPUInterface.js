@@ -457,8 +457,9 @@ class ShaderSource {
 class GPUDataTexture {
 	constructor(gl) {
 		this.gl = gl;
+		this.data = new Uint8Array(0);
 	}
-	set bytes(count) {
+	set minBytes(count) {
 		if (count <= this.bytes) return;
 		const { INTERNAL_FORMAT, FORMAT, TYPE, PIXEL_BYTES } = GPUDataTexture;
 		const { gl } = this;
@@ -468,9 +469,10 @@ class GPUDataTexture {
 			this.size, this.size, 0,
 			gl[FORMAT], gl[TYPE], null
 		);
+		this.data = new Uint8Array(PIXEL_BYTES * this.size ** 2);
 	}
 	get bytes() {
-		return GPUDataTexture.PIXEL_BYTES * this.size ** 2;
+		return this.data.byteLength;
 	}
 	bind(unit) {
 		const { gl } = this;
@@ -480,6 +482,21 @@ class GPUDataTexture {
 		else this.texture = GLUtils.createTexture(gl);
 
 		return this.texture;
+	}
+	write(byteArray) {
+		const { FORMAT, TYPE, TypedArray } = GPUDataTexture;
+		const { gl } = this;
+
+		const bytes = byteArray.byteLength;
+		this.minBytes = bytes;
+		
+		this.data.set(byteArray);
+		gl.texSubImage2D(
+			gl.TEXTURE_2D, 0,
+			0, 0, this.size, this.size,
+			gl[FORMAT], gl[TYPE],
+			new TypedArray(this.data.buffer)
+		);
 	}
 	
 	static TypedArray = Uint32Array;
@@ -631,44 +648,9 @@ class GPUInputArray extends GPUArray {
 	}
 	writeTexture() {
 		if (!this.length) return;
-		
-		const { PIXEL_BYTES, CHANNEL_BYTES, FORMAT, TYPE, TypedArray } = GPUDataTexture;
-		const { gl } = this;
 
-		const bytes = this.length * this.struct.size;
-		
-		this.texture.bind(this.unit);		
-		this.texture.bytes = bytes;
-
-		const ROW_BYTES = this.texture.size * PIXEL_BYTES;
-
-		const writeRect = (x, y, width, height) => {
-			const byteOffset = x * PIXEL_BYTES + y * ROW_BYTES;
-			const byteLength = width * height * PIXEL_BYTES;
-			const paddedByteLength = Math.ceil(byteLength / PIXEL_BYTES) * PIXEL_BYTES;
-			const channelLength = paddedByteLength / CHANNEL_BYTES;
-			let typedArray;
-			if (paddedByteLength > this.buffer.byteLength) {
-				typedArray = new TypedArray(channelLength);
-				new Uint8Array(typedArray.buffer).set(this.buffer.data, 0);
-			} else {
-				typedArray = new TypedArray(this.buffer.data.buffer, byteOffset, channelLength);
-			}
-			gl.texSubImage2D(
-				gl.TEXTURE_2D, 0,
-				x, y, width, height,
-				gl[FORMAT], gl[TYPE],
-				typedArray
-			);
-		};
-
-		const completeRows = Math.floor(bytes / ROW_BYTES);
-		const completePixels = Math.floor((bytes % ROW_BYTES) / PIXEL_BYTES);
-		const remainder = bytes % PIXEL_BYTES;
-
-		if (completeRows) writeRect(0, 0, this.texture.size, completeRows);
-		if (completePixels) writeRect(0, completeRows, completePixels, 1);
-		if (remainder) writeRect(completePixels, completeRows, 1, 1);		
+		this.texture.bind(this.unit);
+		this.texture.write(this.buffer.getView());
 	}
 	static getNames(name) {
 		return {
