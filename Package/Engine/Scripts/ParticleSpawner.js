@@ -236,9 +236,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 		const timerIncrement = 1 / this.lifeSpan;
 
 		let end = particles.length - 1;
-		if (this.computation)
-			this.computation.setUniform("timerIncrement", timerIncrement, false);
-
+		
 		if (this.computation) {
 			const array = this.computation.getUniform("particles");
 			loop: for (let i = 0; i <= end; i++) {
@@ -248,6 +246,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 					if (i > end) continue loop;
 				}
 			}
+			this.computation.setUniform("timerIncrement", timerIncrement, false);
 		} else {
 			loop: for (let i = 0; i <= end; i++) {
 				while (particles[i].timer >= 1) {
@@ -307,7 +306,7 @@ class PARTICLE_SPAWNER extends ElementScript {
 			const p = particles[i];
 			
 			if (cullGraphics) {
-				p.position.get(particleBall.position);
+				p.position.get(particleBall.position); // mutates Shape
 				if (bounds.cullBall(particleBall)) continue;
 			}
 			
