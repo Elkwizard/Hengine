@@ -25,9 +25,9 @@ class Artist {
 	 * Calls a function while using a specified coordinate transform
 	 * @param Matrix transform | The specific coordinate transform to use
 	 * @param () => void draw | The function that will be called while using the specified transform
-	 * @param Boolean global? | Whether the transform should be applied in place of all current transforms (true), or composed with the current transform (false). Default is true.
+	 * @param Boolean global? | Whether the transform should be applied in place of all current transforms (true), or composed with the current transform (false). Default is false.
 	 */
-	drawThrough(mat, draw, global = true) {
+	drawThrough(mat, draw, global = false) {
 		this.save();
 		if (global) this.transform = mat;
 		else this.addTransform(mat);
