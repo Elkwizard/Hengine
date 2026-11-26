@@ -21,17 +21,11 @@ class Matrix extends Float64Array {
 					this[i * size + j] = args[j * size + i];
 		} else if (args.length > 1) {
 			this.setAxes(...args);
+		} else if (args.length === 1) {
+			this.setFrom(args[0])
 		} else {
 			for (let i = 0; i < size; i++)
 				this[i + i * size] = 1;
-
-			if (args.length) {
-				const matrix = args[0];
-				const s = matrix.constructor.size;
-				for (let i = 0; i < s; i++)
-				for (let j = 0; j < s; j++)
-					this[i * size + j] = matrix[i * s + j];
-			}
 		}
 	}
 	/**
@@ -114,6 +108,29 @@ class Matrix extends Float64Array {
 			for (let r = 0; r < modValues.length; r++)
 				this[c * size + r] = axis[modValues[r]];
 		}
+
+		return this;
+	}
+	/**
+	 * Replaces the matrix's elements in-place from the upper-left with the elements of another matrix.
+	 * Any values not overwritten will be as if replaced by an identity matrix.
+	 * Returns the caller.
+	 * @param Matrix matrix | The matrix to copy from into the caller. It can be a different size from the caller
+	 * @return Matrix
+	 */
+	setFrom(matrix) {
+		const fromSize = matrix.constructor.size;
+		const toSize = this.constructor.size;
+		
+		if (fromSize === toSize)
+			return matrix.get(this);
+		
+		const copySize = Math.min(fromSize, toSize);
+		
+		this.constructor.identity(this);
+		for (let c = 0; c < copySize; c++)
+		for (let r = 0; r < copySize; r++)
+			this[c * toSize + r] = matrix[c * fromSize + r];
 
 		return this;
 	}
