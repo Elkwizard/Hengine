@@ -32,7 +32,9 @@ class Artist3D extends Artist {
 		this.strokeObj = new Artist3D.StrokeRenderer(this);
 		this.drawObj = new Artist3D.DrawRenderer(this);
 		this.vector3Pool = new StackAllocator(Vector3);
+		this.matrix3Pool = new StackAllocator(Matrix3);
 		this.matrix4Pool = new StackAllocator(Matrix4);
+		this.matrix3Pool.push();
 		this.matrix4Pool.push();
 		this.vector3Pool.push();
 		this.postProcess = {
@@ -246,10 +248,13 @@ class Artist3D extends Artist {
 		transform[14] += x * transform[2] + y * transform[6] + z * transform[10];
 	}
 	scale(...args) {
-		this.addTransform(Matrix4.scale(...args));
+		const mat4 = this.matrix4Pool.alloc();
+		this.addTransform(Matrix4.scale(...args, mat4));
 	}
 	rotate(axis, angle) {
-		this.addTransform(new Matrix4(Quaternion.fromRotation(axis, angle).toMatrix()));
+		const mat4 = this.matrix4Pool.alloc();
+		const mat3 = this.matrix3Pool.alloc();
+		this.addTransform(mat4.setFrom(Quaternion.fromRotation(axis, angle).toMatrix(mat3)));
 	}
 	/**
 	 * Returns an object with various methods for queueing lights to be rendered.
@@ -754,6 +759,7 @@ class Artist3D extends Artist {
 		this.strokeObj.clear();
 		this.drawObj.clear();
 		this.vector3Pool.next();
+		this.matrix3Pool.next();
 		this.matrix4Pool.next();
 	}
 	fill({ x, y, z, w }) {
