@@ -2024,6 +2024,21 @@ Artist3D.StrokeRenderer = class StrokeRenderer extends Artist3D.PathRenderer {
 		this.lineRadius = lineWidth * 0.5;
 	}
 	/**
+	 * Draws a series of connected line segments.
+	 * @param Vector3[] points | The points to connect
+	 */
+	connector(points) {
+		for (let i = 0; i < points.length - 1; i++)
+			this.line(points[i], points[i + 1]);
+	}
+	/**
+	 * Draws a closed polygon by connecting a series of points.
+	 * @param Vector3[] points | The points to connect, where the last point connects to the first
+	 */
+	polygon(points) {
+		this.connector([...points, points[0]]);
+	}
+	/**
 	 * @group line/arrow
 	 * Draws a line segment, with an arrow head at the end for the `arrow` variant.
 	 * @signature

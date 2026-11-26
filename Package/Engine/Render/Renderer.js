@@ -867,7 +867,6 @@ CanvasArtist2D.StrokeRenderer = class extends CanvasArtist2D.ActionRenderer {
 		this.arrowHead(x1, y1, x1 - x, y1 - y);
 	}
 	/**
-	 * @name connector
 	 * Renders a series of connected line segments.
 	 * @param Vector2[] points | The points to connect
 	 */
