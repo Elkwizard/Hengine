@@ -662,13 +662,20 @@ class Vector3 extends Vector {
 	/**
 	 * Returns the smallest rotation (in axis-angle form) that could rotate the caller to face in a given direction.
 	 * @param Vector3 target | The target direction to rotate toward
+	 * @param Vector3 axis? | The axis to use for the angle if multiple could be valid (rotations by π). If not a provided, an unspecified correct axis will be used
 	 * @return Vector3 
 	 */
-	angleTo(target) {
+	angleTo(target, axis) {
 		const cross = this.cross(target);
 		const dot = this.dot(target);
-		if (cross.sqrMag.equals(0))
-			return dot < 0 ? this.normal.normalize().mul(Math.PI) : Vector3.zero;
+		if (cross.sqrMag.equals(0)) {
+			if (dot < 0) {
+				axis ??= this.normal;
+				return axis.normalized.mul(Math.PI);
+			}
+
+			return Vector3.zero;
+		}
 		
 		cross.mag = Math.acos(dot / (this.mag * target.mag));
 		return cross;
