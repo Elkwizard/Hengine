@@ -301,6 +301,18 @@ class Matrix extends Float64Array {
 		}
 		return dst;
 	}
+	/**
+	 * Computes the product A * caller * inv(A), for a given matrix A and returns the result.
+	 * This can be used to perform transformations within a given context, such as `Matrix3.rotation(1).under(Matrix3.translation(1, 2))` to rotate by 1 radian about the point (1, 2).
+	 * @param Matrix context | The matrix A in the calculation
+	 * @param Matrix dst? | A destination to optionally store the result in. If not specified, the result will be a new matrix
+	 * @return Matrix
+	 */
+	under(context, dst) {
+		return this.constructor.mul([
+			context, this, context.inverse
+		], dst);
+	}
 	toByteBuffer(buffer = new ByteBuffer()) {
 		for (let i = 0; i < this.length; i++)
 			buffer.write.float64(this[i]);
